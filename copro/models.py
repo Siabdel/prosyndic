@@ -90,7 +90,7 @@ class AbstractLigneDoc(models.Model):
         self.documents.add(piecej, bulk=False)
         return True
 
-    def documents_join(self):
+    def get_documents_join(self):
         return self.documents.all()
 
     def __unicode__(self):
@@ -104,10 +104,13 @@ class AbstractLigneDoc(models.Model):
         ordering = ('-created_at',)
         abstract = True
     
-
+class Piece(models.Model):
+    name = models.CharField(max_length=50, blank=True, null=True)
+    residence = models.ForeignKey('Residence', on_delete=models.CASCADE)
+    pieces = models.FileField(upload_to="upload/")
+    
 class Residence(models.Model):
     name = models.CharField(max_length=100)
-    photo = models.ImageField(upload_to="media/")
     adresse = models.CharField(max_length=200, blank=True, null=True)
     comment = models.TextField(null=True)
 
@@ -116,6 +119,9 @@ class Residence(models.Model):
         verbose_name_plural = _('Residences')
         ordering = ('name',)
     
+    def get_pieces_jointe():
+        pass
+        
     def __unicode__(self):
         return u'%s' % self.name
     def __str__(self):

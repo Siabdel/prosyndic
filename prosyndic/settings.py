@@ -163,6 +163,7 @@ STATIC_ROOT = os.path.join(BASE_DIR, "static" )
 # Additional locations of static files
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'staticfiles'),
+    os.path.join(BASE_DIR, 'media', 'upload'),
 ]
 
 # ManifestStaticFilesStorage is recommended in production, to prevent outdated

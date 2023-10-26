@@ -86,7 +86,7 @@ class AbstractLigneDoc(models.Model):
     comment = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
     # Piece jointe
-    documents  = GenericRelation('Document')
+    # documents  = GenericRelation('Document')
 
     def add_document(self, piecej):
         self.documents.add(piecej, bulk=False)
@@ -105,6 +105,12 @@ class AbstractLigneDoc(models.Model):
     class Meta:
         ordering = ('-created_at',)
         abstract = True
+        
+class Pjointe(models.Model):
+    name = models.CharField(max_length=50, blank=True, null=True)
+    candidature = models.ForeignKey('LigneDeCandidature', on_delete=models.CASCADE)
+    piece = models.FileField(upload_to="upload/")
+  
     
 class Piece(models.Model):
     name = models.CharField(max_length=50, blank=True, null=True)
@@ -116,14 +122,12 @@ class Residence(models.Model):
     adresse = models.CharField(max_length=200, blank=True, null=True)
     comment = models.TextField(null=True)
     color_code = models.CharField(max_length=6, default="010101")
+    image = models.ImageField(upload_to="upload/", null=True)
 
     class Meta:
         verbose_name = _('Residence')
         verbose_name_plural = _('Residences')
         ordering = ('name',)
-    
-    def get_pieces_jointe():
-        pass
     
     @admin.display
     def colored_name(self):
@@ -133,6 +137,8 @@ class Residence(models.Model):
             self.name,
             self.adresse,
         )
+    
+    
     def __unicode__(self):
         return u'%s' % self.name
     def __str__(self):
@@ -161,7 +167,10 @@ class LigneDeCandidature(AbstractLigneDoc):
     reference = models.CharField(_("Les réferences de la societe"), max_length=100, blank=True, null=True)
     telephone = models.CharField(_("Téléphone"), max_length=50, blank=True, null=True)
     recommande_par = models.CharField(max_length=100, blank=True, null=True)
-    visite = models.BooleanField(_("Visite effectuée"), default='')
-    candidat = models.BooleanField(_("Ajouter a la liste des Candidats"))
+    visite = models.BooleanField(_("Visite effectuée"), default=False)
+    candidat = models.BooleanField(_("Ajouter a la liste des Candidats"), default=False)
+    offre = models.BooleanField(_("Offre du syndic"), default=False)
+    remuneration = models.PositiveIntegerField(blank=True, null=True)
+    budget_global = models.PositiveIntegerField(blank=True, null=True)
     author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     comment = models.TextField( blank=True, null=True)    

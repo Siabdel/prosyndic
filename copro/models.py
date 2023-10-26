@@ -8,6 +8,8 @@ from django.contrib.contenttypes.fields import GenericRelation, GenericForeignKe
 from django.contrib.auth.models import User
 import django
 from django.conf import settings
+from django.utils.html import format_html
+from django.contrib import admin
 
 now = django.utils.timezone.now()
 
@@ -107,12 +109,13 @@ class AbstractLigneDoc(models.Model):
 class Piece(models.Model):
     name = models.CharField(max_length=50, blank=True, null=True)
     residence = models.ForeignKey('Residence', on_delete=models.CASCADE)
-    pieces = models.FileField(upload_to="upload/")
+    piece = models.FileField(upload_to="upload/")
     
 class Residence(models.Model):
     name = models.CharField(max_length=100)
     adresse = models.CharField(max_length=200, blank=True, null=True)
     comment = models.TextField(null=True)
+    color_code = models.CharField(max_length=6, default="010101")
 
     class Meta:
         verbose_name = _('Residence')
@@ -121,7 +124,15 @@ class Residence(models.Model):
     
     def get_pieces_jointe():
         pass
-        
+    
+    @admin.display
+    def colored_name(self):
+        return format_html(
+            '<span style="color: #{};">{} {}</span>',
+            self.color_code,
+            self.name,
+            self.adresse,
+        )
     def __unicode__(self):
         return u'%s' % self.name
     def __str__(self):

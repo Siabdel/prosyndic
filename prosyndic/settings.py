@@ -52,6 +52,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.sites',
+    #
+    'debug_toolbar',
     
     # D- 3 rd party apps Django Rest Framework 
     'corsheaders', 
@@ -71,6 +73,8 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    # debug 
+    'debug_toolbar.middleware.DebugToolbarMiddleware',
 ]
 # pour resoudre erreur No 'Access-Control-Allow-Origin' header is
 CORS_ORIGIN_ALLOW_ALL = True
@@ -163,6 +167,7 @@ STATIC_ROOT = os.path.join(BASE_DIR, "static" )
 # Additional locations of static files
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'staticfiles'),
+    os.path.join(BASE_DIR, 'media'),
     os.path.join(BASE_DIR, 'media', 'upload'),
 ]
 
@@ -172,7 +177,7 @@ STATICFILES_DIRS = [
 STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.ManifestStaticFilesStorage'
 
 
-MEDIA_URL = '/media/'
+MEDIA_URL = 'media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')
 
 
@@ -180,3 +185,5 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+# 
+INTERNAL_IP = ['127.0.0.1']

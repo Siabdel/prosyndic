@@ -144,12 +144,19 @@ class Residence(models.Model):
     def __str__(self):
         return u'%s' % self.name
    
+
+
+class PrestationService(models.Model):
+    name = models.CharField(_("Prestation de service") , max_length=50)
+    description = models.TextField(blank=True, null=True)
+    code = models.CharField(max_length=10)
 #  Projet 
 class Etude(AbstractEnteteDoc):
     title = models.CharField(max_length=200)
+    #   type_presta = models.ForeignKey(PrestationService, on_delete=models.CASCADE)
     description = models.TextField()
     documents  = GenericRelation(Document)
-
+    
 
 class LigneDeCandidature(AbstractLigneDoc):
     class STATUS(models.TextChoices):
@@ -161,7 +168,8 @@ class LigneDeCandidature(AbstractLigneDoc):
     societe = models.CharField(max_length=50)
     status = models.CharField(_("Status :"), choices=STATUS.choices,
                               default="1", max_length=30)
-    adresse = models.CharField(max_length=100, blank=True, null=True)
+    adresse = models.CharField(max_length=150, blank=True, null=True)
+    site_web = models.URLField(blank=True, null=True)
     contacte = models.CharField(max_length=100, blank=True, null=True)
     role = models.CharField(max_length=50, blank=True, null=True)
     reference = models.CharField(_("Les réferences de la societe"), max_length=100, blank=True, null=True)

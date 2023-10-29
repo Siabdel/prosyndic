@@ -1,0 +1,12 @@
+{% load static  wagtailcore_tags mes_service_tags  %}
+
+<div class="col-md-3">
+    <a target="_blank" href="{# url '' #}"
+        class="list-group-item">        
+            {% get_extra_text Service.icon_slug %}
+    </a>
+    <h4 class="service-heading"><a target="_blank" href="{# url 'toto' #}"
+            class="list-group-item text-black-50"> {{ Service.title}}</h4></a>
+    <p class="text-muted"> {{ Service.introduction }} </p>
+</div>
+

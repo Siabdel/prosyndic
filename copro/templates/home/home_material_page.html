@@ -1,0 +1,21 @@
+{% extends "base/themes/material_bootstrap/material_bootstrap.html" %}
+
+
+{% block extra_css %}
+{% endblock extra_css %}
+
+
+
+{% block content %}
+
+<hr>
+<div>
+    <h3> BASE_DIR = {{ TEMPLATE_DESIGN }} </h3>
+    <br>
+    <h5> PROJECT_DIR {{ PROJECT_DIR }} </h5> 
+    <h5> DEBUG = {{ DEBUG }} </h5>
+    <h5> ALLOWED_HOSTS = {{ ALLOWED_HOSTS }} </h5>
+</div>
+
+
+{% endblock content %}

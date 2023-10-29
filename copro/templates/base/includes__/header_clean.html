@@ -1,0 +1,30 @@
+    <!-- Navigation -->
+    {% load static %}
+    <nav class="navbar navbar-expand-lg navbar-light fixed-top" id="mainNavi" 
+        style="background-color:#3b3329">
+        <div class="container">
+            <a class="navbar-brand text-white" href="index.html">Start Atlasoft</a>
+            <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse"
+                data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false"
+                aria-label="Toggle navigation">
+                Menu
+                <i class="fas fa-bars"></i>
+            </button>
+
+
+            <div class="collapse navbar-collapse" id="navbarResponsive">
+                <ul class="navbar-nav ml-auto">
+
+                    {% for item in navigation.menu_items.all %}
+                        <li class="nav-item">
+                            <a class="nav-link text-white" href="{{ item.link }}"
+                             {% if item.open_in_new_tab %} target="_blank" {% endif %}>
+                             {{ item.title }}</a>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+   

@@ -1,6 +1,7 @@
 import os
 from django.contrib import admin
 from copro import models as pro_models
+from accounts import models as acc_models
 from django.conf import settings
 from django.contrib.admin.views.main import ChangeList
 from django.contrib.admin.utils import quote
@@ -18,6 +19,12 @@ class BaseReadOnlyAdminMixin:
         return True 
 
     def has_delete_permission(self, request, obj=None):
+        if request.user.is_authenticated:
+            # if request.user.get_username() == 'admin':
+            if request.user.is_superuser :
+                return True
+            else :
+                return False
         return False
 
 class PieceInline(admin.StackedInline):
@@ -60,7 +67,7 @@ class LigneDeCandidatureAdmin(BaseReadOnlyAdminMixin, admin.ModelAdmin):
     search_fields = ['societe',]
     exclude = ["title", ]
     #fields = [("societe", "contacte"), "comment"]
-    list_display = ["upper_societe", "contacte", "role", "telephone", "adresse", "status", "get_documents",  ]
+    list_display = ["upper_societe", "contacte", "role", "telephone", "adresse", "site_web", "status", "get_documents",  ]
 
     @admin.display(empty_value="???")
     def get_author(self, obj):
@@ -125,8 +132,19 @@ class ResidenceAdmin(BaseReadOnlyAdminMixin, admin.ModelAdmin):
             print("photo name {}".format(afile.name))
             obj.photos.create(image=afile)
 
+class PrestationServiceAdmin(admin.ModelAdmin):
+    list_display  = [f.name for f in pro_models.PrestationService._meta.get_fields()]
+
+class AccountsAdmin(admin.ModelAdmin):
+    list_display  = [f.name for f in acc_models.CustomUser._meta.get_fields()]
+    list_display.remove("groups")
+    list_display.remove("user_permissions")
+    
+
 # registre
 #admin.site.register(pro_models.Residence, ResidenceAdmin)
 admin.site.register(pro_models.Residence, ResidenceAdmin)
 admin.site.register(pro_models.Etude, EtudeAdmin)
 admin.site.register(pro_models.LigneDeCandidature, LigneDeCandidatureAdmin)
+admin.site.register(pro_models.PrestationService, PrestationServiceAdmin)
+admin.site.register(acc_models.CustomUser, AccountsAdmin)

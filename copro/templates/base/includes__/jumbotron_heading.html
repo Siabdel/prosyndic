@@ -1,0 +1,37 @@
+<div class="jumbotron">
+    <div class="card-heading row">
+
+        <div class="col-lg-offset-1 col-lg-3">
+            <div class="row">
+                <div class="col-sm-6">
+                    <span id="id_content_msg" class=""> </span>
+                    <A href="/da/cart/listitem/">
+                        <img class="pull-left " src="{% static 'images/project_room.jpeg' %}" height="182"
+                            width="300" />
+                    </A>
+                </div>
+                <div class="col-sm-6">
+                    <script type="text/javascript">
+                        var ofs_count = "{{ object_list|length }}";
+                    </script>
+                    <product-tabs :nb_ofs="ofs_count"></product-tabs>
+                </div>
+            </div>
+
+            <HR>
+
+            <div class="row">
+                {% if machine_choisie %}
+                <div class="row">
+
+                    <div class="col-sm-10">
+                        <p><img class="pull-left " src="{% static 'images/depot_icone.jpeg' %}" height="40"
+                                width="60" /></p>
+                        <p<label for="localisation :">Localisation</label> <span>{{machine_choisie}}</span></p>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>

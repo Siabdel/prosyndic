@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     # local app 
     'copro.apps.CoproConfig',
     'accounts.apps.AccountsConfig',
+    
     # contribs
     'django.contrib.admin',
     'django.contrib.auth',
@@ -58,8 +59,8 @@ INSTALLED_APPS = [
     # D- 3 rd party apps Django Rest Framework 
     'corsheaders', 
     # User Authentication
-    #'allauth',
-    #'allauth.account',
+    'allauth',
+    'allauth.account',
     #'allauth.socialaccount',
 ]
 
@@ -88,7 +89,10 @@ ROOT_URLCONF = 'prosyndic.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [
+             os.path.join(BASE_DIR, 'copro', 'templates'),
+            ],
+        
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [

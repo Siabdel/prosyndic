@@ -53,15 +53,14 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.sites',
-    #
+    # debug tools
     'debug_toolbar',
-    
     # D- 3 rd party apps Django Rest Framework 
     'corsheaders', 
     # User Authentication
     'allauth',
     'allauth.account',
-    #'allauth.socialaccount',
+    'allauth.socialaccount',
 ]
 
 AUTH_USER_MODEL = "accounts.CustomUser" # new
@@ -69,11 +68,14 @@ AUTH_USER_MODEL = "accounts.CustomUser" # new
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    "corsheaders.middleware.CorsMiddleware",  # new
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    # Add the account middleware:
+    #"allauth.account.middleware.AccountMiddleware",
     # debug 
     'debug_toolbar.middleware.DebugToolbarMiddleware',
 ]

@@ -61,6 +61,8 @@ INSTALLED_APPS = [
     'allauth',
     'allauth.account',
     'allauth.socialaccount',
+    'markdownx', # <-- needed for adding markdown to forms
+    
 ]
 
 AUTH_USER_MODEL = "accounts.CustomUser" # new

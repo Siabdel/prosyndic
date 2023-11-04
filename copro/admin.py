@@ -6,10 +6,12 @@ from django.conf import settings
 from django.contrib.admin.views.main import ChangeList
 from django.contrib.admin.utils import quote
 from django.utils.safestring import mark_safe
-from django.utils.html import format_html_join
+from django.utils.html import format_html_join, format_html
+from markdownx.admin import MarkdownxModelAdmin 
 
-
-
+admin.site.site_header = "PROSYNDIC Admin"
+admin.site.site_title = "PROSYNDIC Admin Portal"
+admin.site.index_title = "Welcome to PROSYNDIC Portal"
 # Register your models here.
 class BaseReadOnlyAdminMixin:
     def has_add_permission(self, request):
@@ -57,7 +59,8 @@ class EtudeAdmin(admin.ModelAdmin):
 class PjointeInline(admin.StackedInline):
     model = pro_models.Pjointe
     extra = 1
-class LigneDeCandidatureAdmin(BaseReadOnlyAdminMixin, admin.ModelAdmin):
+
+class LigneDeCandidatureAdmin(BaseReadOnlyAdminMixin, MarkdownxModelAdmin):
     inlines = [PjointeInline]
 
     list_display  = [f.name for f in pro_models.LigneDeCandidature._meta.get_fields()]
@@ -67,7 +70,9 @@ class LigneDeCandidatureAdmin(BaseReadOnlyAdminMixin, admin.ModelAdmin):
     search_fields = ['societe',]
     exclude = ["title", ]
     #fields = [("societe", "contacte"), "comment"]
-    list_display = ["upper_societe", "contacte", "role", "telephone", "adresse", "site_web", "status", "get_documents",  ]
+    list_display = ["upper_societe", "contacte", "role", "telephone", "site_web", "status", "notation", "get_documents",  ]
+    list_filter  = ('status', 'etude',  )
+    list_filter = ('societe', 'offre_recu',  )
 
     @admin.display(empty_value="???")
     def get_author(self, obj):
@@ -90,10 +95,17 @@ class LigneDeCandidatureAdmin(BaseReadOnlyAdminMixin, admin.ModelAdmin):
                 for ff in pieces])
         # return  mark_safe("<br> *** <a href='/media/{}'>toto</a> ".format(pieces[0].piece.name)) 
         return mark_safe(pj)
+    
+    def thumbnail(self, obj):
+        width, height = 100, 200
+        html = '<img src="/{url}" width="{width}" height={height} />'
+        return format_html( html.format(url=obj.cover.url, width=width, height=height)
+        )
         
     get_documents.allow_tags = True
     get_documents.short_description = "doc id"
-
+    # sort comumn
+    upper_societe.admin_order_field = "societe"
     
     def get_changeform_initial_data(self, request):
         return {
@@ -141,6 +153,21 @@ class AccountsAdmin(admin.ModelAdmin):
     list_display.remove("user_permissions")
     
 
+class EventAdmin(admin.ModelAdmin) :
+    list_total  = [ f.name for f in pro_models.Evenement._meta.get_fields()]
+    list_display = list_total
+
+class ContacteAdmin(admin.ModelAdmin) :
+    list_total  = [ f.name for f in pro_models.Contacte._meta.get_fields()]
+    list_display = list_total
+class EventAdmin(admin.ModelAdmin) :
+    list_total  = [ f.name for f in pro_models.Evenement._meta.get_fields()]
+    list_display = list_total
+
+class TicketAdmin(admin.ModelAdmin) :
+    list_total  = [ f.name for f in pro_models.Ticket._meta.get_fields()]
+    list_display = list_total
+
 # registre
 #admin.site.register(pro_models.Residence, ResidenceAdmin)
 admin.site.register(pro_models.Residence, ResidenceAdmin)
@@ -148,3 +175,7 @@ admin.site.register(pro_models.Etude, EtudeAdmin)
 admin.site.register(pro_models.LigneDeCandidature, LigneDeCandidatureAdmin)
 admin.site.register(pro_models.PrestationService, PrestationServiceAdmin)
 admin.site.register(acc_models.CustomUser, AccountsAdmin)
+admin.site.register(pro_models.Evenement, EventAdmin)
+admin.site.register(pro_models.Contacte, ContacteAdmin)
+admin.site.register(pro_models.Ticket, TicketAdmin)
+admin.site.register(pro_models.Category, )

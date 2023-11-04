@@ -10,11 +10,73 @@ import django
 from django.conf import settings
 from django.utils.html import format_html
 from django.contrib import admin
+from markdownx.models import MarkdownxField
+from django.utils import timezone
 
 now = django.utils.timezone.now()
 
+TICKET_URGENCY_CHOICES = (
+    ('FAIBLE',  _('pas important pas urgent')), # Jaune
+    ('CRITIQUE', _('important et pas Urgent')), # vert
+
+    ('MOYEN',   _('uregnt et pas importance')),   # Orange
+    ('URGENT',  _('Urgent et Important')),       # Urgent et important
+)
+
+TICKET_DEFAULT_URGENCY = 'MOYEN'
+
+TICKET_TYPE_CHOICES = (
+    ('BUG', _('bug')),
+    ('TASK', _('task')),
+    ('IDEA', _('idea')),
+)
+
+TICKET_DEFAULT_TYPE = 'BUG'
+
+TICKET_STATUS_CHOICES = (
+    ('NOUVEAU', _('nouveau')),
+    ('ENCOURS', _('encours')),
+    ('RESOLUE', _('resolue')),
+    ('CLOTUREE', _("cloturee")),
+    ('ANNULEE', _('annulee')),
+    ('ENATTENTE', _('en attente')),
+)
+
+TICKET_DEFAULT_STATUS = 'NOUVEAU'
+TICKET_DEFAULT_URGENCY = 'MOYEN'
+
+# TICKET_CLOSE_STATUSES = ('INVALID', 'DUPLICATE', 'RESOLVED')
+TICKET_CLOSE_STATUSES = ('CLOTUREE', 'ANNULEE', )
+
+class Category(models.Model):
+    """Category model.
+    """
+    parent = models.ForeignKey('self', blank=True, null=True, related_name='children', on_delete=models.SET_NULL)
+    title = models.CharField(_('title'), max_length=100, unique=True)
+    slug = models.SlugField(_('slug'), unique=True)
+
+    class Meta:
+        verbose_name = _('category')
+        verbose_name_plural = _('categories')
+        ordering = ('title',)
+
+    def _occurences(self):
+        object_list = []
+        related_objects = self._meta.get_all_related_many_to_many_objects()
+        for related in related_objects:
+            if related.opts.installed:
+                model = related.model
+                for obj in model.objects.select_related().filter(categories__title=self.title):
+                    object_list.append(obj)
+        return object_list
+    occurences = property(_occurences)
+
+    def __str__(self):
+        return u'%s' % self.title
+
+
 # Documents pieces jointes
-class Document(models.Model):
+class DocumentJoint(models.Model):
     title = models.CharField(max_length = 100)
     pj_file = models.FileField(upload_to='upload/', blank=True, null=True)
    
@@ -58,6 +120,46 @@ class Document(models.Model):
     class Meta:
         indexes = [ models.Index(fields=["content_type", "object_id"]), ]
    
+class Document(models.Model):
+    document        = models.FileField(upload_to='documents/', blank=True, null=True)
+    do_title           = models.CharField(max_length=255, blank=True, null=True)
+    do_description     = models.TextField( blank=True, null=True)
+    file_basename   = models.CharField(max_length=50, blank=True, null=True)
+    thumbnail_file  = models.CharField(max_length=50, blank=True, null=True)
+    file_type       = models.CharField(max_length=20, blank=True, null=True)
+    file_size       = models.BigIntegerField(blank=True, null=True)
+    initial_name    = models.CharField(max_length=255, blank=True, null=True)
+    created = models.DateTimeField(auto_now_add=True, blank=True, null=True)
+    active  = models.BooleanField(default=False)
+    
+    def create_relation(self, obj):
+        self.content_object = obj
+        self.save()
+
+    def get_document_or_object(self, obj, distinction=None):
+        """
+        This function allows you to get pieces for a specific object
+        If distinction is set it will filter out any relation that doesnt have
+        that distinction.
+        """ 
+        ct = ContentType.objects.get_for_model(obj)
+        return ct
+      
+    def __str__(self):
+        return "%s" % (self.do_title)
+
+    def __unicode__(self):
+        return "%s" % (self.do_tile)
+
+
+class GDocument(models.Model):
+    document  = models.ForeignKey(Document, null=True, blank=True, verbose_name=_('piece jointe'), on_delete=models.CASCADE)
+    created   = models.DateTimeField(auto_now_add=True, null=True, blank=True)
+    # Listed below are the mandatory fields for a generic relation
+    content_type    = models.ForeignKey(ContentType, on_delete=models.CASCADE)
+    object_id       = models.PositiveIntegerField()
+    content_object  = GenericForeignKey('content_type', 'object_id')
+
 
 class AbstractEnteteDoc(models.Model):
     title = models.CharField(max_length=200)
@@ -168,6 +270,7 @@ class LigneDeCandidature(AbstractLigneDoc):
     societe = models.CharField(max_length=50)
     status = models.CharField(_("Status :"), choices=STATUS.choices,
                               default="1", max_length=30)
+    notation = models.IntegerField(blank=True, null=True)
     adresse = models.CharField(max_length=150, blank=True, null=True)
     site_web = models.URLField(blank=True, null=True)
     contacte = models.CharField(max_length=100, blank=True, null=True)
@@ -176,9 +279,58 @@ class LigneDeCandidature(AbstractLigneDoc):
     telephone = models.CharField(_("Téléphone"), max_length=50, blank=True, null=True)
     recommande_par = models.CharField(max_length=100, blank=True, null=True)
     visite = models.BooleanField(_("Visite effectuée"), default=False)
-    candidat = models.BooleanField(_("Ajouter a la liste des Candidats"), default=False)
+    offre_recu = models.BooleanField(_("Candidat a fait une offre"), default=False)
     offre = models.BooleanField(_("Offre du syndic"), default=False)
     remuneration = models.PositiveIntegerField(blank=True, null=True)
     budget_global = models.PositiveIntegerField(blank=True, null=True)
     author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-    comment = models.TextField( blank=True, null=True)    
+    description = MarkdownxField( blank=True, null=True)    
+    comment = models.TextField(_('Observations'),  blank=True, null=True)  
+      
+      
+class Contacte(models.Model):
+    name = models.CharField(max_length=100)
+    adresse = models.TextField(blank=True, null=True)
+    email = models.EmailField(blank=True, null=True)
+    telephone = models.CharField(max_length=50, blank=True, null=True)
+    
+    
+class Evenement(models.Model):
+    title = models.CharField(max_length=100)
+    description = models.TextField(blank=True, null=True)
+    author      = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    start       = models.DateTimeField(null=True, blank=True, verbose_name=_('date debut'))
+    end         = models.DateTimeField(null=True, blank=True, verbose_name=_('date fin'), default=timezone.now)
+    created     = models.DateTimeField(auto_now_add=True, verbose_name=_('created on'))
+    closed      = models.DateTimeField(null=True, blank=True, verbose_name=_('closed on'))
+    categories  = models.ForeignKey('Category', null=True, blank=True, verbose_name=_('categories'), on_delete=models.SET_NULL)
+
+    class Meta:
+        ordering = ('-start',)
+        get_latest_by = '-start'
+        verbose_name = _('Evenement')
+        verbose_name_plural = _('Evenements')
+
+    def __unicode__(self):
+        return u'%s' % self.title
+    
+
+class Ticket(models.Model):
+    """
+    Ticket model. Incident
+    """
+    parent = models.ForeignKey('self', blank=True, null=True, related_name='children',  on_delete=models.SET_NULL)
+    residence = models.ForeignKey(Residence, related_name='tickets', verbose_name=_('project'), on_delete=models.CASCADE)
+    sequence = models.PositiveIntegerField(verbose_name=_('sequence'))
+    title = models.CharField(max_length=255, verbose_name=_('title'))
+    description = models.TextField(help_text=_("Description"), verbose_name=_('description'))
+    author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    urgency = models.CharField(max_length=20, choices=TICKET_URGENCY_CHOICES, default=TICKET_DEFAULT_URGENCY, verbose_name=_('urgency'))
+    status = models.CharField(max_length=20, choices=TICKET_STATUS_CHOICES, default=TICKET_DEFAULT_STATUS, verbose_name=_('status'))
+    created = models.DateTimeField(auto_now_add=True, verbose_name=_('created on'))
+    modified = models.DateTimeField(auto_now=True, verbose_name=_('modified on'))
+    closed = models.DateTimeField(null=True, blank=True, verbose_name=_('closed on'))
+    due_date        = models.DateTimeField(null=True, blank=True)   # date d'echeance - deadline
+    start_date      = models.DateTimeField(null=True, blank=True) # date debut de realisation
+    end_date        = models.DateTimeField(null=True, blank=True) # date de fin de realisation
+    schedule_date   = models.DateTimeField(null=True, blank=True) # date planifiee

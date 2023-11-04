@@ -1,0 +1,29 @@
+{% extends "base/themes/agency/startboot_agency_base.html" %}
+{# extends "base/themes/material_bootstrap/material_bootstrap.html" #}
+
+
+{% block header %}
+{% endblock header %}
+
+{% block content %}
+
+<hr>
+<div class="container row" >
+    <div class="col-5">
+        <h3> Résidence OPALE </h3>
+        <ul class="list-group text-primary">
+            <a class="list-group-item text-primary" href="/admin/copro/residence/" target="_blank">Residence Opale </a>
+            <a class="list-group-item text-primary" href="/admin/copro/lignedecandidature/" target="_blank">Gestionnaire immobilier Syndic</a>
+            <a class="list-group-item text-primary" href="/admin/copro/lignedecandidature/" target="_blank">Prestataires service Jadinage</a>
+            <a class="list-group-item text-primary" href="/admin/copro/lignedecandidature/" target="_blank">Prestataires service Picine</a>
+            <span class="list-group-item  text-primary active" target="_blank">
+                <a class="list-group-item text-primary" href="/admin/copro/lignedecandidature/" target="_blank">Apple d'offre Jadinage</a>
+            </span>
+        </ul>
+    </div>
+    <div class="col-5">
+        <img src="/media/upload/prestigia_001.jpg" width="150%" />
+    </div>
+</div>
+
+{% endblock content %}

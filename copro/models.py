@@ -167,7 +167,8 @@ class AbstractEnteteDoc(models.Model):
     created_at  = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     modified_at = models.DateTimeField(auto_now=True)
-    documents  = GenericRelation(Document)
+    ##documents  = GenericRelation(Document)
+    documents   = GenericRelation(GDocument, null=True, blank=True) #  les documents rattachées
 
     def add_document(self, piecej):
         self.documents.add(piecej, bulk=False)
@@ -213,11 +214,15 @@ class Pjointe(models.Model):
     candidature = models.ForeignKey('LigneDeCandidature', on_delete=models.CASCADE)
     piece = models.FileField(upload_to="upload/")
   
-    
+    def __str__(self):
+        return "%s" % (self.name)
 class Piece(models.Model):
     name = models.CharField(max_length=50, blank=True, null=True)
     residence = models.ForeignKey('Residence', on_delete=models.CASCADE)
     piece = models.FileField(upload_to="upload/")
+    #documents   = GenericRelation(GDocument, null=True, blank=True) #  les documents rattachées
+    def __str__(self):
+        return "%s" % (self.name)
     
 class Residence(models.Model):
     name = models.CharField(max_length=100)
@@ -252,12 +257,27 @@ class PrestationService(models.Model):
     name = models.CharField(_("Prestation de service") , max_length=50)
     description = models.TextField(blank=True, null=True)
     code = models.CharField(max_length=10)
-#  Projet 
+    
+    def __str__(self):
+        return "%s" % (self.name)
+#  Etude de Projet 
+
+
+class PJEtude(models.Model):
+    name = models.CharField(max_length=50, blank=True, null=True)
+    etude = models.ForeignKey('Etude', on_delete=models.CASCADE)
+    piece = models.FileField(upload_to="upload/")
+  
+    def __str__(self):
+        return "%s" % (self.name)
+
 class Etude(AbstractEnteteDoc):
     title = models.CharField(max_length=200)
-    #   type_presta = models.ForeignKey(PrestationService, on_delete=models.CASCADE)
+    type_presta = models.ForeignKey(PrestationService, default=1, on_delete=models.CASCADE)
     description = models.TextField()
-    documents  = GenericRelation(Document)
+
+    def __str__(self):
+        return "%s" % (self.title)
     
 
 class LigneDeCandidature(AbstractLigneDoc):
@@ -286,6 +306,9 @@ class LigneDeCandidature(AbstractLigneDoc):
     author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     description = MarkdownxField( blank=True, null=True)    
     comment = models.TextField(_('Observations'),  blank=True, null=True)  
+    
+    def __str__(self):
+        return "%s" % (self.societe)
       
       
 class Contacte(models.Model):
@@ -293,6 +316,9 @@ class Contacte(models.Model):
     adresse = models.TextField(blank=True, null=True)
     email = models.EmailField(blank=True, null=True)
     telephone = models.CharField(max_length=50, blank=True, null=True)
+    
+    def __str__(self):
+        return "%s" % (self.name)
     
     
 class Evenement(models.Model):

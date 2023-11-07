@@ -39,22 +39,38 @@ class PieceInline(admin.StackedInline):
         print("Toto ....... !")
         obj.save()
         
-
+class PieceEtudeInline(admin.StackedInline):
+    model = pro_models.PJEtude
+    extra = 1
+    
 
 class DocumentAdmin(admin.ModelAdmin):
     list_display  = [f.name for f in pro_models.Residence._meta.get_fields()]
 
+@admin.register(pro_models.Etude)
 class EtudeAdmin(admin.ModelAdmin):
-    list_display  = [f.name for f in pro_models.Etude._meta.get_fields()]
-    list_display  = ('title', 'description',  'created_at', 'get_author', 'get_documents', )
+    inlines = [PieceEtudeInline]
+    list_display  = ('title', 'description', 'type_presta',  'created_at', 'get_author', 'get_documents', )
     #list_select_related = ('author',  )
     search_fields = ['title',]
+    fields  = ('title', 'description',)
     
     def get_author(self, obj):
         return obj.created_by.username
 
-    def get_documents(self, obj):
+    def get_documents_(self, obj):
         return obj.documents.all().first()
+    
+    @admin.display(description="Pieces jointe")
+    def get_documents(self, obj):
+        # return obj.pieces.all().first()
+        pieces = pro_models.PJEtude.objects.filter(etude=obj.pk)
+        # image_path =  os.path.join(settings.BASE_DIR, 'media', 'upload')
+        pj = '<br>'.join(["--<a href='/media/{}'>{}</a>"
+                .format(ff.piece.name, os.path.basename(ff.piece.name))
+                for ff in pieces])
+        # return  mark_safe("<br> *** <a href='/media/{}'>toto</a> ".format(pieces[0].piece.name)) 
+        return mark_safe(pj)
     
 class PjointeInline(admin.StackedInline):
     model = pro_models.Pjointe
@@ -146,6 +162,7 @@ class ResidenceAdmin(BaseReadOnlyAdminMixin, admin.ModelAdmin):
 
 class PrestationServiceAdmin(admin.ModelAdmin):
     list_display  = [f.name for f in pro_models.PrestationService._meta.get_fields()]
+    list_display = ['name', 'code', 'description']
 
 class AccountsAdmin(admin.ModelAdmin):
     list_display  = [f.name for f in acc_models.CustomUser._meta.get_fields()]
@@ -171,7 +188,7 @@ class TicketAdmin(admin.ModelAdmin) :
 # registre
 #admin.site.register(pro_models.Residence, ResidenceAdmin)
 admin.site.register(pro_models.Residence, ResidenceAdmin)
-admin.site.register(pro_models.Etude, EtudeAdmin)
+#admin.site.register(pro_models.Etude, EtudeAdmin)
 admin.site.register(pro_models.LigneDeCandidature, LigneDeCandidatureAdmin)
 admin.site.register(pro_models.PrestationService, PrestationServiceAdmin)
 admin.site.register(acc_models.CustomUser, AccountsAdmin)

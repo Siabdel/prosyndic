@@ -360,3 +360,6 @@ class Ticket(models.Model):
     start_date      = models.DateTimeField(null=True, blank=True) # date debut de realisation
     end_date        = models.DateTimeField(null=True, blank=True) # date de fin de realisation
     schedule_date   = models.DateTimeField(null=True, blank=True) # date planifiee
+
+    def __str__(self):
+        return self.title

@@ -76,6 +76,7 @@ class PjointeInline(admin.StackedInline):
     model = pro_models.Pjointe
     extra = 1
 
+@admin.register(pro_models.LigneDeCandidature)
 class LigneDeCandidatureAdmin(BaseReadOnlyAdminMixin, MarkdownxModelAdmin):
     inlines = [PjointeInline]
 
@@ -129,6 +130,7 @@ class LigneDeCandidatureAdmin(BaseReadOnlyAdminMixin, MarkdownxModelAdmin):
             'etude': 1, 
             }
 
+@admin.register(pro_models.Residence)
 class ResidenceAdmin(BaseReadOnlyAdminMixin, admin.ModelAdmin):
     list_display  = ['photo', 'name', 'adresse', 'get_documents' ]
     list_display_links  = ('photo', 'name', 'get_documents', )
@@ -164,35 +166,30 @@ class PrestationServiceAdmin(admin.ModelAdmin):
     list_display  = [f.name for f in pro_models.PrestationService._meta.get_fields()]
     list_display = ['name', 'code', 'description']
 
+# @admin.register(acc_models.CustomUser)
 class AccountsAdmin(admin.ModelAdmin):
     list_display  = [f.name for f in acc_models.CustomUser._meta.get_fields()]
     list_display.remove("groups")
     list_display.remove("user_permissions")
     
 
-class EventAdmin(admin.ModelAdmin) :
-    list_total  = [ f.name for f in pro_models.Evenement._meta.get_fields()]
-    list_display = list_total
-
+@admin.register(pro_models.Contacte)
 class ContacteAdmin(admin.ModelAdmin) :
     list_total  = [ f.name for f in pro_models.Contacte._meta.get_fields()]
     list_display = list_total
+@admin.register(pro_models.Evenement)
 class EventAdmin(admin.ModelAdmin) :
     list_total  = [ f.name for f in pro_models.Evenement._meta.get_fields()]
     list_display = list_total
 
+
+@admin.register(pro_models.Ticket)
 class TicketAdmin(admin.ModelAdmin) :
     list_total  = [ f.name for f in pro_models.Ticket._meta.get_fields()]
     list_display = list_total
+    list_display = ['title', 'description', 'residence', 'status', 'due_date',  ]
+
 
 # registre
-#admin.site.register(pro_models.Residence, ResidenceAdmin)
-admin.site.register(pro_models.Residence, ResidenceAdmin)
-#admin.site.register(pro_models.Etude, EtudeAdmin)
-admin.site.register(pro_models.LigneDeCandidature, LigneDeCandidatureAdmin)
 admin.site.register(pro_models.PrestationService, PrestationServiceAdmin)
-admin.site.register(acc_models.CustomUser, AccountsAdmin)
-admin.site.register(pro_models.Evenement, EventAdmin)
-admin.site.register(pro_models.Contacte, ContacteAdmin)
-admin.site.register(pro_models.Ticket, TicketAdmin)
 admin.site.register(pro_models.Category, )

@@ -3,16 +3,16 @@ __pycache__/
 __pycache__/*
 *.py[cod]
 *$py.class
-*.pyc
 # C extensions
 *.so
 # pdf
 *.pdf
-*.md
 *.doc
 *.docx
 *.xls
 *.pyc
+*.cpython-39
+*.md
 
 # Distribution / packaging
 .Python

@@ -300,9 +300,11 @@ class LigneDeCandidature(AbstractLigneDoc):
     recommande_par = models.CharField(max_length=100, blank=True, null=True)
     visite = models.BooleanField(_("Visite effectuée"), default=False)
     offre_recu = models.BooleanField(_("Candidat a fait une offre"), default=False)
-    offre = models.BooleanField(_("Offre du syndic"), default=False)
+    offre = models.PositiveBigIntegerField(_("Offre du syndic"), default=False)
     remuneration = models.PositiveIntegerField(blank=True, null=True)
     budget_global = models.PositiveIntegerField(blank=True, null=True)
+    budget_securite = models.PositiveIntegerField(blank=True, null=True)
+    budget_jardinage = models.PositiveIntegerField(blank=True, null=True)
     author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     description = MarkdownxField( blank=True, null=True)    
     comment = models.TextField(_('Observations'),  blank=True, null=True)  
@@ -321,6 +323,14 @@ class Contacte(models.Model):
         return "%s" % (self.name)
     
     
+class PJEvent(models.Model):
+    name = models.CharField(max_length=50, blank=True, null=True)
+    event = models.ForeignKey('Evenement', on_delete=models.CASCADE)
+    piece = models.FileField(upload_to="upload/")
+  
+    def __str__(self):
+        return "%s" % (self.name)
+
 class Evenement(models.Model):
     title = models.CharField(max_length=100)
     description = models.TextField(blank=True, null=True)
@@ -338,6 +348,8 @@ class Evenement(models.Model):
         verbose_name_plural = _('Evenements')
 
     def __unicode__(self):
+        return u'%s' % self.title
+    def __str__(self):
         return u'%s' % self.title
     
 

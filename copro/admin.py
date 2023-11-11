@@ -8,6 +8,9 @@ from django.contrib.admin.utils import quote
 from django.utils.safestring import mark_safe
 from django.utils.html import format_html_join, format_html
 from markdownx.admin import MarkdownxModelAdmin 
+from django.contrib.contenttypes.admin import GenericStackedInline
+from django.utils import timezone
+
 
 admin.site.site_header = "PROSYNDIC Admin"
 admin.site.site_title = "PROSYNDIC Admin Portal"
@@ -46,7 +49,9 @@ class PieceEtudeInline(admin.StackedInline):
 
 class DocumentAdmin(admin.ModelAdmin):
     list_display  = [f.name for f in pro_models.Residence._meta.get_fields()]
-
+class CandidatInline(admin.StackedInline):
+    model=pro_models.LigneDeCandidature
+    extra=5
 @admin.register(pro_models.Etude)
 class EtudeAdmin(admin.ModelAdmin):
     inlines = [PieceEtudeInline]
@@ -87,9 +92,12 @@ class LigneDeCandidatureAdmin(BaseReadOnlyAdminMixin, MarkdownxModelAdmin):
     search_fields = ['societe',]
     exclude = ["title", ]
     #fields = [("societe", "contacte"), "comment"]
-    list_display = ["upper_societe", "contacte", "role", "telephone", "site_web", "status", "notation", "get_documents",  ]
+    list_display = ["upper_societe", "contacte", "role", "telephone", 
+                    "remuneration", "budget_global",
+                    "reference", "budget_securite", "budget_jardinage",
+                    "site_web", "notation", "get_documents",  ]
     list_filter  = ('status', 'etude',  )
-    list_filter = ('societe', 'offre_recu',  )
+    list_filter = ('societe', 'offre_recu', 'etude',  )
 
     @admin.display(empty_value="???")
     def get_author(self, obj):
@@ -162,25 +170,53 @@ class ResidenceAdmin(BaseReadOnlyAdminMixin, admin.ModelAdmin):
             print("photo name {}".format(afile.name))
             obj.photos.create(image=afile)
 
+@admin.register(pro_models.PrestationService)
 class PrestationServiceAdmin(admin.ModelAdmin):
     list_display  = [f.name for f in pro_models.PrestationService._meta.get_fields()]
     list_display = ['name', 'code', 'description']
 
-# @admin.register(acc_models.CustomUser)
-class AccountsAdmin(admin.ModelAdmin):
-    list_display  = [f.name for f in acc_models.CustomUser._meta.get_fields()]
-    list_display.remove("groups")
-    list_display.remove("user_permissions")
-    
+ 
 
 @admin.register(pro_models.Contacte)
 class ContacteAdmin(admin.ModelAdmin) :
     list_total  = [ f.name for f in pro_models.Contacte._meta.get_fields()]
     list_display = list_total
+
+class PieceJointeInline(admin.StackedInline):
+    model = pro_models.PJEvent
+    extra = 1
 @admin.register(pro_models.Evenement)
 class EventAdmin(admin.ModelAdmin) :
+    inlines = [PieceJointeInline]
     list_total  = [ f.name for f in pro_models.Evenement._meta.get_fields()]
-    list_display = list_total
+    list_display = ["title", "description", "start", "delai_start", "end", "closed", "get_documents",  ]
+    fields = ['title', 'start', 'end',]
+    #list_editable = fields
+    exclude = ('category', )
+    
+    def delai_start(self, obj):
+        aujourdhui = timezone.now()
+        nb_jours = obj.start - aujourdhui
+        if nb_jours.days > 0:
+            return "reste {} jours".format((obj.start - aujourdhui).days)
+        else :
+            return ""
+        
+    @admin.display(description="Pieces jointe")
+    def get_documents(self, obj):
+        # return obj.pieces.all().first()
+        pieces = pro_models.PJEvent.objects.filter(event=obj.pk)
+        # image_path =  os.path.join(settings.BASE_DIR, 'media', 'upload')
+        pj = '<br>'.join(["--<a href='/media/{}'>{}</a>"
+                .format(ff.piece.name, os.path.basename(ff.piece.name))
+                for ff in pieces])
+        # return  mark_safe("<br> *** <a href='/media/{}'>toto</a> ".format(pieces[0].piece.name)) 
+        return mark_safe(pj)
+
+    def get_form(self, request, obj=None, **kwargs):
+        form = super(EventAdmin, self).get_form(request, obj, **kwargs)
+        #form.base_fields['Category'].queryset = pro_models.Category.objects.filter(title__iexact='economie')
+        return form
 
 
 @admin.register(pro_models.Ticket)
@@ -191,5 +227,4 @@ class TicketAdmin(admin.ModelAdmin) :
 
 
 # registre
-admin.site.register(pro_models.PrestationService, PrestationServiceAdmin)
 admin.site.register(pro_models.Category, )

@@ -47,8 +47,6 @@ class PieceEtudeInline(admin.StackedInline):
     extra = 1
     
 
-class DocumentAdmin(admin.ModelAdmin):
-    list_display  = [f.name for f in pro_models.Residence._meta.get_fields()]
 class CandidatInline(admin.StackedInline):
     model=pro_models.LigneDeCandidature
     extra=5
@@ -225,6 +223,25 @@ class TicketAdmin(admin.ModelAdmin) :
     list_display = list_total
     list_display = ['title', 'description', 'residence', 'status', 'due_date',  ]
 
+# base de données de documents 
+from itertools import chain
+@admin.register(pro_models.Document)
+class BaseDocuments(admin.ModelAdmin):
+    list_display = ['do_title', 'get_documents',  ]
+    search_fields  = ["get_documents", ]
 
+    def get_documents(self, obj):
+        # return obj.pieces.all().first()
+        pieces1 = pro_models.PJEtude.objects.all()
+        pieces2 = pro_models.PJEvent.objects.all()
+        pieces3 = pro_models.Pjointe.objects.all()
+        all_pieces = list(chain(pieces1, pieces2, pieces3))
+        # image_path =  os.path.join(settings.BASE_DIR, 'media', 'upload')
+        pj = '<br>'.join(["--<a href='/media/{}'>{}</a>"
+                .format(ff.piece.name, os.path.basename(ff.piece.name))
+                for ff in all_pieces])
+        return mark_safe(pj)
+    
+    
 # registre
 admin.site.register(pro_models.Category, )

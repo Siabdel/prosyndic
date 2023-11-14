@@ -209,20 +209,24 @@ class AbstractLigneDoc(models.Model):
         ordering = ('-created_at',)
         abstract = True
         
-class Pjointe(models.Model):
+class AbstractPieceJointe(models.Model):
     name = models.CharField(max_length=50, blank=True, null=True)
+    piece = models.FileField(upload_to="upload/")
+    created = models.DateField(auto_created=True, blank=True, null=True)
+    modified = models.DateTimeField(auto_now=True, verbose_name=_('Date Creation'))
+    created_by = models.ForeignKey(settings.AUTH_USER_MODEL, blank=True, on_delete=models.CASCADE)
+
+    class Meta:
+        abstract = True
+
+    def __str__(self) -> str:
+        return "{}".format(self.name)
+    
+class Pjointe(AbstractPieceJointe):
     candidature = models.ForeignKey('LigneDeCandidature', on_delete=models.CASCADE)
-    piece = models.FileField(upload_to="upload/")
   
-    def __str__(self):
-        return "%s" % (self.name)
-class Piece(models.Model):
-    name = models.CharField(max_length=50, blank=True, null=True)
+class Piece(AbstractPieceJointe):
     residence = models.ForeignKey('Residence', on_delete=models.CASCADE)
-    piece = models.FileField(upload_to="upload/")
-    #documents   = GenericRelation(GDocument, null=True, blank=True) #  les documents rattachées
-    def __str__(self):
-        return "%s" % (self.name)
     
 class Residence(models.Model):
     name = models.CharField(max_length=100)
@@ -263,13 +267,8 @@ class PrestationService(models.Model):
 #  Etude de Projet 
 
 
-class PJEtude(models.Model):
-    name = models.CharField(max_length=50, blank=True, null=True)
+class PJEtude(AbstractPieceJointe):
     etude = models.ForeignKey('Etude', on_delete=models.CASCADE)
-    piece = models.FileField(upload_to="upload/")
-  
-    def __str__(self):
-        return "%s" % (self.name)
 
 class Etude(AbstractEnteteDoc):
     title = models.CharField(max_length=200)
@@ -292,6 +291,7 @@ class LigneDeCandidature(AbstractLigneDoc):
                               default="1", max_length=30)
     notation = models.IntegerField(blank=True, null=True)
     adresse = models.CharField(max_length=150, blank=True, null=True)
+    email = models.EmailField( blank=True, null=True)
     site_web = models.URLField(blank=True, null=True)
     contacte = models.CharField(max_length=100, blank=True, null=True)
     role = models.CharField(max_length=50, blank=True, null=True)
@@ -300,7 +300,6 @@ class LigneDeCandidature(AbstractLigneDoc):
     recommande_par = models.CharField(max_length=100, blank=True, null=True)
     visite = models.BooleanField(_("Visite effectuée"), default=False)
     offre_recu = models.BooleanField(_("Candidat a fait une offre"), default=False)
-    offre = models.PositiveBigIntegerField(_("Offre du syndic"), default=False)
     remuneration = models.PositiveIntegerField(blank=True, null=True)
     budget_global = models.PositiveIntegerField(blank=True, null=True)
     budget_securite = models.PositiveIntegerField(blank=True, null=True)

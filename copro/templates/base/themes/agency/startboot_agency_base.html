@@ -53,8 +53,10 @@
         {% block header %}
             {% include "./includes/header_agency.html" with parent=site_root calling_page=self %}
         {% endblock header %}
-
-        {% block content %}{% endblock %}
+        
+        <div class="container-fluid" id="app" v-cloak>
+            {% block content %}{% endblock %}
+        </div>
 
 
         {# Global jquery #}
@@ -77,8 +79,42 @@
         <!-- Custom Theme JavaScript -->
         <script src="{% static 'bootstrap_agency/js/agency.js' %}"></script>
 
+        {# Override this in templates to add extra javascript #}
+        <!-- VUEJS  -->
+        <script src="{% static 'vuejs/vue.min.js' %}"></script>
+
         {% block extra_js %}
-            {# Override this in templates to add extra javascript #}
-        {% endblock %}
+        {% endblock extra_js %}
+    
+        <script>
+            new Vue({
+                el: '#app',
+                data: { 
+                    message : "OK on est sous vue.js",
+                    cle_search : "",
+                },
+                created(){
+                    // `this` est une référence à l'instance de vm
+                    console.log('this is message: ' + this.message)
+                },
+                methods: {
+                    chercher(form){
+                        const url = '/basedoc/';
+                        let url = `/basedoc/`
+
+                        // ajax load
+                        fetch(url)
+                        .then(response => response.json())
+                        .then(json => {
+                            this.message = json;
+                            //console.log(" data = " + this.adresses[0].nom )
+                            })  
+                        .catch(err =>err.msg)
+                        console.log("vous chercher ...!" + this.cle_search)
+
+                    },
+                }
+            });
+        </script>
     </body>
 </html>

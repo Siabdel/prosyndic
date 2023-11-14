@@ -10,6 +10,7 @@ from django.utils.html import format_html_join, format_html
 from markdownx.admin import MarkdownxModelAdmin 
 from django.contrib.contenttypes.admin import GenericStackedInline
 from django.utils import timezone
+from itertools import chain
 
 
 admin.site.site_header = "PROSYNDIC Admin"
@@ -90,16 +91,21 @@ class LigneDeCandidatureAdmin(BaseReadOnlyAdminMixin, MarkdownxModelAdmin):
     search_fields = ['societe',]
     exclude = ["title", ]
     #fields = [("societe", "contacte"), "comment"]
-    list_display = ["upper_societe", "contacte", "role", "telephone", 
+    list_display = ["upper_societe", "contacte", "role", "telephone", "email",
                     "remuneration", "budget_global",
                     "reference", "budget_securite", "budget_jardinage",
-                    "site_web", "notation", "get_documents",  ]
+                    "get_site_web", "notation", "get_documents",  ]
     list_filter  = ('status', 'etude',  )
     list_filter = ('societe', 'offre_recu', 'etude',  )
 
     @admin.display(empty_value="???")
     def get_author(self, obj):
         return obj.author.username
+    
+    @admin.display(description="site web")
+    def get_site_web(self, obj):
+        return mark_safe("<a href='{}' target='_blanc' />{} </a>".format(obj.site_web, obj.site_web))
+        
     
     @admin.display(description="Societe")
     def upper_societe(self, obj):
@@ -224,7 +230,6 @@ class TicketAdmin(admin.ModelAdmin) :
     list_display = ['title', 'description', 'residence', 'status', 'due_date',  ]
 
 # base de données de documents 
-from itertools import chain
 @admin.register(pro_models.Document)
 class BaseDocuments(admin.ModelAdmin):
     list_display = ['do_title', 'get_documents',  ]

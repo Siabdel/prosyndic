@@ -1,0 +1,47 @@
+{% extends "base/themes/agency/startboot_agency_base.html" %}
+{% load  static %}
+{% load l10n %}
+
+{% block header %}
+{% endblock header %}
+
+{% block content %}
+
+<hr>
+<div class="container row">
+    <div class="col-10">
+    <h3> Résidence OPALE </h3>
+    <form class="d-flex" action="/admin/" method="post" @submit.prevent="chercher(this)">
+            {% csrf_token %}
+        <input class="form-control me-2" v-model="cle_search" type="text" placeholder="Search" >
+        <input class="btn btn-outline-success" type="submit" value="Rechercher" />
+    </form>
+    <hr/>
+
+    <table class="table table-striped">
+        <thead>
+            <tr> <th>Titre</th> <th>voir Document </th> <th>Created </th> </tr>
+        </thead>
+        <tbody>
+        {% for elem in object_list %}
+            <tr>
+                <td scope="row"> {{ elem.name }} </td>
+                <td>
+                    <a href='/media/{{ elem.piece.name }}' target='_blanc'>
+                         {{elem.name}} 
+                    </a>  
+                </td>
+                <td> {{ elem.modified }} </td>
+            </tr>
+        {% endfor %}
+            
+        </tbody>
+    </table> 
+       
+    </div>
+    <div class="col-2">
+        <img src="/media/upload/prestigia_001.jpg" width="50%" />
+    </div>
+</div>
+ 
+{% endblock content %}

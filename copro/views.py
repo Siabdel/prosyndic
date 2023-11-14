@@ -47,8 +47,7 @@ class BaseDonneeDoc(ListView):
         context['current_user'] = self.request.user
         context['now'] = timezone.now()
         return context
-    def get(self, request, **kwargs):
-        pass
+     
     
     def get_queryset(self, **kwargs):
         pieces1 = pro_models.PJEtude.objects.all()

@@ -8,7 +8,8 @@ from django.views.generic import ListView, TemplateView
 from copro import models as pro_models
 from accounts import models as acc_models
 from itertools import chain
-
+from rest_framework import generics, permissions
+from copro import serializers as pro_seriz
 
 # Create your views here.
 
@@ -57,3 +58,15 @@ class BaseDonneeDoc(ListView):
       
         # self.object_list = pro_model.Document.objects.all().order_by("-created")
         return self.object_list
+
+# Document
+class DocumentApiList(generics.ListCreateAPIView):
+    serializer_class = pro_seriz.DocumentApiSerializer 
+    pieces1 = pro_models.PJEtude.objects.all()
+    pieces2 = pro_models.PJEvent.objects.all()
+    pieces3 = pro_models.Pjointe.objects.all()
+    ## docs = pro_models.Document.objects.all()
+     
+    # queryset = list(chain(pieces1, pieces2, pieces3,))
+    ##queryset = pro_models.Document.objects.all().order_by('-id')
+    queryset = pro_models.PJEtude.objects.all()

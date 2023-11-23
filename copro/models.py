@@ -1,3 +1,4 @@
+import os, json
 from django.db import models
 from django.db import models
 from django.utils.translation import gettext as _
@@ -12,6 +13,7 @@ from django.utils.html import format_html
 from django.contrib import admin
 from markdownx.models import MarkdownxField
 from django.utils import timezone
+from django.core import serializers
 
 now = django.utils.timezone.now()
 
@@ -129,7 +131,7 @@ class Document(models.Model):
     file_type       = models.CharField(max_length=20, blank=True, null=True)
     file_size       = models.BigIntegerField(blank=True, null=True)
     initial_name    = models.CharField(max_length=255, blank=True, null=True)
-    created = models.DateTimeField(auto_now_add=True, blank=True, null=True)
+    created = models.DateField(auto_now_add=True, blank=True, null=True)
     active  = models.BooleanField(default=False)
     
     def create_relation(self, obj):
@@ -165,7 +167,7 @@ class AbstractEnteteDoc(models.Model):
     title = models.CharField(max_length=200)
     description = models.TextField()
     created_at  = models.DateTimeField(auto_now_add=True)
-    created_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    created_by = models.ForeignKey(settings.AUTH_USER_MODEL, blank=True, on_delete=models.CASCADE)
     modified_at = models.DateTimeField(auto_now=True)
     ##documents  = GenericRelation(Document)
     documents   = GenericRelation(GDocument, null=True, blank=True) #  les documents rattachées
@@ -212,10 +214,22 @@ class AbstractLigneDoc(models.Model):
 class AbstractPieceJointe(models.Model):
     name = models.CharField(max_length=50, blank=True, null=True)
     piece = models.FileField(upload_to="upload/")
-    created = models.DateField(auto_created=True, blank=True, null=True)
+    created = models.DateField(auto_created=True, auto_now_add=True, blank=True)
     modified = models.DateTimeField(auto_now=True, verbose_name=_('Date Creation'))
-    created_by = models.ForeignKey(settings.AUTH_USER_MODEL, blank=True, on_delete=models.CASCADE)
+    created_by = models.ForeignKey(settings.AUTH_USER_MODEL,
+                            default=1, on_delete=models.CASCADE)
 
+    def get_piece(self):
+        # data = serializers.serialize('json', self.piece)
+        #return json.dumps({})
+        return os.path.join('/media', self.piece.name)
+        
+    def save(self): 
+        if self.piece.name : 
+            self.name = self.piece.name
+        # super save
+        super(AbstractPieceJointe, self).save()
+        
     class Meta:
         abstract = True
 

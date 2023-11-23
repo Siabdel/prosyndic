@@ -53,6 +53,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.sites',
+    'rest_framework', # new
     # debug tools
     'debug_toolbar',
     # D- 3 rd party apps Django Rest Framework 

@@ -45,7 +45,9 @@ class PieceInline(admin.StackedInline):
         
 class PieceEtudeInline(admin.StackedInline):
     model = pro_models.PJEtude
-    extra = 1
+    readonly_fields = ('created_by',)
+    fields = ( 'piece',)
+    extra = 0
     
 
 class CandidatInline(admin.StackedInline):

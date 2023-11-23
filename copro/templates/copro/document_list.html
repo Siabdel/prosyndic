@@ -5,39 +5,77 @@
 {% block header %}
 {% endblock header %}
 
+{% block extra_js %}
+    <script>
+        var vm = new Vue({
+            el: "#app",
+            delimiters: ['[[', ']]'],
+            data: { 
+                message : "OK on est sous vue.js",
+                cle_search : "",
+                documents : [],
+                url : "",
+            },
+            created(){
+                // `this` est une référence à l'instance de vm
+                console.log('this is message: ' + this.message)
+                this.load_docs()
+            },
+            methods: {
+                load_docs(form){
+                    let url = `/doc/`
+
+                    // ajax load
+                    fetch(url)
+                    .then(response => response.json())
+                    .then(json => {
+                        this.documents = json;
+                        console.log(" data = " + this.documents[0].do_title )
+                        })  
+                    .catch(err => {
+                        console.log("erreur fetch", err.msg);
+                        }
+                        )
+                    console.log("vous chercher ...!" + this.cle_search)
+                },
+            }
+        });
+        // mount
+        vm.$mount('.app')
+    </script>
+   
+{% endblock extra_js%}
+
 {% block content %}
 
 <hr>
-<div class="container row">
+<div class="container row" id="app">
     <div class="col-10">
-    <h3> Résidence OPALE </h3>
-    <form class="d-flex" action="/admin/" method="post" @submit.prevent="chercher(this)">
-            {% csrf_token %}
-        <input class="form-control me-2" v-model="cle_search" type="text" placeholder="Search" >
-        <input class="btn btn-outline-success" type="submit" value="Rechercher" />
-    </form>
-    <hr/>
+        <h3> [[ message ]] </h3>
+        <form class="d-flex" action="/admin/" method="post" @submit.prevent="chercher(this)">
+                {% csrf_token %}
+            <input class="form-control me-2" v-model="cle_search" type="text" placeholder="Search" >
+            <input class="btn btn-outline-success" type="submit" value="Rechercher" />
+        </form>
+        <hr/>
 
-    <table class="table table-striped">
-        <thead>
-            <tr> <th>Titre</th> <th>voir Document </th> <th>Created </th> </tr>
-        </thead>
-        <tbody>
-        {% for elem in object_list %}
-            <tr>
-                <td scope="row"> {{ elem.name }} </td>
-                <td>
-                    <a href='/media/{{ elem.piece.name }}' target='_blanc'>
-                         {{elem.name}} 
-                    </a>  
-                </td>
-                <td> {{ elem.modified }} </td>
-            </tr>
-        {% endfor %}
-            
-        </tbody>
-    </table> 
-       
+        <table class="table table-striped">
+            <thead>
+                <tr> <th>Titre</th> <th>voir Document </th> <th>Created </th> </tr>
+            </thead>
+            <tbody>
+                <tr v-for="(doc, index) in documents" :key=index>
+                    <td scope="row"> [[ doc.name ]] </td>
+                    <td>
+                        <a :href="doc.get_piece"  target='_blanc'>
+                            [[doc.get_piece]] 
+                        </a>  
+                    </td>
+                    <td> [[ doc.created ]] </td>
+                </tr>
+                
+            </tbody>
+        </table> 
     </div>
     <div class="col-2">
         <img src="/media/upload/prestigia_001.jpg" width="50%" />

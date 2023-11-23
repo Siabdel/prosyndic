@@ -76,8 +76,8 @@ class Dict2Obj(object):
     Turns a dictionary into a class
     allow object-like access to dicts, it does so via getattr
     """
-    def __init__(self, d):
-        for k, v in d.items():
+    def __init__(self, dictionary):
+        for k, v in dictionary.items():
             if isinstance(k, (list, tuple)):
                 setattr(self, k, [obj(x) if isinstance(x, dict) else x for x in v])
             else:

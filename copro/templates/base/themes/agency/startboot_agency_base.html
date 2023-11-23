@@ -54,10 +54,9 @@
             {% include "./includes/header_agency.html" with parent=site_root calling_page=self %}
         {% endblock header %}
         
-        <div class="container-fluid" id="app" v-cloak>
+        <div class="container-fluid" > 
             {% block content %}{% endblock %}
         </div>
-
 
         {# Global jquery #}
         <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
@@ -80,41 +79,12 @@
         <script src="{% static 'bootstrap_agency/js/agency.js' %}"></script>
 
         {# Override this in templates to add extra javascript #}
-        <!-- VUEJS  -->
-        <script src="{% static 'vuejs/vue.min.js' %}"></script>
+        <script src="{% static 'vuejs/vue.min.js' %}"></script> 
+        <!-- VUEJS   
+        <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>-->
 
         {% block extra_js %}
         {% endblock extra_js %}
-    
-        <script>
-            new Vue({
-                el: '#app',
-                data: { 
-                    message : "OK on est sous vue.js",
-                    cle_search : "",
-                },
-                created(){
-                    // `this` est une référence à l'instance de vm
-                    console.log('this is message: ' + this.message)
-                },
-                methods: {
-                    chercher(form){
-                        const url = '/basedoc/';
-                        let url = `/basedoc/`
-
-                        // ajax load
-                        fetch(url)
-                        .then(response => response.json())
-                        .then(json => {
-                            this.message = json;
-                            //console.log(" data = " + this.adresses[0].nom )
-                            })  
-                        .catch(err =>err.msg)
-                        console.log("vous chercher ...!" + this.cle_search)
-
-                    },
-                }
-            });
-        </script>
+       
     </body>
 </html>

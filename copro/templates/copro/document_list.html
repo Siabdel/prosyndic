@@ -12,17 +12,32 @@
             delimiters: ['[[', ']]'],
             data: { 
                 message : "OK on est sous vue.js",
-                cle_search : "",
                 documents : [],
                 url : "",
+                filterKey : "",
+                sortedKey : "name",
+                sortBy : "nom",
+                currentSort : "nom",
+                order : -1 :
             },
             created(){
                 // `this` est une référence à l'instance de vm
                 console.log('this is message: ' + this.message)
                 this.load_docs()
             },
+             computed: {
+                sortedDocuments(){
+                return this.documents
+                .filter(doc => doc.name.includes(this.filterKey))
+                .sort((a, b) =>  {
+                    if(a[this.currentSort] < b[this.currentSort]) return -1 * this.order
+                    if(a[this.currentSort] > b[this.currentSort]) return 1 * this.order
+                    return 0
+                })
+                }
+            },
             methods: {
-                load_docs(form){
+                load_docs(){
                     let url = `/doc/`
 
                     // ajax load
@@ -38,6 +53,23 @@
                         )
                     console.log("vous chercher ...!" + this.cle_search)
                 },
+                //-------
+                chercher_doc(event){
+                    let url = `/doc/`
+
+                    // ajax load
+                    fetch(url)
+                    .then(response => response.json())
+                    .then(json => {
+                        this.documents = json;
+                        console.log(" data = " + this.documents )
+                        })  
+                    .catch(err => {
+                        console.log("erreur fetch", err.msg);
+                        }
+                        )
+                    console.log("vous chercher ...!" + this.filterKey)
+                },
             }
         });
         // mount
@@ -52,9 +84,9 @@
 <div class="container row" id="app">
     <div class="col-10">
         <h3> [[ message ]] </h3>
-        <form class="d-flex" action="/admin/" method="post" @submit.prevent="chercher(this)">
+        <form class="d-flex" action="/admin/" method="post" @submit.prevent="">
                 {% csrf_token %}
-            <input class="form-control me-2" v-model="cle_search" type="text" placeholder="Search" >
+            <input class="form-control me-2" v-model="filterKey" type="text" placeholder="saisie un mot de recherche" >
             <input class="btn btn-outline-success" type="submit" value="Rechercher" />
         </form>
         <hr/>
@@ -64,7 +96,7 @@
                 <tr> <th>Titre</th> <th>voir Document </th> <th>Created </th> </tr>
             </thead>
             <tbody>
-                <tr v-for="(doc, index) in documents" :key=index>
+                <tr v-for="(doc, index) in sortedDocuments" :key=index>
                     <td scope="row"> [[ doc.name ]] </td>
                     <td>
                         <a :href="doc.get_piece"  target='_blanc'>

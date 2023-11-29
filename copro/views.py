@@ -10,6 +10,9 @@ from accounts import models as acc_models
 from itertools import chain
 from rest_framework import generics, permissions
 from copro import serializers as pro_seriz
+from django.contrib.auth.decorators import login_required, permission_required
+from django.contrib import messages
+from django.utils.decorators import method_decorator
 
 # Create your views here.
 
@@ -37,7 +40,7 @@ class PortailHome(TemplateView) :
         context['username']  = self.request.user.username
         return context
     
-
+@method_decorator(login_required(login_url="/admin/login"), 'dispatch')
 class BaseDonneeDoc(ListView):
     model=pro_models.Document
     template_name = "copro/document_list.html"
@@ -65,8 +68,8 @@ class DocumentApiList(generics.ListCreateAPIView):
     pieces1 = pro_models.PJEtude.objects.all()
     pieces2 = pro_models.PJEvent.objects.all()
     pieces3 = pro_models.Pjointe.objects.all()
+    pieces4 = pro_models.Piece.objects.all()
     ## docs = pro_models.Document.objects.all()
      
-    # queryset = list(chain(pieces1, pieces2, pieces3,))
-    ##queryset = pro_models.Document.objects.all().order_by('-id')
-    queryset = pro_models.PJEtude.objects.all()
+    #queryset = list(chain(pieces1, pieces2, pieces3, pieces4, ))
+    queryset = pro_models.Piece.objects.all()

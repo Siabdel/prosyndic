@@ -1,4 +1,6 @@
 import os, json
+import datetime
+import time
 from django.db import models
 from django.db import models
 from django.utils.translation import gettext as _
@@ -131,7 +133,7 @@ class Document(models.Model):
     file_type       = models.CharField(max_length=20, blank=True, null=True)
     file_size       = models.BigIntegerField(blank=True, null=True)
     initial_name    = models.CharField(max_length=255, blank=True, null=True)
-    created = models.DateField(auto_now_add=True, blank=True, null=True)
+    created = models.DateField(auto_created=True, auto_now_add=True, blank=True, )
     active  = models.BooleanField(default=False)
     
     def create_relation(self, obj):
@@ -156,7 +158,7 @@ class Document(models.Model):
 
 class GDocument(models.Model):
     document  = models.ForeignKey(Document, null=True, blank=True, verbose_name=_('piece jointe'), on_delete=models.CASCADE)
-    created   = models.DateTimeField(auto_now_add=True, null=True, blank=True)
+    created   = models.DateTimeField(auto_created=True, auto_now_add=True, blank=True)
     # Listed below are the mandatory fields for a generic relation
     content_type    = models.ForeignKey(ContentType, on_delete=models.CASCADE)
     object_id       = models.PositiveIntegerField()
@@ -166,8 +168,8 @@ class GDocument(models.Model):
 class AbstractEnteteDoc(models.Model):
     title = models.CharField(max_length=200)
     description = models.TextField()
-    created_at  = models.DateTimeField(auto_now_add=True)
-    created_by = models.ForeignKey(settings.AUTH_USER_MODEL, blank=True, on_delete=models.CASCADE)
+    created_at  = models.DateTimeField(auto_created=True, auto_now_add=True)
+    created_by = models.ForeignKey(settings.AUTH_USER_MODEL, default=1, on_delete=models.CASCADE)
     modified_at = models.DateTimeField(auto_now=True)
     ##documents  = GenericRelation(Document)
     documents   = GenericRelation(GDocument, null=True, blank=True) #  les documents rattachées
@@ -189,7 +191,7 @@ class AbstractEnteteDoc(models.Model):
 class AbstractLigneDoc(models.Model):
     title = models.CharField(max_length=200)
     comment = models.TextField()
-    created_at = models.DateTimeField(auto_now_add=True)
+    created_at = models.DateTimeField(auto_created=True, auto_now_add=True)
     # Piece jointe
     # documents  = GenericRelation('Document')
 
@@ -214,16 +216,30 @@ class AbstractLigneDoc(models.Model):
 class AbstractPieceJointe(models.Model):
     name = models.CharField(max_length=50, blank=True, null=True)
     piece = models.FileField(upload_to="upload/")
-    created = models.DateField(auto_created=True, auto_now_add=True, blank=True)
+    created = models.DateField(auto_now=True, auto_created=True)
     modified = models.DateTimeField(auto_now=True, verbose_name=_('Date Creation'))
-    created_by = models.ForeignKey(settings.AUTH_USER_MODEL,
-                            default=1, on_delete=models.CASCADE)
+    created_by = models.ForeignKey(settings.AUTH_USER_MODEL, default=1, on_delete=models.CASCADE)
 
-    def get_piece(self):
+    @property
+    def piece_name(self):
         # data = serializers.serialize('json', self.piece)
         #return json.dumps({})
-        return os.path.join('/media', self.piece.name)
+        piece_name = os.path.splitext(os.path.basename(self.piece.name))[0]
+        return os.path.basename(piece_name)
         
+    @property
+    def piece_path(self):
+        piece_path =  os.path.join('/media/', self.piece.name)
+        return piece_path
+    
+    @property
+    def init_date_created(self):
+        # date en secondes 
+        ti_c = os.path.getctime(self.piece.path)
+        return time.ctime(ti_c)
+
+        
+
     def save(self): 
         if self.piece.name : 
             self.name = self.piece.name
@@ -318,7 +334,7 @@ class LigneDeCandidature(AbstractLigneDoc):
     budget_global = models.PositiveIntegerField(blank=True, null=True)
     budget_securite = models.PositiveIntegerField(blank=True, null=True)
     budget_jardinage = models.PositiveIntegerField(blank=True, null=True)
-    author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    author = models.ForeignKey(settings.AUTH_USER_MODEL, default=1, on_delete=models.CASCADE)
     description = MarkdownxField( blank=True, null=True)    
     comment = models.TextField(_('Observations'),  blank=True, null=True)  
     
@@ -336,21 +352,17 @@ class Contacte(models.Model):
         return "%s" % (self.name)
     
     
-class PJEvent(models.Model):
-    name = models.CharField(max_length=50, blank=True, null=True)
+class PJEvent(AbstractPieceJointe):
     event = models.ForeignKey('Evenement', on_delete=models.CASCADE)
-    piece = models.FileField(upload_to="upload/")
   
-    def __str__(self):
-        return "%s" % (self.name)
 
 class Evenement(models.Model):
     title = models.CharField(max_length=100)
     description = models.TextField(blank=True, null=True)
-    author      = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    author      = models.ForeignKey(settings.AUTH_USER_MODEL, default=1, on_delete=models.CASCADE)
     start       = models.DateTimeField(null=True, blank=True, verbose_name=_('date debut'))
     end         = models.DateTimeField(null=True, blank=True, verbose_name=_('date fin'), default=timezone.now)
-    created     = models.DateTimeField(auto_now_add=True, verbose_name=_('created on'))
+    created     = models.DateTimeField(auto_created=True, auto_now_add=True, verbose_name=_('created on'))
     closed      = models.DateTimeField(null=True, blank=True, verbose_name=_('closed on'))
     categories  = models.ForeignKey('Category', null=True, blank=True, verbose_name=_('categories'), on_delete=models.SET_NULL)
 
@@ -375,10 +387,10 @@ class Ticket(models.Model):
     sequence = models.PositiveIntegerField(verbose_name=_('sequence'))
     title = models.CharField(max_length=255, verbose_name=_('title'))
     description = models.TextField(help_text=_("Description"), verbose_name=_('description'))
-    author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    author = models.ForeignKey(settings.AUTH_USER_MODEL, default=1, on_delete=models.CASCADE)
     urgency = models.CharField(max_length=20, choices=TICKET_URGENCY_CHOICES, default=TICKET_DEFAULT_URGENCY, verbose_name=_('urgency'))
     status = models.CharField(max_length=20, choices=TICKET_STATUS_CHOICES, default=TICKET_DEFAULT_STATUS, verbose_name=_('status'))
-    created = models.DateTimeField(auto_now_add=True, verbose_name=_('created on'))
+    created = models.DateTimeField(auto_created=True, auto_now_add=True, verbose_name=_('created on'))
     modified = models.DateTimeField(auto_now=True, verbose_name=_('modified on'))
     closed = models.DateTimeField(null=True, blank=True, verbose_name=_('closed on'))
     due_date        = models.DateTimeField(null=True, blank=True)   # date d'echeance - deadline

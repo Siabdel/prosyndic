@@ -23,6 +23,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('accounts/', include('allauth.urls')),
     path('', include('copro.urls')),
+    path('home/', include('copro.urls')),
     path('markdownx/', include('markdownx.urls')), # MarkdownX URL patterns
 ]
 

@@ -19,7 +19,10 @@ class DocumentApiSerializer(serializers.ModelSerializer):
     class Meta :
         model = pro_models.PJEtude
         #fields = '__all__'
-        fields = ('name', 'get_piece', 'created', 'created_by',)
+        fields = ('name', 'piece_name', 'piece_path',
+                  'modified', 'created', 'created_by',
+                  'init_date_created')
+        
         
    
    

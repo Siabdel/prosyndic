@@ -143,6 +143,33 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',
+	  'allauth.account.auth_backends.AuthenticationBackend',
+    ]
+
+
+LOGIN_REDIRECT_URL = '/'
+LOGOUT_REDIRECT_URL = '/'
+ACCOUNT_EMAIL_CONFIRMATION_EXPIRE_DAYS = 1 
+# Sets the number of days within which an account should be activated. 
+
+#ACCOUNT_EMAIL_REQUIRED = False
+# set whether an email verification is necessary or not
+
+#ACCOUNT_EMAIL_VERIFICATION = "mandatory"
+# Used to prevent brute force attacks.
+
+ACCOUNT_LOGIN_ATTEMPTS_LIMIT = 5
+# User gets blocked from logging back in until a timeout.
+
+ACCOUNT_LOGIN_ATTEMPTS_TIMEOUT = 86400  # 1 day in seconds
+# value set is in seconds from the last unsuccessful login attempt
+
+ACCOUNT_LOGOUT_REDIRECT_URL = '/accounts/login/'
+
+AUTH_USER_MODEL = "accounts.CustomUser"  # new
+
 
 # Internationalization
 # https://docs.djangoproject.com/en/4.2/topics/i18n/
@@ -189,6 +216,26 @@ STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.ManifestStaticFilesSto
 
 MEDIA_URL = 'media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')
+
+REST_FRAMEWORK = {  # new
+    "DEFAULT_PERMISSION_CLASSES": [
+        "rest_framework.permissions.IsAuthenticated",
+        ## 'rest_framework.permissions.IsAdminUser'
+    ],
+    "DEFAULT_AUTHENTICATION_CLASSES": [  # new
+        #"rest_framework.authentication.BasicAuthentication",  # enables simple command line authentication
+        "rest_framework.authentication.SessionAuthentication",
+        #"rest_framework.authentication.TokenAuthentication",  # new
+    ],
+}
+
+CORS_ORIGIN_WHITELIST = (
+    "http://localhost:3000",
+    "http://localhost:8000",
+    "http://localhost:8080",
+)
+
+CSRF_TRUSTED_ORIGINS = ["http://localhost:8000"]
 
 
 # Default primary key field type

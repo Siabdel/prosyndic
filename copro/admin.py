@@ -35,7 +35,7 @@ class BaseReadOnlyAdminMixin:
 
 class PieceInline(admin.StackedInline):
     model = pro_models.Piece
-    extra = 1
+    extra = 0
     
     def save_form(self, request, obj, form, change):
         # save residance
@@ -52,7 +52,7 @@ class PieceEtudeInline(admin.StackedInline):
 
 class CandidatInline(admin.StackedInline):
     model=pro_models.LigneDeCandidature
-    extra=5
+    extra=0
 @admin.register(pro_models.Etude)
 class EtudeAdmin(admin.ModelAdmin):
     inlines = [PieceEtudeInline]
@@ -80,7 +80,7 @@ class EtudeAdmin(admin.ModelAdmin):
     
 class PjointeInline(admin.StackedInline):
     model = pro_models.Pjointe
-    extra = 1
+    extra = 0
 
 @admin.register(pro_models.LigneDeCandidature)
 class LigneDeCandidatureAdmin(BaseReadOnlyAdminMixin, MarkdownxModelAdmin):
@@ -190,7 +190,7 @@ class ContacteAdmin(admin.ModelAdmin) :
 
 class PieceJointeInline(admin.StackedInline):
     model = pro_models.PJEvent
-    extra = 1
+    extra = 0
 @admin.register(pro_models.Evenement)
 class EventAdmin(admin.ModelAdmin) :
     inlines = [PieceJointeInline]

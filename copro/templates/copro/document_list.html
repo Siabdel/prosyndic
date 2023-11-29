@@ -18,45 +18,43 @@
                 sortedKey : "name",
                 sortBy : "nom",
                 currentSort : "nom",
-                order : -1 :
+                order : -1 ,
             },
+            //----
             created(){
                 // `this` est une référence à l'instance de vm
                 console.log('this is message: ' + this.message)
                 this.load_docs()
             },
-             computed: {
+            //---
+            computed: {
+                // sinon 
                 sortedDocuments(){
-                return this.documents
-                .filter(doc => doc.name.includes(this.filterKey))
-                .sort((a, b) =>  {
-                    if(a[this.currentSort] < b[this.currentSort]) return -1 * this.order
-                    if(a[this.currentSort] > b[this.currentSort]) return 1 * this.order
-                    return 0
-                })
+                    return this.documents.filter(doc => doc.piece_name.includes(this.filterKey)).sort((a, b) =>  {
+                        if(a[this.currentSort] < b[this.currentSort]) return -1 * this.order
+                        if(a[this.currentSort] > b[this.currentSort]) return 1 * this.order
+                        return 0
+                    })
                 }
             },
             methods: {
                 load_docs(){
                     let url = `/doc/`
-
                     // ajax load
                     fetch(url)
                     .then(response => response.json())
                     .then(json => {
                         this.documents = json;
-                        console.log(" data = " + this.documents[0].do_title )
+                        console.log(" data ok = " + this.documents[0].name )
                         })  
                     .catch(err => {
-                        console.log("erreur fetch", err.msg);
-                        }
-                        )
-                    console.log("vous chercher ...!" + this.cle_search)
+                        console.log("erreur fetch load_docs", err)
+                        })
+                    //console.log("vous chercher ...!" + this.filterKey)
                 },
                 //-------
                 chercher_doc(event){
                     let url = `/doc/`
-
                     // ajax load
                     fetch(url)
                     .then(response => response.json())
@@ -68,7 +66,7 @@
                         console.log("erreur fetch", err.msg);
                         }
                         )
-                    console.log("vous chercher ...!" + this.filterKey)
+                    //console.log("vous chercher ...!" + this.filterKey)
                 },
             }
         });
@@ -95,15 +93,15 @@
             <thead>
                 <tr> <th>Titre</th> <th>voir Document </th> <th>Created </th> </tr>
             </thead>
-            <tbody>
+            <tbody v-if="sortedDocuments">
                 <tr v-for="(doc, index) in sortedDocuments" :key=index>
-                    <td scope="row"> [[ doc.name ]] </td>
+                    <td scope="row"> [[ doc.piece_name ]] </td>
                     <td>
-                        <a :href="doc.get_piece"  target='_blanc'>
-                            [[doc.get_piece]] 
+                        <a :href="doc.piece_path"  target='_blanc'>
+                            [[ doc.piece_name ]] 
                         </a>  
                     </td>
-                    <td> [[ doc.created ]] </td>
+                    <td> [[ doc.init_date_created ]] </td>
                 </tr>
                 
             </tbody>

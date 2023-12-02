@@ -6,4 +6,5 @@ urlpatterns = [
     path('home/', views.Home.as_view(), name='home'),
     path('services/', views.PortailHome.as_view(), name='home_page'),
     path('basedoc/', views.BaseDonneeDoc.as_view(), name="basdoc"),
+    path("polls/", include("polls.urls")),
 ] 

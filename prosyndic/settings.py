@@ -44,6 +44,9 @@ INSTALLED_APPS = [
     # local app 
     'copro.apps.CoproConfig',
     'accounts.apps.AccountsConfig',
+    "polls.apps.PollsConfig",
+    "cartcom.apps.CartcomConfig",
+    "simulator.apps.SimulatorConfig",
     
     # contribs
     'django.contrib.admin',

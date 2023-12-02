@@ -214,7 +214,7 @@ class AbstractPieceJointe(models.Model):
     piece = models.FileField(upload_to="upload/")
     created = models.DateField(auto_created=True, blank=True, null=True)
     modified = models.DateTimeField(auto_now=True, verbose_name=_('Date Creation'))
-    created_by = models.ForeignKey(settings.AUTH_USER_MODEL, blank=True, on_delete=models.CASCADE)
+    created_by = models.ForeignKey(settings.AUTH_USER_MODEL, default=1, on_delete=models.CASCADE)
 
     class Meta:
         abstract = True

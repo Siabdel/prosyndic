@@ -1,0 +1,35 @@
+
+<div  class="panel panel-default">
+  <h4 class="panel-heading">Commentaire</h4>
+  <div class="panel-body col-sm-12">
+    <div class="message">
+      <span class="text-danger" v-show="erreur" > {{ message }}    </span>
+        <div v-if="errors.length > 0">
+          <h4 class="text-warning">Please correct the following error(s) !!:  {{ erreur }}   </h4>
+          <ul>
+               <li v-for="error in errors"> {{ erreur }}  </li>
+          </ul>
+        </div>
+    </div>
+    <form action="#" id="form_equipe"  method="POST" class="col-mm-6">
+      {% csrf_token %}
+      <textarea name="comment" rows="8" cols="80"></textarea>
+      <input class="btn btn-success" type="submit"  onclick="" value="sauvegarder ***">
+    </form>
+  </div>
+</div>
+
+<script type="text/javascript">
+  $('#form_equipe').on('submit', function (event){
+    // post le formulaire
+    var v_cac_id = $("#cac_id").val();
+    console.log("on valide le formulaire : " + $( "#form_equipe" ).serialize());
+    // envoie du poste
+    $.post( "{% url 'api_add_comment'  12345   %}".replace(/12345/, 8), $( "#form_equipe" ).serialize() ).done(function( data ) {
+      // refreach
+    }).fail(function() {
+    console.log( "error" );
+  });
+    event.preventDefault();
+  });
+</script>

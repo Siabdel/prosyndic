@@ -1,0 +1,32 @@
+<!-- template for the modal component -->
+<script type="text/x-template" id="modal-cac-template">
+  <transition name="modal">
+    <div class="modal-mask">
+      <div class="modal-wrapper">
+        <div class="modal-container">
+
+          <div class="modal-header">
+            <slot name="header">
+              Confirmation
+            </slot>
+          </div>
+
+          <div class="modal-body">
+            <slot name="body">
+              Souhaitez-vous supprimer la Demande d'approvisionnment ?
+            </slot>
+          </div>
+          <div class="modal-footer">
+            <slot name="footer">
+              <button class="modal-default-button" data-dismiss='modal' @click="$emit('close');"> Quitter </button>
+              <button id="id_validation"  class="modal-default-button" @click.prevent="deleteDa([[ elem.pk ]] ); $emit('close');">
+
+                <em class="fa fa-save"></em>Confirmez</button>
+            </slot>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </transition>
+</script>

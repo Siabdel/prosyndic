@@ -1,0 +1,141 @@
+<!-- Services Recherche -->
+ {% load i18n   %}
+<div>
+  <p> Semaine actuelle : {{ semaine_actuelle }}/20{{annee_actuelle}}</p>
+  <p> <h3 v-show="machine_selected">machine: <span class="text-info">[[current_machine]] </span></h3>  </p>
+
+	<form action="" method="POST" name="sentSearch" id="contactForm" class="form-inline" @submit.prevent="validate_form" >
+    {% csrf_token %}
+    <div class="row">
+          <div class="message">
+            <span class="text-danger" v-show="erreur" > [[ erreur ]] </span>
+              <div v-if="errors.length > 0">
+                <h4 class="text-warning">Please correct the following error(s) !!: [[ errors ]] </h4>
+                <ul>
+                  <li v-for="error in errors">[[ error ]] </li>
+                </ul>
+              </div>
+          </div>
+      		<div class="col-xs-12 col-sm-12 col-md-2 col-lg-2 ">
+      				 <div class="input-group input-group-lg text-lg">
+      							{{ form.semaines.errors }}
+      							<span class="input-group-addon"> <i class="fa fa-calendar"></i></span>
+
+                    <label for="semaine_actuelle" class="text-info text-bold">Semaine : [[semaine]]</label>
+                    <button type="button" class="btn btn-success btn-lg" @click.prevent="updateWeek"> [[edit_msg ]]  </button>
+      							<input v-show="edit_week" type="number" name="semaine" v-model="semaine" maxlength="2"
+                      id="id_semaine" @keyup.enter.prevent="charge_list_of"  class="input-lg" size="6"   >
+      				 </div>
+      		</div>
+
+          <div class="col-xs-12 col-sm-12 col-md-2 col-lg-2 col-lg-offset-1">
+      				 <div class="input-group input-group-lg text-lg">
+      							{{ form.annee.errors }}
+      							<span class="input-group-addon"> <i class="fa fa-calendar"></i></span>
+                    <label for="annee_actuelle" class="text-info text-bold">Année : [[annee]]</label>
+                    <button type="button" class="btn btn-success btn-lg" @click.prevent="updateYear"> [[edit_msg ]]  </button>
+      							<input v-show="edit_year" type="text" name="annee" v-model="annee" maxlength="4"
+                      id="id_annee" @keyup.enter.prevent="charge_list_of" class="input-lg" size="4">
+      				 </div>
+      		</div>
+
+          <div class="col-xs-12 col-sm-12 col-md-8 col-lg-5 col-lg-offset-1">
+          	 <div class="input-group input-group-lg text-lg" style="line-height: 1.5">
+          				{{ form.machines.errors___ }}
+          				<span class="input-group-addon">
+                    	{{ form.machines  }}
+                  </span>
+
+          	 </div>
+             <input  type="hidden" id="id_current_machine" v-model="current_machine"  >
+
+          </div>
+    </div>
+
+    <!-- selection des jours -->
+    <div class="row">
+      <div class="form-group">
+        <div class="col-xs-12 col-sm-12 col-md-12  col-lg-12">
+          <div class="form-group">
+               <div class="input-group input-group-lg text-large ">
+                  {{ form.jours_semaine.errors }}
+                  {{ form.jours_semaine}}
+               </div>
+          </div>
+        </div>
+      </div>
+    </div>
+<HR>
+    <!-- selection des jours -->
+    <div class="row">
+      <div class="col-md-6" >
+          <input v-show="machine_selected" type="submit" style="line-height:1.9%"  class="btn btn-warning btn-lg"  value="Lancez **" />
+      </div>
+    </div>
+	</form>
+</div>
+
+<script  type='text/javascript'>
+  //$('input').addClass("form-control");
+  $('#id_jours_semaine').addClass("list-group list-unstyled text-info list-inline text-left");
+  $('.errorlist').addClass("list-unstyled text-info list-inline text-left");
+  // ------------------------------------------------------
+  //-- VUEJS on sauvegarde des variable pour VUEJS
+  //----------------------------------------------------
+  var semaine_of = '{{ semaine_of }}';
+  var semaine_actuelle = '{{ semaine_actuelle }}';
+
+  var annee_saisie = '{{ annee_saisie}}';
+  var annee_actuelle = '{{ annee_actuelle}}';
+  var machine_selected = false;
+  var ofs_list = '{{ object_list}}';
+  var nombre_ofs = '{{ object_list.count }}';
+  var count_cart = '{{ nb_of_incart }}';
+
+
+
+  if( parseInt(semaine_of) > 0){
+    var init_semaine = semaine_of ;
+  }else{
+    var init_semaine = semaine_actuelle;
+  }
+
+  if( parseInt(annee_saisie) > 0){
+    var init_annee = annee_saisie;
+  }else{
+    var init_annee = annee_actuelle;
+  }
+
+  $(document).ready(function(){
+    $("#id_machines").on('change', function(event) {
+      var machine_selectionnee = $("#id_machines").val();
+      console.log("url= semaine change ** =" +  machine_selectionnee);
+      //$("#id_current_machine").val(machine_selectionnee);
+      vm.current_machine = machine_selectionnee;
+      var machine_selected = true;
+    });
+  });// fin $(document).ready
+
+  // ------------------------------------------------------
+  //-- si semaine change on recharge ofs de la semaine
+  //----------------------------------------------------
+  //alert(init_semaine);
+  $("#id_semaine__").change(function(event) {
+    var semaine = $(this).val();
+    var annee   = '{{ annee }}';
+    //var machine_selectionne = $("#id_machines").find(":selected").val();
+    //var machine_selectionnee = $("#id_machines option:selected").val();
+    var machine_selectionnee = $("#id_machines").val();
+    console.log("url= semaine of ** =" +  semaine  );
+    alert("url= semaine of ** =" +  semaine  );
+
+    url = "/of/home/da/1238" ;
+    url = url.replace(/1238/, semaine);
+    //alert(" je selectionne !" + semaine );
+    location.href = url;
+    location.replace(url)
+    //window.location.reload(false);
+  });
+
+
+</script>

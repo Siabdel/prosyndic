@@ -1,0 +1,152 @@
+{% extends 'base_da.html' %}
+{% load i18n staticfiles static %}
+
+	{% block left_side %}
+		<h4>Gestion commandes approvisionnment</h4>
+		<hr>
+	  {% include 'da_left_menu.html' %}
+		  <li class="list-group-item"> <h4> <a href="{% url 'console_liste_da'  %}">Gestion des DA </a></h4></li>
+  {% endblock left_side %}
+
+	{% block right_side %}
+	{% endblock right_side %}
+
+  {% block main_side %}
+
+<div class="container-fluid">
+	<div class="jumbotron">
+	  <div class="card-heading row">
+	        <div class="col-lg-10">
+					<p> <h3>Demande approvisionnment de l'année 2019  </h3>  </p>
+					</div>
+
+					<div class="col-lg-2">
+	          <span id="id_content_msg" class="text-warning">  </span>
+
+	          <A href="/da/cart/listitem/" >
+	            <img class="pull-left " src="{% static 'images/chariot.jpeg' %}" height="60" width="60" />
+	          </A>
+	        </div>
+	  </div>
+	</div>
+
+	<div class="row">
+	  <div class="col-md-6">
+	    <div class="card with-nav-tabs panel-primary">
+	        <div class="card-heading">
+	                <ul class="nav nav-tabs">
+	                  <!-- Action groupées -->
+	                  <!-- Dropdown -->
+	                  <li class="nav-item dropdown">
+	                    <a class="nav-link dropdown-toggle" href="#" id="navbardrop" data-toggle="dropdown">Action groupées </a>
+	                    <ul class="dropdown-menu">
+	                          <a class="dropdown-item" href="#"  target="_blank"> </a>
+	                          <li class="nav-item disabled"><a id="id_desactiver_of" class="nav-link text-muted  disabled"  disabled href="#" data-toggle="tab">----</a></li>
+	                    </ul>
+	                  </li>
+										<li class="nav-item"><a href="/da/console/listda/" title="vue de toute les Demandes approvisionnment" class="nav-link text-blod" >
+											{% if toggle_shwo_all %}
+												<span> Toute DA</span>
+												{% else %}
+												<span> Mes demandes Appro  </span>
+											 {% endif %}
+										</a>
+									</li>
+	                </ul>
+	        </div>
+	    </div>
+	  </div>
+	</div>
+
+	<!-- **** -->
+	<div class="row" id="app">
+		<div class="nav nav-tabs nav-tabs-horizontal text-white col-md-12">
+	      <div class="bg-warning__" style="background-color:grey">
+		      <A href="print_of?code_of=<dtml-var code_of>"  target="_blank" >
+		      <A href="#" class="btn btn-primary btn-lg"  onclick="history.back();" ><em class="fa fa-close"></em>Annuler</A>
+	      </div>
+	  </div>
+		<!-- use the modal component, pass in the prop -->
+		<modal v-if="showModal" @close="showModal = false">
+		 <!--
+			 you can use custom content here to overwrite
+			 default content
+		 -->
+		 <h3 slot="header">Confirmation</h3>
+		</modal>
+
+		<table class="table table-striped">
+			  <thead class="thead thead-inverse">
+			    <tr>
+			      <th v-show="false"> <input type="checkbox"  class="btn btn-large" onclick="checkAll(event);" name='super' id="id_checkAll"/>Check all </th>
+
+						<th><a @click="sort('demande_appro_id')">Ref DA</a> </th>
+						<th><a @click="sort('created')">Date debut</a> </th>
+						<th><a @click="sort('created_by')">Operateur </th>
+			      <th><a @click="sort('entrepot')">Entrepot </th>
+						<th><a @click="sort('zone_appro')">Zone Appro </th>
+						<th><a @click="sort('semaine')">Semaine </th>
+						<th><a @click="sort('annee')">Annee </th>
+			      <th class="text-center" colspan=3> <em class="fa fa-cogs fa-lg">Action</em> </th>
+
+			    </tr>
+			  </thead>
+		</table>
+
+		<table  class="table table-striped">
+			<tbody >
+				<compof v-for="(article, index) in sortedCats"  :index="index" v-bind:elem="article"> </compof>
+			</tbody>
+		</table>
+		<div class="row" >
+		<button class='btn-warning btn-lg  ' @click="prevPage">Précedent</button>
+		<button class='btn-warning btn-lg  ' @click="nextPage">Suivant</button>
+		</div>
+
+	</div>
+<!-- PAGINATION -->
+
+
+<!-- Message Modal -->
+
+	 <!-- template for the modal component -->
+	 {% include 'cac_template.html' %}
+
+</template>
+
+</div>
+
+
+{% endblock %}
+
+
+{% block extra_js %}
+<!-- VUEJS  -->
+<script src="{% static 'vuejs/vue2.3.4.js' %}"></script>
+<script src="{% static 'vuejs/app_appro.js' %}"></script>
+<!-- VUEJS  -->
+
+
+<script type="text/javascript">
+var cac_id = '{{ cac_id }}';
+var demande_appro_id = '{{object_list.first.demande_appro}}';
+
+
+$(document).ready(function(){
+	// afficher popup form add comment
+  $('#add_comment').on('show.bs.modal', function(e) {
+		alert("ok ..." );
+		$(this).find('.btn-ok').attr('href', $(e.relatedTarget).data('href'));
+  });
+
+	// confirme la suppression
+
+	// afficher popup sans barre progress wait
+  $('#confirm_delete' ).on('show.bs.modal', function(e) {
+      $(this).find('.btn-ok').attr('href', $(e.relatedTarget).data('href'));
+  });
+
+
+});
+  </script>
+{% endblock %}

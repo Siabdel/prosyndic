@@ -8,4 +8,6 @@ urlpatterns = [
     path('basedoc/', views.BaseDonneeDoc.as_view(), name="basdoc"), # Document
     path('doc/',  pro_view.DocumentApiList.as_view(), ), # new
     # API framework 
+    ## API
+    path('basedoc/', views.BaseDonneeDoc.as_view(), name="basdoc"),
 ] 

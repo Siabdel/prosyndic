@@ -1,0 +1,98 @@
+{% extends 'base_da.html' %}
+{% load i18n staticfiles static %}
+{% load of_tag %}
+
+	{% block left_side %}
+	  <h4>Proposition Demande approvisionnment </h4>
+		<hr>
+		{% include 'da_left_menu.html' %}
+  {% endblock left_side %}
+
+	{% block right_side %}
+	{% endblock %}
+
+
+  {% block main_side %}
+
+<div class="container-fluid" id="app2">
+	<div class="jumbotron">
+	  <div class="card-heading row">
+	        <div class="col-lg-10">
+					{% if articles %}
+	          <ul class="list-unstyled text-info">
+		          <li> <h3> Proposition Demande approvisionnment :  {{ commande_appro.pk }} </h3></li>
+							<li> <h3>Semaine : {{ commande_appro.semaine }} / 20{{ commande_appro.annee }}  </h3> </li>
+	          	<li class="text-info"> {{message}}</li>
+	          </ul>
+					{% else %}
+						<p> pas de proposiiton DA active ! </p>
+					{% endif %}
+	        </div>
+
+	        <span id="id_content_msg" class="text-warning"></span>
+
+	        <div class="col-lg-2">
+	          <span class=""> 2 </span>
+						<A href="/da/cart/listitem/" >
+							<img class="pull-left " src="{% static 'images/chariot.jpeg' %}" height="82" width="100" />
+						</A>
+	        </div>
+	  </div>
+	</div>
+
+<!-- ** -->
+<div class="row"  @validation.prevent="alert('validation a ete emit !');">
+	<div class="nav nav-tabs nav-tabs-horizontal text-white col-md-12">
+      <div class="bg-warning__" style="background-color:grey">
+	      <A href="print_of?code_of=<dtml-var code_of>"  target="_blank" >
+
+	      <A href="#" class="btn btn-primary btn-lg"  onclick="history.back();" ><em class="fa fa-close"></em>Annuler</A>
+				<A  href="/da/cac_ext_print/print/{{commande_appro.pk}}"
+					class="btn btn-primary btn-lg text-white" target="_blank" ><em class="fa fa-print"></em>Imprimez</A>
+
+      </div>
+  </div>
+
+  <table class="table table-striped">
+    <form id="form_da_selectionner" action="#" >
+      <thead class="thead thead-inverse">
+        <tr>
+          <th>Ref. Produit</th> <th>Nombre of</th>  <th>Quantite finale</th>
+          <th class="text-center" colspan=3><em class="fa fa-cogs fa-lg">Action</em></th>
+        </tr>
+      </thead>
+      <tbody>
+
+        <!-- definition des variables --->
+        {% assign compteur_mof 8 %}
+        {% assign code_of_precedent "" %}
+        <!-- definition des variables --->
+
+				{% for article in articles  %}
+					<tr  v-show="articles"  v-for="(product, index) in articles" :key=index class="list-unstyled">
+						{% for key, values in article.items  %}
+							{% if key == 'article' %}
+						  	<td> <h3 class="text-info"> Code produit: {{ values.0 }} <h3> {{ values.1   }} </td>
+							{% elif key == 'quantite_tot' %}
+								<td> <h3 class="text-info">  {{ values |  floatformat:0  }} <h3></td>
+							{% else %}
+							<td> <h3 class="text-info">  {{ values  }} <h3></td>
+							{% endif %}
+						{% endfor %}
+						<td>
+							<button  v-else-if="(product.selected) && (!product.validate)" class="btn-success btn-lg btn-block"
+								@click.prevent="select_article_ligneda(event, {{product.pk}})" >X</button>
+						</td>
+					</tr>
+				{% endfor %}
+
+      </tbody>
+    </form>
+
+  </table>
+</div>
+<!-- PAGINATION -->
+
+</div>
+
+{% endblock %}

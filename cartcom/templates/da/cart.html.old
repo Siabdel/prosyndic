@@ -1,0 +1,107 @@
+{% extends 'base_da.html' %}
+{% load i18n static %}
+
+{% block left_side %}
+  <h4><img class="pull-left " src="{% static 'images/chariot.jpeg' %}" height="40" width="40" />
+    Panier Demande approvisionnment</h4>
+    <hr>
+    {% include 'da_left_menu.html' %}
+  {% endblock left_side %}
+
+  {% block right_side %}
+  {% endblock %}
+
+
+  {% block main_side %}
+
+<div class="container-fluid">
+  <div class="jumbotron">
+    <div class="card-heading row">
+          <div class="col-lg-10">
+            	{% if item_list %}
+            <ul class="list-unstyled text-info">
+              <li>  <h3>Demande approvisionnement code <big> {{ item_list.first }} </big></li>
+              <li>  <h3>Année  {{ item_list.first.product.semaine}} /20{{item_list.first.product.annee}}</h3></li>
+            </ul>
+            {% else %}
+  						<p> pas d'article dans le panier ! </p>
+  					{% endif %}
+
+          </div>
+          <div class="row">
+            <span id="id_content_msg" class="text-warning">  </span>
+
+          </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-md-6">
+      <div class="card with-nav-tabs panel-primary">
+          <div class="card-heading">
+                  <ul class="nav nav-tabs">
+                    <!-- Action groupées -->
+                    <!-- Dropdown -->
+                    <li class="nav-item dropdown">
+                      <a class="nav-link dropdown-toggle" href="#" id="navbardrop" data-toggle="dropdown">Action groupées </a>
+                      <ul class="dropdown-menu">
+                            <a class="dropdown-item" href="#"  target="_blank"> </a>
+                            <li class="nav-item"><a id="id_plannifier_of" class="nav-link  text-primary" href="#" data-toggle="tab">---</a></li>
+                            <li class="nav-item disabled"><a id="id_desactiver_of" class="nav-link text-muted  disabled"  disabled href="#" data-toggle="tab">---</a></li>
+                      </ul>
+                    </li>
+
+                  </ul>
+          </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- boucle de creation des of a partir des commandes du plan de charge <dtml-call create_auto_of -->
+  <div class="row">
+    <div class="nav nav-tabs nav-tabs-horizontal text-white col-md-12">
+      <div class="bg-warning__" style="background-color:grey">
+
+      {% if item_list.count > 0  %}
+       <A  class="btn btn-lg btn-primary" href="/da/cart/emptycart"  >Vide le panier</A>
+       <A  class="btn btn-lg btn-primary" href="/da/cart/simulation/{{item_list.first.product.semaine}}/{{item_list.first.product.annee}}/{{item_list.first.product.machine_travail_id}}"    > Calcul de la demande d'appro</A>
+      {% endif %}
+        <A href="#" class="btn btn-primary btn-lg"  onclick="history.back();" ><em class="fa fa-close"></em>Annuler</A>
+      </div>
+  </div>
+
+  <table class="table table-striped">
+    <form id="form_check_grouper" action="" >
+      <thead class="thead thead-inverse">
+        <tr>
+             <th>Référence OF</th> <th>Machine</th>   <th>Ref. Commande</th> <th>Formule fab</th> <th>Formule Cond.</th>   <th>Quantitée</th>
+          <th class="text-center" colspan=3><em class="fa fa-cogs fa-lg">Action</em></th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- definition des variables --->
+        {% for item in object_list %}
+        <tr>
+            <td> {{ item.product.code_of}} </td>
+            <td> {{ item.product.machine_travail }} </td>
+            <td> {{ item.product.commande}} </td>
+            <td> {{ item.product.code_form_prod_id}} </td>
+            <td> {{ item.product.code_form_cond_id}} </td>
+            <td> {{ item.quantity}} </td>
+            <td> <A href="/da/cart/delitem/{{ item.id}}" > Supprimer</A> </td>
+        </tr>
+
+        {% endfor %}
+      </tbody>
+      <tfoot>
+            <td> <A  class="btn btn-lg btn-warning" href="#"  onclick="history.back();"> retour</A> </td>
+
+      </tfoot>
+    </form>
+
+  </table>
+</div>
+<!-- PAGINATION -->
+
+{% endblock %}

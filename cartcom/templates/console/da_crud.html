@@ -1,0 +1,81 @@
+{% extends 'console/console_base.html' %}
+{% load i18n static %}
+
+{% block left_side %}
+  <h4>Gestion commandes approvisionnment</h4>
+  <hr>
+  {% include 'da/da_left_menu.html' %}
+
+{% endblock left_side %}
+
+{% block right_side %}
+{% endblock right_side %}
+
+{% block main_side %}
+
+   <table id='datatable'
+   data-show-export="true"
+   data-export-types="['pdf', 'excel']"
+   data-export-options="{
+     'fileName':'tableExport',
+     'worksheetName':'tableExport',
+     'htmlContent':'true',
+
+   }"
+   ></table>
+
+<!-- Yep, all you need is a properly identified
+     but otherwise empty, table tag!
+-->
+<!-- -->
+<script src="{% static 'bower_components/bootstrap-table/dist/bootstrap-table.min.js' %}" ></script>
+
+
+<!-- jQuery first, then Popper.js, then Bootstrap JS, and then Bootstrap Table JS-->
+<!-- <script src="https://unpkg.com/bootstrap-table@1.13.4/dist/bootstrap-table.min.js"></script>-->
+
+<script type="text/javascript">
+
+$(document).ready(function() {
+
+function dateFormat(value, row, index) {
+   return moment(value).format('DD/MM/YYYY');
+}
+
+ $('#datatable').bootstrapTable({
+    search: true,
+    striped: true,
+    pagination: true,
+    showColumns: true,
+    showToggle: true,
+    showExport: true,
+    exportOptions: {
+        fileName: 'export_anim',
+        worksheetName: 'table',
+        csvSeparator: ';',
+        jspdf: {
+            orientation: "l",
+            autotable: {
+                styles: {rowHeight: 14, fontSize: 8, fillColor: 240},
+                headerStyles: {fillColor: 255, textColor: 0},
+                alternateRowStyles: {fillColor: 210, textColor: 0}
+            }
+        }
+    },
+    sortable: true,
+    paginationVAlign: 'both',
+    pageSize: 25,
+    pageList: [10, 25, 50, 100, 'ALL'],
+    //columns: [{   field: 'code_of',    title: 'Item ID'  }, {    field: 'commande',    title: 'Item Name'  }],  // here is where we use the column content from our Django View
+    columns : {{ columns|safe }},
+    //data: [{"id":1001,"code_of":"C2019021059", "commande":"181407"}]
+    data: {{ data|safe }}
+
+  });//  <th data-field="createdAt" data-formatter="dateFormat">Created At</th>
+  $("td").attr('data-field', 'createdAt' )
+  $("td").attr('data-formatter', "dateFormat")
+  $('th').addClass('text-info text-bold')
+});// fin document.ready
+</script>
+
+{% endblock %}

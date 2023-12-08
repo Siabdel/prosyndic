@@ -1,0 +1,212 @@
+{% extends 'base_da.html' %}
+{% load i18n staticfiles   %}
+{% load of_tag %}
+
+	{% block left_side %}
+	  <h5>Menu</h5>
+		{% include 'da_left_menu.html' %}
+  {% endblock left_side %}
+
+  {% block main_side %}
+
+<div class="container-fluid" id="app">
+<div class="jumbotron">
+  <div class="card-heading row">
+        <div class="col-lg-10">
+          <ul class="list-unstyled text-info">
+          <li> <h3> Proposition Demande approvisionnment: DA_{{ object_list.first.demande_appro }} --*--</h3></li>
+          <li> <h3> {{ object_list.first.nom_machine }} </h3> </li>
+          <li class="text-info"> {{ semaine }} /  {{ annee }}</li>
+          <li class="text-info"> Demande appro  </li>
+          </ul>
+        </div>
+
+        <span id="id_content_msg" class="text-warning"></span>
+
+        <div class="col-lg-2">
+          <span class=""> 2 </span>
+          <A href="/of/cart/listitem/" >
+            <img class="pull-left " src="{% static 'images/cart_01.png' %}" height="42" width="62" />
+          </A>
+        </div>
+  </div>
+</div>
+
+<!-- ** -->
+<div class="row">
+
+<template class="container" id="of_template">
+		<table   class="table table-bordered table-striped">
+				<tr class="text-center" v-show="of.active" :key=of.id  v-for="(of, index) in ofs">
+					{% for of in object_list %}
+					<td>***
+						<input type="checkbox" v-bind:checked="checked" v-on:change="$emit('checker', $event.target.checked)" class="form-check-input" />  </td>
+					<td>
+						<A href="#" class="btn"
+						v-bind:class="{
+								'btn-success btn-xs' : 	of.statut == 'S',
+								'btn-info btn-xs' : 		of.statut == 'P',
+								'btn-danger btn-xs' : 	of.statut == 'L',
+							  'btn-warning btn-xs' : 	of.statut == 'C',}" >
+							<i class="fa fa-pencil"  >  </i>
+							<span v-if="of.statut == 'L'" > Lancer </span>
+							<span v-if="of.statut == 'C'"> Creer </span>
+							<span v-if="of.statut == 'P'"> planifier </span>
+							<span v-if="of.statut == 'S'" > Cloturer </span>
+						</A>
+					</td>
+
+					<td> {{ of.statut  }}</td>
+					<td> {{ of.code_of  }}</td>
+					<td> {{ of.date_debut  }}</td>
+					<td> {{ of.commande}}</td>
+					<td> {{ of.client  }}</td>
+					<td> {{ of.quantite_cde }}</td>
+
+					<td> <A href="#" @click.stop="of.statut='P'"  href="" class="" > <i class="fa fa-pencil" style="font-size:14px;">Planifier </i>  </A> </td>
+					<td> <A href="#" @click.stop="of.statut='L'" href="" class="" > <i class="fa fa-pencil" style="font-size:14px;">Lancer </i>  </A> </td>
+					<td> <A href="#" @click.stop="of.statut='S'"  href="" class="" > <i class="fa fa-pencil" style="font-size:14px;">Cloturer </i>  </A> </td>
+					<td> <A href="#" class="" > <i class="fa fa-pencil" style="font-size:14px;">Edit </i>  </A> </td>
+					{% endfor %}
+				</tr>
+			</table>
+</template>
+
+<!-- PAGINATION -->
+
+</div>
+
+<!----- Modal popup confirmation -->
+<div class="modal fade" id="genere-of" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                Confirmation
+            </div>
+            <div class="modal-body">
+                Vous confirmmez la génération automatique des OF **?
+                  <!-- Barre de progression -->
+                  <p   class="text-warning clss_br_wait" style="display:none"><img src="barre_progress" width="250px" height="50">  </p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Quitter</button>
+                <a  class="btn btn-danger btn-ok clss_ok_genere">Ok</a>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+
+<!----- Modal popup confirmation -->
+<div class="modal fade" id="confirm-cloture" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                Confirmation
+            </div>
+            <div class="modal-body">
+                Vous confirmmez la cloture de cette OF ?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Quitter</button>
+                <a class="btn btn-danger btn-ok">Ok</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+
+{% block extra_js %}
+<!-- VUEJS  -->
+	<script src="{% static 'vuejs/app.js' %}"></script>
+<!-- VUEJS  -->
+
+<!-- autres  -->
+  <script type="text/javascript">
+// alert(" vuejs");
+// toggle btn selectionne
+	function toggle_check(event){
+		//checker
+		var button_select = event.target;
+		//$('input:checkbox ')
+		if ($(button_select).is(':checked')){
+		  $(id_lda).prop('checked', false);
+		}else{
+		  $(id_lda).prop('checked', true);
+		}
+	}
+
+  function select_article_ligneda(event, ligneda_id)
+    {
+      var url = "{% url 'cart_select_article_ligneda' 'selecteditem' 4321 %}".replace(/4321/, ligneda_id);
+      //alert("ok");
+      // post la demande
+			var self = event.target;
+      $.get( url ).done(function(data, status, error)  {
+
+        $("#id_content_msg").html(status);
+          ligne_id = "#" + ligneda_id
+          console.log("ca marche item update: " +  data);
+					// eviter les effets de bord du click
+    			//$(self).css("background-color", "yellow");
+					$(self).toggleClass('btn-warning', 1000, "easeOutSine" );
+
+					if ($(self).text() == 'Selectionnez'){
+						$(self).text('Delectionner')
+					}else{
+							$(self).text('Delectionner')
+					};
+          //checker
+          var id_lda = "#id_check_" +  ligneda_id
+          //$('input:checkbox ')
+          if ($(id_lda).is(':checked')){
+            $(id_lda).prop('checked', false);
+          }else{
+            $(id_lda).prop('checked', true);
+          }
+
+      }).fail(function(req, status, error) {
+        alert( "error" +  error );
+      });
+
+      //eviter les effets de bord du click
+      event.preventDefault();
+			event.stopPropagation();
+    } // fin de add_item_of
+
+  function checkAll(event){
+    var target = $(event.target);
+    if(target.is(':checked')){
+        $('input:checkbox').not(target).not(':checked').prop('checked', true);
+        console.log("list est checked : ");
+    }else{
+        $('input:checkbox').not(target).prop('checked', false);
+        console.log("list not checked : ");
+    }
+
+		// eviter les effets de bord du click
+    event.preventDefault();
+  }
+    //
+    // valisder la demande approvi
+    $("#form_da_selectionner").on('submit', function (event){
+      //
+        var url = "{% url 'cart_validate_da' 'validateda' 4321 %}".replace(/4321/, '{{demande_appro}}');
+        alert( "on valide " +  url );
+        $.get( url ).done(function(data, status, error)  {
+            $("#id_content_msg").html(status);
+            console.log("ca marche dappro update: " +  data );
+
+        }).fail(function(req, status, error) {
+          alert( "error" +  error );
+        });
+        //eviter les effets de bord du click
+        event.preventDefault();
+    });
+
+
+  </script>
+{% endblock %}

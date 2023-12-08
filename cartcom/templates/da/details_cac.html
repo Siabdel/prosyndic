@@ -1,0 +1,172 @@
+{% extends 'base_da.html' %}
+{% load i18n staticfiles static %}
+{% load of_tag %}
+
+	{% block left_side %}
+  <h4>Commande approvisionnment details</h4>
+	<hr>
+  {% include 'da_left_menu.html' %}
+
+
+  {% endblock left_side %}
+
+	{% block right_side %}
+	{% endblock %}
+
+
+  {% block main_side %}
+
+<div class="container-fluid" id="app3">
+	<div class="jumbotron">
+	  <div class="card-heading row">
+	        <div class="col-lg-10">
+	          <ul class="list-unstyled text-info">
+							<li> <h3>Ref : Commande approvisionnment:  {{ object_list.first.demande_appro }} </h3></li>
+							<li> <h3>Ref : Commande approvisionnment Gestform {{ cdeappro }} </h3></li>
+							<li> <h3>Semaine : {{ object_list.first.demande_appro.semaine }} / 20{{ object_list.first.demande_appro.annee }}  </h3> </li>
+	          </ul>
+	        </div>
+
+	        <span id="id_content_msg" class="text-warning"></span>
+
+	        <div class="col-lg-2">
+	          <span class=""> 2 </span>
+						<A href="/da/cart/listitem/" >
+							<img class="pull-left " src="{% static 'images/chariot.jpeg' %}" height="82" width="100" />
+						</A>
+	        </div>
+	  </div>
+	</div>
+
+<!-- ** -->
+
+<div class="row">
+  <div class="col-md-6">
+    <div class="card with-nav-tabs panel-primary">
+        <div class="card-heading">
+                <ul class="nav nav-tabs">
+                  <!-- Action groupées -->
+                  <!-- Dropdown -->
+                  <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbardrop" data-toggle="dropdown">Action groupées </a>
+                    <ul class="dropdown-menu">
+                          <li class="nav-item"><a id="id_gouper_produit" class="nav-link  text-primary"  @click.prevent="grouper_produit({{ object_list.first.demande_appro }})"  > groupé par produit</a></li>
+													<li class="nav-item"><a  class="nav-link  text-primary" href="#" data-toggle="tab"> </a></li>
+                          <li class="nav-item disabled"><a id="id_desactiver_of" class="nav-link text-muted  disabled"  disabled href="#" data-toggle="tab">----</a></li>
+                    </ul>
+                  </li>
+                </ul>
+        </div>
+    </div>
+  </div>
+</div>
+
+<div class="row">
+	<div class="nav nav-tabs nav-tabs-horizontal text-white col-md-12">
+      <div class="bg-warning__" style="background-color:grey">
+				<A  href="/da/cac_ext_print/print/{{object_list.first.demande_appro}}"
+					class="btn btn-primary btn-lg text-white" target="_blank" ><em class="fa fa-print"></em>Imprimez</A>
+	      <A href="#" class="btn btn-primary btn-lg"  onclick="history.back();" ><em class="fa fa-close"></em>Retour</A>
+
+      </div>
+  </div>
+
+  <table class="table table-striped">
+    <form id="form_da_selectionner" action="#" >
+      <thead class="thead thead-inverse">
+        <tr>
+          <th>Code of</th> <th>Ref. Produit</th> <th>Num. Commande</th> <th>Quantite prevue</th><th>Taux de perte MP</th><th>Quantite finale</th>
+          <th class="text-center" colspan=3><em class="fa fa-cogs fa-lg"></em></th>
+
+        </tr>
+      </thead>
+      <tbody>
+        <!-- definition des variables --->
+        {% assign compteur_mof 8 %}
+        {% assign code_of_precedent "" %}
+        <!-- definition des variables --->
+				<thead>
+					<th v-if="articles.length === 0" class="text-danger text-bold" colspan="5" > pas de produit  ! </th>
+				</thead>
+				<tr  v-show="articles" v-for="(product, index) in sortedProduct" :key=index class="list-unstyled">
+						<td v-if="index === 0">  <h3 class="text-info"> [[product.fields.code_of]] </h3>  </td>
+						<td v-else-if="(index > 0) && (product.fields.code_of===articles[index-1].fields.code_of)">  --</td>
+						<td v-else> <h3 class="text-info"> [[product.fields.code_of]] <h3></td>
+						<td class="text-warning"> [[ product.fields.article ]] - [[ product.fields.nom_article ]] </td>
+						<td> [[ product.fields.commande]] </td>
+						<td> [[ product.fields.quantite_produit  | arrondi(2) ]]  <input type="hidden" v-model="product.fields.code_of" @change="alertOFChange()" >  </td>
+						<td> [[ product.fields.taux_perte_mp  | arrondi(2) ]] % <input type="hidden" v-model="product.fields.code_of" @change="alertOFChange()" >  </td>
+						<td> [[ product.fields.quantite_produit * (1 + product.fields.taux_perte_mp / 100) | arrondi(0) ]]
+							<input type="hidden" v-model="product.fields.code_of" @change="alertOFChange()" >  </td>
+						<td>
+							<button  class="btn-success btn-lg btn-block" DISABLED >X</button>
+						</td>
+				</tr>
+
+      </tbody>
+    </form>
+
+  </table>
+</div>
+<!-- PAGINATION -->
+
+</div>
+
+
+<!----- Modal popup confirmation -->
+<div class="modal fade" id="confirm_validation" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                Confirmation
+            </div>
+            <div class="modal-body">
+                Vous confirmez la Validation de cette commande ?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Quitter</button>
+                <a class="btn btn-danger btn-ok">Ok</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+
+{% block extra_js %}
+
+<script type="text/javascript">
+var cac_id = '{{ cac_id }}';
+var demande_appro_id = '{{object_list.first.demande_appro}}';
+
+
+$(document).ready(function(){
+	// toggle btn selectionne
+	function toggle_check(event){
+		//checker
+		var button_select = event.target;
+		//$('input:checkbox ')
+		if ($(button_select).is(':checked')){
+		  $(id_lda).prop('checked', false);
+		}else{
+		  $(id_lda).prop('checked', true);
+		}
+	}
+
+	// afficher popup sans barre progress wait
+  $('#confirm_validation, #confirm_start').on('show.bs.modal', function(e) {
+      $(this).find('.btn-ok').attr('href', $(e.relatedTarget).data('href'));
+  });
+
+});
+  </script>
+
+
+	<!-- VUEJS  -->
+	<script src="{% static 'vuejs/vue.min.js' %}"></script>
+	<script src="{% static 'vuejs/main_3_vue.js' %}"></script>
+	<!-- VUEJS  -->
+
+
+{% endblock %}

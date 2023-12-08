@@ -24,6 +24,9 @@ urlpatterns = [
     path('accounts/', include('allauth.urls')),
     path('', include('copro.urls')),
     path('home/', include('copro.urls')),
+    path('simu/', include('simulator.urls')),
+    path('cart/', include('cartcom.urls')),
+    path("polls/", include("polls.urls")),
     path('markdownx/', include('markdownx.urls')), # MarkdownX URL patterns
 ]
 

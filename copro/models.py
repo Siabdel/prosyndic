@@ -222,6 +222,32 @@ class AbstractPieceJointe(models.Model):
     def __str__(self) -> str:
         return "{}".format(self.name)
     
+# Commantaire
+class Comment(models.Model):
+    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
+    object_id = models.PositiveIntegerField()
+    content_object = GenericForeignKey('content_type', 'object_id')
+    content = models.TextField()
+
+    def create_relation(self, obj):
+        self.content_object = obj
+        self.save()
+
+class Rating(models.Model):
+    """_summary_
+    Notes et avis : les types de contenu peuvent être utilisés pour créer un système de notes et
+    d'avis pour différents types de contenu, comme des produits, des restaurants ou des
+    services
+    """
+    score = models.PositiveIntegerField()
+    review = models.TextField()
+    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
+    object_id = models.PositiveIntegerField()
+    content_object = GenericForeignKey('content_type', 'object_id')
+    
+    def create_relation(self, obj):
+        self.content_object_1 = obj
+        self.save()
 class Pjointe(AbstractPieceJointe):
     candidature = models.ForeignKey('LigneDeCandidature', on_delete=models.CASCADE)
   
@@ -306,7 +332,11 @@ class LigneDeCandidature(AbstractLigneDoc):
     budget_jardinage = models.PositiveIntegerField(blank=True, null=True)
     author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     description = MarkdownxField( blank=True, null=True)    
-    comment = models.TextField(_('Observations'),  blank=True, null=True)  
+    comments = GenericRelation(Comment)
+    
+    def candidat_comments(self) : 
+        return  self.comments.all()
+
     
     def __str__(self):
         return "%s" % (self.societe)
@@ -339,6 +369,10 @@ class Evenement(models.Model):
     created     = models.DateTimeField(auto_now_add=True, verbose_name=_('created on'))
     closed      = models.DateTimeField(null=True, blank=True, verbose_name=_('closed on'))
     categories  = models.ForeignKey('Category', null=True, blank=True, verbose_name=_('categories'), on_delete=models.SET_NULL)
+    comments = GenericRelation(Comment)
+    
+    def event_comments(self):
+        return  self.comments.all()
 
     class Meta:
         ordering = ('-start',)
@@ -374,3 +408,4 @@ class Ticket(models.Model):
 
     def __str__(self):
         return self.title
+

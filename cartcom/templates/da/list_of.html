@@ -1,0 +1,244 @@
+{% extends 'base_da.html' %}
+{% load   staticfiles static %}
+{% load l10n %}
+
+
+{% block template_vuejs %}
+ {% endblock %}
+
+
+	{% block left_side %}
+    <h4>Demande approvisionnment Accueil</h4>
+    <hr>
+    {% include 'da_left_menu.html' %}
+  {% endblock left_side %}
+
+	{% block right_side %}
+
+	{% endblock right_side %}
+
+	<HR>
+
+{% block main_side %}
+
+<div class="container-fluid" id="app">
+  <div class="jumbotron">
+    <div class="card-heading row">
+          <div class="col-lg-8">
+  					     {% include 'search.html' %}
+  				</div>
+
+  				<div class="col-lg-offset-1 col-lg-3">
+            <div class="row">
+              <div  class="col-sm-6">
+                <span id="id_content_msg" class="text-warning">  </span>
+                <A href="/da/cart/listitem/" >
+                  <img class="pull-left " src="{% static 'images/chariot.jpeg' %}" height="82" width="100" />
+                </A>
+              </div>
+              <div class="col-sm-6">
+                <script type="text/javascript">
+                    var ofs_count = "{{ object_list|length }}" ;
+                </script>
+                <product-tabs :nb_ofs="ofs_count"></product-tabs>
+              </div>
+            </div>
+
+            <HR>
+
+            <div class="row">
+              {% if machine_choisie %}
+              <div class="row">
+
+              <div class="col-sm-10">
+                <p><img class="pull-left " src="{% static 'images/depot_icone.jpeg' %}" height="40" width="60" /></p>
+                <p<label for="localisation :">Localisation</label> <span>{{machine_choisie}}</span></p>
+              </div>
+              </div>
+              {% endif %}
+            </div>
+          </div>
+      </div>
+    </div>
+
+  <div class="row">
+    <div class="col-md-6">
+      <div class="card with-nav-tabs panel-primary">
+          <div class="card-heading">
+                  <ul class="nav nav-tabs">
+                    <!-- Action groupées -->
+                    <!-- Dropdown -->
+                    <li class="nav-item dropdown">
+                      <a class="nav-link dropdown-toggle" href="#" id="navbardrop" data-toggle="dropdown">Action groupées </a>
+                      <ul class="dropdown-menu">
+                            <a class="dropdown-item" href="#"  target="_blank"> </a>
+                            <li class="nav-item"><a  @click.prevent="add_ofs_cart" class="nav-link  text-primary"  >Ajouter dans le panier </a></li>
+                            <li class="nav-item disabled"><a  class="nav-link text-muted  disabled"  disabled href="#" data-toggle="tab">------</a></li>
+                      </ul>
+                    </li>
+                  </ul>
+          </div>
+      </div>
+    </div>
+
+    <div class="nav nav-tabs nav-tabs-horizontal text-white col-md-12">
+        <div class="bg-warning__" style="background-color:grey">
+  	      <A href="print_of?code_of=<dtml-var code_of>"  target="_blank" >
+  	      <A href='#' class="btn btn-primary btn-lg text-white"  ><em class="fa fa-print"></em>Imprimez</A>
+  	      <A href="#" class="btn btn-primary btn-lg"  onclick="history.back();" ><em class="fa fa-close"></em>Annuler</A>
+        </div>
+    </div>
+
+  </div>
+
+<!-->
+<div class="row" >
+	<!-- reviews commentaires -->
+  <table class="table table-striped">
+    <form id="form_check_grouper" action="" >
+      <thead class="thead thead-inverse">
+        <tr>
+          <th> <input type="checkbox"  class="btn btn-large" onclick="checkAll(event);" name='super' id="id_checkAll"/>Check all </th>
+          <th>Référence OF</th>  <th>Details OF</th>
+          <th class="text-center" colspan=3><em class="fa fa-cogs fa-lg">Action</em></th>
+        </tr>
+      </thead>
+      <tbody>
+
+        {% if object_list.count > 0 %}
+          {% for of in object_list %}
+          <tr class="list-unstyled">
+              <td> __<input type="checkbox" name="{{ of.code_of }}" class="form-check-input" /> </td>
+              <td>
+                    <img src="/static/images/cosmetics_00{{range}}.jpeg"   width="144" />
+              </td>
+
+              <td>
+
+                <li>
+                  <h3 class="text-info"> {{ of.article }} </h3>
+                </li>
+
+                <li> <label class="" for="code_of"> Code of  :</label>
+                  <span class="text-info"> {{ of.code_of }} </span>
+                  <small>{{ of.date_debut_reelle }} </<small>
+                </li>
+
+                <li> <label class="" for="commande">Numero de Commande  :</label>
+                  <span class="text-info"> {{ of.commande }} </span>
+                </li>
+
+                <li> <label class="" for="nomclie">Client  :</label>
+                  <span class="text-info">{{ of.client.nomclie }}</span>
+                </li>
+
+                <li>  <label class="col-sm-2" for="quantite prévue">quantite prévue </label> :
+                    <span class="col-sm-4  text-danger">
+                      {% if of.comment == 'completed' or  of.comment == 'partialed' %}
+                        <input type="text" class="form-control" id="quantite_prevue_{{ of.code_of }}"  value="{{ of.quantite_prevue }}" readonly/>
+                      {% else %}
+                        <input type="text" class="form-control" id="quantite_prevue_{{ of.code_of }}"  value="{{ of.quantite_prevue }}" readonly />
+                      {% endif %}
+                    </span>
+                </li>
+              </td>
+
+              <td>
+                 <A id="id_ajouter_of"  @click.prevent="add_of_cart(event, '{{ of.code_of  }}', $('#quantite_prevue_{{ of.code_of }}').val())"
+                  class="btn btn-lg btn-warning"  :class="toggle?'btn btn-lg btn-warning':'btn btn-lg btn-success'" > Ajouter</A>
+              </td>
+          </tr>
+          {% endfor %}
+        {% else %}
+          <p class="text-danger"> pas de OF Trouvé ! </p>
+        {% endif %}
+      </tbody>
+    </form>
+
+  </table>
+</div>
+<!-- PAGINATION -->
+
+</div> <!-- fin app -->
+
+<!----- Modal popup confirmation -->
+<div class="modal fade" id="genere-of" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                Confirmation
+            </div>
+            <div class="modal-body">
+                Vous confirmmez la génération automatique des OF **?
+                  <!-- Barre de progression -->
+                  <p   class="text-warning clss_br_wait" style="display:none"><img src="{% static '/images/barre_progress.gif' %}" width="250px" height="50">  </p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Quitter</button>
+                <a  class="btn btn-danger btn-ok clss_ok_genere">Ok</a>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+
+
+{% endblock %}
+
+
+{% block extra_js %}
+
+<!-- VUEJS  -->
+<script src="{% static 'vuejs/vue.min.js' %}"></script>
+<script src="{% static 'vuejs/main_vue.js' %}"></script>
+<!-- VUEJS  -->
+
+
+<script type="text/javascript">
+	$(document).ready(function(){
+    var days_selected = [];
+    var ofs_count = "{{ object_list.count }}" ;
+
+    $( "#id_machines").attr('v-model', 'selected');
+    // ------------------------------------------------------
+    //-- VUEJS on sauvegarde des variable pour VUEJS
+    //----------------------------------------------------
+    $( "input:checkbox").change(function() {
+    	if ($(this).is(":checked")) {
+    		days_selected.push($(this).val());
+    	}
+      //console.log( "this check " + $( "input:checkbox:checked" ).val() + $(this).val());
+    	console.log( "this check " + days_selected);
+    });
+
+});
+// fin document ready
+
+
+    //--------------------------
+    //---- checkAll
+    //--------------------------
+
+    function checkAll(event){
+
+         var target = $(event.target) ;
+
+
+         if( target.get(0).checked ){
+            $('.form-check-input').not(target).not(':checked').prop('checked', true);
+            //alert("id   check c'est super" + target.is(':checked'));
+            obj =  $('input:checkbox').not(target).not(':checked');
+            $.each( obj, function( key, value ) {
+                //alert( key + ": " + value );
+                //console.log("list chekced ! " + key + "val=" + value.id);
+              });
+         } else {
+           //alert("id not  check c'est super" + target.is(':checked'));
+           console.log("list not chekced ! " + $('input:checkbox').not(target).not(':checked'));
+           $('input:checkbox').not(target).prop('checked', false);
+         }
+    }
+  </script>
+
+{% endblock %}

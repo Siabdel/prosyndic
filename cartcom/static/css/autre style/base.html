@@ -1,0 +1,59 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+
+	<title>Blue Business Receiving</title>
+	<style type="text/css" media="screen">
+		* {margin:0; padding:0;}
+		body {font-family:"Trebuchet MS", sans-serif; font-size:62.5%; text-align:center; color:#777;}
+		p {line-height:150%; margin:0 0 2em 0;}
+		a {text-decoration:none;}
+		a:hover {color:#293B8D;}
+		#content, #masthead, #footer {text-align:left; font-size:1.2em;}
+		#footer {clear:both; padding:2em;}
+		#content {width:80%; margin:2em auto; }
+		#col1 {width:80%; float:left;}
+		#col2 {width:18%; float:right;}
+		#sidebar {padding:2em; background:#E3F0FF; margin:0;}
+		#sidebar li {list-style:none; font-size:1.4em; font-weight:bold;}
+		#col2 h2 {padding:.5em 1em; background:#ACBFD5; color:#fff; display:block; margin:0;}
+		table {border:collapse; border-top:1px solid #555; border-left:1px solid #555; border-right:1px solid #555;}
+		table th, table td {padding:.5em 1em; border-bottom:1px solid #555;}
+		thead {background:#999; color:#fff; font-weight:bold;}
+		tbody tr:hover {background:#FFFEDB;}
+	</style>
+</head>
+
+<body>
+<div id="masthead">
+	
+</div>
+<div id="content">
+	<div id="col1">
+{% block content %}
+
+{% endblock %}
+	</div>
+	<div id="col2">
+		<h2>Date Range</h2>
+		<div id="sidebar">
+			<ul>
+			<li><a href="/received/{% now "Y/b/d" %}">Today</a></li>
+			<li><a href="/received/2007/jul/">July</a></li>
+			<li><a href="/received/2007/aug/">August</a></li>
+			<li><a href="/received/2007/sep/">September</a></li>
+			<li><a href="/received/2007/oct/">October</a></li>
+			<li><a href="/received/2007/nov/">November</a></li>
+			<li><a href="/received/2007/dec/">December</a></li>
+			</ul>
+		</div>
+	</div>
+</div>
+<div id="footer">
+	
+</div>
+</body>
+</html>

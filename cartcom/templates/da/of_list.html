@@ -1,0 +1,95 @@
+{% extends 'base_of.html' %}
+{% load i18n static %}
+
+{% block left_side %}
+  <h4><img class="pull-left " src="{% static 'images/chariot.jpeg' %}" height="40" width="40" />
+    Panier Demande approvisionnment</h4>
+    <hr>
+    {% include 'da_left_menu.html' %}
+  {% endblock left_side %}
+
+  {% block right_side %}
+  {% endblock %}
+
+
+  {% block main_side %}
+
+<div class="container-fluid" >
+  <div class="jumbotron">
+  	<h2 class="text-center"> Gestion OFs  </h2>
+  	<h4 class="text-center text-primary"> Année  2018</h4>
+  </div>
+
+  <div class="container" id="app">
+    <table   class="table table-bordered table-striped">
+
+    	<thead>
+        <tr class="font-weight-bold text-center" >
+        	<th>Check</th>
+          <th><a @click="sort('date_debut_reelle')">Date debut</a></th>
+          <th><a @click="sort('code_of')">Code of</a> </th>
+          <th><a @click="sort('statut')">Statut</a>  </th>
+          <th><a @click="sort('commande_id')">Commande</a></th>
+        	<th><a @click="sort('client_id')">Client</a> </th>
+          <th><a @click="sort('quantite_prevue')"> Quantite</a></th>
+          <th colspan="4"> Action</th>
+        </tr>
+    	</thead>
+      <table>
+        <tbody >
+          <compof v-for="article in sortedCats"  :key="article.id" v-bind:of="article"> </compof>
+        </tbody>
+      </table>
+[[ sortedCats ]]
+    </table>
+
+    <div class="row" >
+    <button class='btn-warning btn-lg  ' @click="prevPage">Précedent</button>
+    <button class='btn-warning btn-lg  ' @click="nextPage">Suivant</button>
+    </div>
+
+  </div>
+
+  <template class="container" id="of_template">
+      <table   class="table table-bordered table-striped">
+  				<tr class="text-center" :key=of.id  v-show="active" >
+  					<td> <input type="checkbox"
+  							v-bind:checked="checked"
+  					    v-on:change="$emit('checker', $event.target.checked)"
+  					 class="form-check-input" />
+           </td>
+
+            <td> [[ of.date_debut_reelle  ]]</td>
+            <td> [[ of.code_of  ]]</td>
+  					<td> [[ of.statut ]]</td>
+  					<td> [[ of.commande]]</td>
+  					<td> [[ of.client  ]]</td>
+  					<td> [[ of.quantite_prevue ]]</td>
+            <td colspan="4">
+    					 <A href="#" @click.prevent="of.statut='P'"  href="" class="" > <i class="fa fa-pencil" style="font-size:14px;">Planifier </i>  </A>
+    				   <A href="#" @click.prevent="of.statut='L'" href="" class="" > <i class="fa fa-pencil" style="font-size:14px;">Lancer </i>  </A>
+    					 <A href="#" @click.prevent="of.statut='S'"  href="" class="" > <i class="fa fa-pencil" style="font-size:14px;">Cloturer </i>  </A>
+            </td>
+            <td>
+  						<A href="#" class="btn"
+  						v-bind:class="{
+  								'btn-success btn-md btn-block' : 	of.statut == 'S',
+  								'btn-info btn-md btn-block' : 		of.statut == 'P',
+  								'btn-danger btn-md btn-block' : 	of.statut == 'L',
+  							  'btn-warning btn-md btn-block' : 	of.statut == 'C',}" >
+  							<span v-if="of.statut == 'L'" > Lancer </span>
+  							<span v-if="of.statut == 'C'"> Creer </span>
+  							<span v-if="of.statut == 'P'"> planifier </span>
+  							<span v-if="of.statut == 'S'" > Cloturer </span>
+  						</A>
+  					</td>
+  				</tr>
+        </table>
+  </template>
+
+  <!-- VUEJS  -->
+	<script src="{% static 'vuejs/vue2.3.4.js' %}"></script>
+	<script src="{% static 'vuejs/app_2.js' %}"></script>
+	<!-- VUEJS  -->
+  {% endblock %}
+</div>

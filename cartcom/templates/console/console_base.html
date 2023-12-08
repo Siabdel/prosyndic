@@ -1,0 +1,201 @@
+{% load i18n static %}
+<!doctype html>
+<html lang='fr'>
+<head>
+	   <meta charset="UTF-8">
+     <title>{% if site_name %}{{ site_name }} : {% endif %}{% block head_title %}{% endblock %}</title>
+     <!-- BOOTSTRAP -->
+		 <!-------------------->
+		 <!-- FullCalendar  --->
+		 <!-------------------->
+		  <!------CSS------>
+		  <link rel='stylesheet' href="{% static 'bootstrap/dist-3.3.5/css/bootstrap.css' %}"  media="screen" />
+		  <link rel='stylesheet' href="{% static 'jquery/css/popup.css' %}"  >
+		  <link rel='stylesheet' href="{% static 'jquery/css/jquery-ui.css' %}"  >
+		  <link rel='stylesheet' href="{% static 'css/style_vuejs.css' %}"  >
+
+
+		  <!------JS---------->
+		  <script src="{% static 'fullcalendar/dist-v2.6.1/moment-2.10.3.js' %}" ></script>
+		  <script src="{% static 'fullcalendar/dist-v3.9.0/lib/jquery-3.3.1.min.js' %}" ></script>
+
+		  <script src="{%  static 'fullcalendar/dist-v3.9.0/lib/jquery-ui-1.12.1.min.js' %}" ></script>
+		  <script src="{% static 'bootstrap/dist-3.3.5/js/bootstrap.js' %}"></script>
+		  <script src="{% static 'jquery/js/jquery.popup.js' %}"></script>
+
+		  <!-------------------->
+		  <!-- FullCalendar  --->
+		  <!-------------------->
+		  <!------CSS------>
+		  <link  href="{% static 'fullcalendar/dist-v3.9.0/scheduler-v1.9.4.css' %}" rel="stylesheet"  >
+		  <link  href="{% static 'fullcalendar/dist-v3.9.0/fullcalendar.css' %}" rel="stylesheet"  >
+		  <link  href="{% static 'fullcalendar/dist-v3.9.0/fullcalendar.print.min.css' %}" rel="stylesheet"  media="print" >
+		  <script src="{% static 'fullcalendar/dist-v3.9.0/fullcalendar.js' %}"></script>
+		  <script src="{% static 'js/scheduler-1.9.4.js' %}"></script>
+		  <script src="{% static 'fullcalendar/locale/fr.js' %}"></script>
+			<script src="{% static 'js/local_script.js' %}"></script>
+
+
+
+		 <!-- font-awesome -->
+		 <!--<link rel="stylesheet" href="{% static 'schedue.css' %}" type="text/css" media="screen" />-->
+		 <link rel="stylesheet" href="{% static 'fonts/font-awesome/css/font-awesome.css' %}" type="text/css">
+		 <link rel='stylesheet' href='{% static "bower_components/fullcalendar/dist/fullcalendar.min.css" %}' />
+		 <!-- <link rel='stylesheet' href='{% static "fullcalendar/dist-2.4.0/fullcalendar.print.css" %}'   media='print' />  -->
+
+     {% block extra_head %}
+     {% endblock %}
+</head>
+
+<style>
+.entete_sce_001 {
+   background-image:url("{% static 'images/gpao_004.jpg' %}" );
+   background-repeat:no-repeat;
+   padding-top: 100px;
+  }
+
+	.entete_sce_002 {
+	   background-image:url("{% static 'images/cosmetics_003.jpg' %}" );
+	   background-repeat:no-repeat;
+	   padding-top: 25px;
+		 border: 2px
+		 solid black;
+	  }
+</style>
+
+
+	<body>
+
+<header class="navbar navbar navbar-fixed-top  bg-primary container-fluid" role="banner">
+	<div class="container">
+		<div class="navbar-header">
+		    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+		        <span class="sr-only">Toggle navigation</span>
+		        <span class="icon-bar"></span>
+		        <span class="icon-bar"></span>
+		        <span class="icon-bar"></span>
+		    </button>
+		    {% if settings.SITE_TITLE %}<a class="navbar-brand" href="/">{{ settings.SITE_TITLE }} </a>{% endif %}
+				{% if settings.SITE_TAGLINE %}<p class="navbar-text visible-lg">{{ settings.SITE_TAGLINE }}</p>{% endif %}
+
+				</div>
+		</div>
+	  <div class="collapse navbar-collapse container">
+	     <!-- page_menu "pages/menus/dropdown.html" -->
+	       <!-- Collect the nav links, forms, and other content for toggling -->
+				<ul class="nav navbar-nav navbar-inverse navbar-right">
+					<li class="hidden">	<a href="#page-top"></a></li>
+					<li class="hidden"><a href="/admin">Administrateur</a></li>
+					<li class=""><a href="/">Accueil</a></li>
+
+					<li class="dropdown">
+						<a href='#' class="dropdown-toggle" data-toggle="dropdown"> Mon compte <b class='caret'></b></a>
+						<ul class="dropdown-menu">
+							<li class='active'>
+								{% if user.is_authenticated %}
+									<a class="page-scroll" href="/accounts/logout"><b>Se déconnecter</b></a>
+									{% else %}
+										<li class='text-center-xs active'><a href="/accounts/login">Se connecter a Pulsar</a></li>
+								{% endif %}
+							</li>
+						</ul>
+					</li>
+
+					<li class="pull-left">
+						{% if user.is_authenticated %}
+							<small class='text-left-xs'> Bonjour Mr(Mme) <br>  {{ user.first_name }} {{ user.last_name}} </small>
+						{% endif %}
+					</li>
+			</ul>
+	  </div>
+	</div>
+</header><!--/header-->
+
+	<div class='row'>
+		<div class="col-md-12">
+			<div  id="demo" class="row jumbotron entete_sce_002 text-center" >
+				<div class="col-md-6">
+					<h3> <img class="img-rounded" src="{% static 'images/pulsar_003.png'  %}"  /> <i> PULSAR SCE</i> Console DA</h3>
+				</div>
+
+				<div class="col-md-6 col-offset-md-12 entete_sce_001">
+				 <!-- <img class="image-circle" src={% static 'images/gpao_004.jpg' %}  width="140px"/> -->
+				</div>
+			</div>
+		</div>
+	</div>
+
+  <section class="container-fluid" id="body">
+		<div class="row">
+			{% if messages %}
+			  <ul id="messages">
+			      {% for message in messages %}
+			      <li id="message_{{ forloop.counter }}"><a href="#" onclick="$('#message_{{ forloop.counter }}').fadeOut(); return false;"><small>{% trans "clear" %}</small></a> {{ message }}</li>
+			      {% endfor %}
+			  </ul>
+			{% endif %}
+
+			  <!-- Message Modal -->
+				<div class='modal fade' id='myModal' role='dialog'>
+				  <div class='modal-dialog'>
+				    <!-- Modal content-->
+				    <div class='modal-content'>
+				      <div class='modal-header'>
+				        <button type='button' class='close' data-dismiss='modal'>&times;</button>
+				        <h4 class='modal-title'>Messages</h4>
+				      </div>
+				      <div class='modal-body'>
+				        <p id="id_content_msg"> </p>
+
+				      </div>
+				      <div class='modal-footer'>
+				        <button type='button' class='btn btn-default' data-dismiss='modal'>Close</button>
+				      </div>
+				    </div>
+				  </div>
+				</div>
+
+		</div>
+
+		{% block content %}
+			<div class="row">
+				<!-- left side -->
+				<div class="col-md-2">
+						{% block left_side %}
+						  <h3>Column 1</h3>
+						{% endblock %}
+				</div>
+
+				<!-- center side -->
+				<div class="col-md-9">
+					{% block main_side %}
+					  <h3>Column 2</h3>
+					{% endblock %}
+				</div>
+
+				<!-- right side -->
+				<div class="col-md-1">
+						{% block right_side %}
+						  <h3>Column 3</h3>
+						{% endblock %}
+				</div>
+			</div>
+
+
+		{% block template_vuejs %}
+		{% endblock %}
+		{% endblock %}
+
+  </section>
+
+	{% block extra_js %}
+	{% endblock %}
+
+
+	{% block extra_style %}
+	{% endblock %}
+
+  <div id="footer">{% block footer %}{% endblock %}</div>
+
+	</body>
+</html>

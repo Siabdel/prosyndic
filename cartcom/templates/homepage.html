@@ -1,0 +1,82 @@
+{% extends 'base_home.html' %}
+{% load i18n staticfiles static %}
+
+
+
+
+{% block top %}
+<section class="emerald" id="title">
+        <div class="container">
+            <div class="row">
+                <div class="col-sm-6">
+                    <h1>{% block title %}{% endblock %}</h1>
+
+                </div>
+                <div class="col-sm-6">
+                    <ul class="breadcrumb pull-right">
+                        {% spaceless %}
+							<!-- page_menu-->
+						{% endspaceless %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+   </section>
+{% endblock %}
+
+
+
+<!--- bloc main --->
+
+{% block body %}
+<div class="container">
+
+
+  <div class="col-md-10 jumbotron">
+    <p class="lead">Pulsar Sce Planification OF</p>
+    <div class="list-group">
+        <li class="list-group-item"><a target="_blank" href="{% url 'fullcalendar_semaine' 'of_calendar' 05 19 2 %}" class="list-group-item">Pulsar.Sce planification OF</a> </li>
+        <li class="list-group-item"><a target="_blank" href="http://192.168.10.232:92/of/listof/36/18/4" class="list-group-item">Demande Approvisionnement</a> </li>
+        <li class="list-group-item"><a target="_blank" href="http://athena:8084/gestform.dev/commande_client/charge_condt/plan_charge/of_ordre_fabrication_v2.00/of_conditionnement/" class="list-group-item">Gestion des ordres de fabrication</a></li>
+        <li class="list-group-item"><a target="_blank" href="http://zope:8084/gestform.com/planning/Calend_Indus_FABR_V4_as/start_rccp" class="list-group-item">RCCP Fabriction</a></li>
+        <li class="list-group-item"><a target="_blank" href="http://zope:8084/gestform.com/planning/Calend_Indus_CONDI_avec_previ/start_rccp" class="list-group-item">RCCP conditionnement avec  prevision</a></li>
+    </div>
+  </div>
+
+</div>
+{% endblock %}
+
+<!--- bloc résultats --->
+<section id="resultats" class="container-fluid">
+	<div class="row">
+    {% block resultats %}{% endblock %}
+	</div>
+</section>
+
+<section class="wet-asphalt" id="services">
+	<div class="container">
+	{% block services %}{% endblock %}
+	</div>
+</section>
+
+<footer id="footer" class="midnight-blue">
+	<div class="container-fluid">
+		{% block footer %}{% endblock %}
+
+	 <div class="row">
+		<div class="col-sm-6">
+				Pulsar Sce theme by <a href="#">strandcosmeticseurope Developers</a>.
+		</div>
+		<div class="col-sm-6">
+				<ul class="pull-right">
+
+						<li><a id="gototop" class="gototop" href="#"><i class="icon-chevron-up"></i></a></li><!--#gototop-->
+				</ul>
+		</div>
+
+	 </div>
+	</div>
+</footer>
+
+</body>
+</html>

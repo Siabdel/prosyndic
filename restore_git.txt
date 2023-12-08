@@ -1,0 +1,1 @@
+git restore --source as_vuejs -- copro/serializers.py

@@ -1,6 +1,7 @@
 # -*- coding:UTF-8 -*-
 import datetime
 from simulator import models
+# from . import views as ofviews
 from django.contrib import messages
 from decimal import Decimal
 from django.contrib.auth.models import User, AnonymousUser
@@ -36,7 +37,7 @@ class Cart(object):
                 self.cartdb = models.CartOf.objects.get(id=cart_id, checked_out=False)
             # except  models.CartOf.DoesNotExist:
             except Exception as err:
-                messages.add_message(self.request, messages.INFO, 'pas de panier pour cart_id.%s' % err.message)
+                messages.add_message(self.request, messages.INFO, 'pas de panier pour cart_id.%s' % err)
                 try :
                     self.cartdb = models.CartOf.objects.filter( created_by = request.user).order_by('id').last()
                     # on update CART_ID en session
@@ -69,7 +70,7 @@ class Cart(object):
             yield item
 
     def new(self, request):
-        cart = models.CartOf.objects.create(creation_date=datetime.datetime.now(), created_by = self.request.user.username)
+        cart = models.CartOf.objects.create(creation_date=datetime.datetime.now(), created_by = self.request.user)
         cart.save()
         request.session[CART_ID] = cart.id
         messages.add_message(self.request, messages.INFO, 'on cree un panier .%s' % cart.id)
@@ -165,6 +166,27 @@ class Cart(object):
 #------------------
 #-----
 #------------------
+class CartDevis(Cart):
+    """
+    Panier viruel pour preparer la commande
+    """
+    def __init__(self, request):
+        # Cart.__init__(request)
+        super(CartDevis, self).__init__(request)
+        Cart.__init__(self, request)
+
+    def get_car_count(self):
+        if self.cartdb:
+            return  self.cartdb.item_set.all().count()
+        else:
+            return 0
+
+    def is_product_exist_incart(self, of):
+        # messages.add_message(self.request, messages.INFO, 'type of self.cartdb  = %s ' %  self.cartdb.item_set.all())
+        for item in self.cartdb.item_set.all():
+            if item.product.code_of == of.code_of:
+                return True
+        return False
 def create_cart_in_database( creation_date=datetime.datetime.now(), checked_out=False):
     """
         Helper function so I don't repeat myself
@@ -188,131 +210,3 @@ def create_item_in_database(cart, product, quantity=1, unit_price=Decimal("100")
 
     return item
 
-
-class CartDemandeAppro(Cart):
-    """
-    Panier viruel pour preparer la demande
-    d'appro
-    """
-    def __init__(self, request):
-        # Cart.__init__(request)
-        super(CartDemandeAppro, self).__init__(request)
-        Cart.__init__(self, request)
-
-    def get_car_count(self):
-        if self.cartdb:
-            return  self.cartdb.item_set.all().count()
-        else:
-            return 0
-
-    def is_product_exist_incart(self, of):
-        # messages.add_message(self.request, messages.INFO, 'type of self.cartdb  = %s ' %  self.cartdb.item_set.all())
-        for item in self.cartdb.item_set.all():
-            if item.product.code_of == of.code_of:
-                return True
-        return False
-
-
-    def calcul_demande_appo(self, of):
-        # calcul DA
-        # 1- recherche du numero de la fiche
-        code_formule = of.code_form_cond_id
-        code_fiche = planif_models.DjangoFiche.objects.get(codecndt=code_formule)
-
-        # 2 - recherche de la formule
-        sql = """
-                SELECT *
-                FROM fcondt{}
-                WHERE codecndt = {}
-                AND codeprod IS NOT NULL
-                ORDER BY ligncndt
-                """.format(code_fiche , code_formule)
-
-        all_columns, formule_cond_rows =  dictfetchall(sql)
-        product = []
-        tab_coef_cond  = []
-
-        for elem in formule_cond_rows :
-            if elem['codeprod']is not u"" :
-                product.append(elem['codeprod'])
-                tab_coef_cond.append(float(elem['nbrecndt']) )
-
-        # 3- calcul
-        # sort inverse de coef
-        ligne = 0
-        #coef.sort(reverse = False)
-        formule = zip(product, tab_coef_cond)
-        # messages.add_message(self.request, messages.INFO, 'formule  %s ' % (formule) )
-
-        # 2 autre calcul
-        ligne = 0
-        proposition_2 = []
-        coef_total  = 1
-        # 1 er lecture de la table des goupes DTECONDT
-
-        # 1 ieme lecture:
-        ligne = 10
-        tab_qtt_groupe , tab_coef_total , t_test = [],[],[]
-
-        qtt_groupe_precedant = 1
-
-        for product, coef in formule:
-            #coef_total = coef_total * coef
-            coef = int(coef)
-            t_test.append(coef)
-
-            if ligne == 10:
-                ligne_actu = 10
-                tab_qtt_groupe.append(coef)
-                coef_total = 1
-                tab_coef_total.append(coef_total)
-
-            elif ligne == int(code_fiche.ligpart1) \
-                or  ligne == int(code_fiche.ligpart2) \
-                or ligne == int(code_fiche.ligpart3) \
-                or ligne == int(code_fiche.ligpart4)  :
-                # changement de groupe
-                if coef == 0 :
-                    tab_qtt_groupe.append(1)
-                    qtt_groupe_precedant = 1
-                else :
-                    tab_qtt_groupe.append(coef)
-
-                # coef_total
-                # coef_total *  avant dernier qtt_groupe
-                coef_total = coef_total * tab_qtt_groupe[len(tab_qtt_groupe) -2]
-                tab_coef_total.append(coef_total)
-
-            else :
-                # tab_qtt_groupe reprend le dernier qtt_groupe
-                tab_qtt_groupe.append(tab_qtt_groupe[len(tab_qtt_groupe) - 1])
-                tab_coef_total.append(coef_total)
-
-            # qtt_groupe_precedant
-            try :
-                product_obj = planif_models.DjangoProduit.objects.get(codeprod=product)
-            except Exception as err:
-                return None
-
-            proposition_2.append(models.Dict2Obj(
-                {
-                'ligne' : ligne,
-                'produit' : product_obj ,
-                'coef' : coef,
-                'coef_total' : coef_total,
-                'quantite' : long(math.ceil( of.quantite_prevue / coef_total))
-                }
-                    )
-                )
-            # save precedant et suivant
-            qtt_groupe_precedant = coef
-            ligne = ligne + 10
-            nomenc = [(elem.produit, elem.quantite) for elem in proposition_2]
-
-
-
-        # return
-        # messages.add_message(self.request, messages.INFO, 'proposition_2= %s' % (nomenc))
-
-        result = {'code_of' : of.code_of, 'proposition' : proposition_2}
-        return  models.Dict2Obj(result)

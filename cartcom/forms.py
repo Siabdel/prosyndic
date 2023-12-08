@@ -3,15 +3,12 @@ import re
 import datetime
 from django import forms
 from django.forms import ModelForm
-from django.utils.translation import ugettext_lazy as _
 from django.contrib.auth.models import User
 from django.forms.utils import ErrorList, ValidationError, ErrorDict
-from ofschedule import models
 # translate
-from django.utils.translation import ugettext_lazy as _
-from django.utils.translation import ugettext, ugettext_lazy as _
+from django.utils.translation import gettext as _
 from django.forms.models import inlineformset_factory
-from approvisionnement import models
+from cartcom import models as cart_models
 
 DURATION_WIDGET_OPTIONS = {
     'format': 'hh:ii',
@@ -29,8 +26,7 @@ w_radio_select = forms.RadioSelect(attrs={'class': 'radio'})
 semaine_aujourdhui = datetime.datetime.isocalendar(datetime.datetime.now())[1]
 SEMAINES_CHOICE = [(sem, sem) for sem in range(semaine_aujourdhui, 53, 1)]
 # -- formulaire de recherche Medecin
-query_machines = models.DjangoMachine.objects.filter(
-    nommach__in=['INCONNU', 'A14'])
+query_machines = cart_models.ItemArticle.objects.all()
 JOURS_SEMAINE = [(1, 'lundi'), (2, 'mardi', ), (3, 'mercredi'),
                  (4, 'jeudi'),  (5, 'vendredi'), (7, 'samedi')]
 
@@ -49,62 +45,15 @@ def format_validator_semaine(value):
 
 
 # contruction list
-queryset = models.DjangoMachine.objects.none(),
-
-query_machine = models.DjangoMachine.objects.all().values_list('codemach', 'nommach').distinct()
-
-machines_de_semaine = [(machine_travail_id__codemach, machine_travail_id__nommach)
-            for (machine_travail_id__codemach, machine_travail_id__nommach)
-            in query_machine.iterator()]
-
-machines_de_semaine = machines_de_semaine + [('', 'None')]
+queryset = cart_models.ItemArticle.objects.none(),
+query_machine = cart_models.ItemArticle.objects.all()
 
 class SearchMachineForm(forms.Form):
-
     # cle_recherche = forms.CharField(max_length=50, widget=forms.TextInput(attrs={'size':30}))
+    choices=JOURS_SEMAINE
+    ###
 
-    machines = forms.ChoiceField(label='Machines',choices=machines_de_semaine, required=False)
-
-    # machines_semaine = [ (choice.pk, choice) for choice in models.DjangoMachine.objects.filter(pk__in =
-    #semaines = forms.CharField(widget=forms.Select( choices=SEMAINES_CHOICE), required=True)
-    semaine = forms.CharField(max_length=2, required=False)
-    annee   = forms.CharField(max_length=4, required=False)
-    #
-    jours_semaine = forms.MultipleChoiceField(required=False,
-                                        widget=forms.CheckboxSelectMultiple,
-                                        choices=JOURS_SEMAINE)
-    #
-    jours_semaine.widget.attrs.update({'class': 'input-lg' })
-
-    semaine.widget.attrs.update({'class': 'input-lg', 'size':'2'})
-    machines.widget.attrs.update({'class': 'input-lg', 'v-model':'current_machine' })
-
-
-    def __init__(self,  *args, **kwargs):
-        # appel a la class mère
-        super(SearchMachineForm, self).__init__(*args, **kwargs)
-        # set the user_id as an attribute of the form
-        #self.fields['semaine'].initial = 33
-        self.fields['machines'].choices= machines_de_semaine
-        self.fields['machines'].widget.attrs['v-model'] = 'current_machine'
-
-        # charger la class bootstrap
-        for key, field in self.fields.items():
-            if field:
-                if field.label:
-                    field.label = ugettext(field.label)  # traduire le label
-                # les input
-
-                if type(field.widget) in (forms.TextInput, forms.DateInput):
-                    field.widget.attrs['class'] = 'input-lg'
-                    # charger place holder
-                    field.widget.attrs['placeholder'] = field.label
-                elif type(field.widget) in (forms.Select, forms.SelectMultiple ):
-                    field.widget.attrs['v-model'] = 'current_machine'
-                    field.widget.attrs['class'] = 'input-lg'
-
-    class Meta:
-        ordering = ('nommach',)
+   
 
 # ------------------------------------
 # -- formulaire de recherche Medecin

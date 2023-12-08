@@ -1,0 +1,261 @@
+{% extends 'base_da.html' %}
+{% load i18n staticfiles static %}
+{% load of_tag %}
+
+	{% block left_side %}
+  	<h4>Demande approvisionnment</h4>
+		<hr>
+		{% include 'da_left_menu.html' %}
+  {% endblock left_side %}
+
+	{% block right_side %}
+	{% endblock %}
+
+
+  {% block main_side %}
+
+<div class="container-fluid" id="app2">
+	<div class="jumbotron">
+	  <div class="card-heading row">
+	        <div class="col-lg-10">
+	          <ul class="list-unstyled text-info">
+	          <li> <h3> Proposition Demande approvisionnment: DA_{{ object_list.first.demande_appro }} </h3></li>
+	          <li> <h3>Machine : {{  nom_machine }}  </h3> </li>
+	          <li class="text-info"> [[message]]</li>
+	          </ul>
+	        </div>
+
+	        <span id="id_content_msg" class="text-warning"></span>
+
+	        <div class="col-lg-2">
+	          <span class=""> 2 </span>
+						<A href="/of/cartlist/listitem/" >
+							<img class="pull-left " src="{% static 'images/chariot.jpeg' %}" height="82" width="100" />
+						</A>
+	        </div>
+	  </div>
+	</div>
+
+<!-- ** -->
+<div class="row"  @validation.prevent="alert('validation a ete emit !');">
+	<div class="nav nav-tabs nav-tabs-horizontal text-white col-md-12">
+      <div class="bg-warning__" style="background-color:grey">
+	      <A href="print_of?code_of=<dtml-var code_of>"  target="_blank" >
+
+	      <A href="#" class="btn btn-primary btn-lg"  onclick="history.back();" ><em class="fa fa-close"></em>Annuler</A>
+			  <button  v-show="articles.length"  class="btn btn-primary btn-lg" id="show-modal" @click="showModal = true"><em class="fa fa-save"></em>Valider</button>
+
+      </div>
+  </div>
+
+	<div class="row">
+		<!-- use the modal component, pass in the prop -->
+		<modal v-if="showModal" @close="showModal = false">
+			<!-- -->
+			<h3 slot="header">Confirmation</h3>
+		</modal>
+	</div>
+
+  <table class="table table-striped">
+    <form id="form_da_selectionner" action="#" >
+      <thead class="thead thead-inverse">
+        <tr>
+          <th> <input type="checkbox"  class="btn btn-large" onclick="checkAll(event);" name='super' id="id_checkAll"/>Check all </th>
+          <th>Code of</th> <th>Ref. Produit</th> <th>Num. Commande</th> <th>Quantite prevue</th><th>Taux de perte MP</th><th>Quantite finale</th>
+          <th class="text-center" colspan=3><em class="fa fa-cogs fa-lg">Action</em></th>
+        </tr>
+      </thead>
+      <tbody>
+
+        <!-- definition des variables --->
+        {% assign compteur_mof 8 %}
+        {% assign code_of_precedent "" %}
+        <!-- definition des variables --->
+				<thead>
+					<th v-if="articles.length === 0" class="text-danger text-bold" colspan="5" > pas d'articles a validez ! </th>
+				</thead>
+				<tr  v-show="articles"  v-for="(product, index) in articles" :key=index class="list-unstyled">
+						<td><input type="hidden"     disabled readonly  CHECKED  /> </td>
+
+						<td v-if="index === 0">  <h3 class="text-info"> [[product.fields.code_of]] </h3>  </td>
+						<td v-else-if="(index > 0) && (product.fields.code_of===articles[index-1].fields.code_of)">  --</td>
+						<td v-else> <h3 class="text-info"> [[product.fields.code_of]] <h3></td>
+						<td class="text-warning"> [[ product.fields.article ]] - [[ product.fields.nom_article ]] </td>
+						<td> [[ product.fields.commande]] </td>
+						<td> [[ product.fields.quantite_produit  | arrondi(2) ]]  <input type="hidden" v-model="product.fields.code_of" @change="alertOFChange()" >  </td>
+						<td> [[ product.fields.taux_perte_mp  | arrondi(2) ]] %s <input type="hidden" v-model="product.fields.code_of" @change="alertOFChange()" >  </td>
+						<td> [[ product.fields.quantite_produit * (1 + product.fields.taux_perte_mp / 100) | arrondi(2) ]]  <input type="hidden" v-model="product.fields.code_of" @change="alertOFChange()" >  </td>
+						<td>
+							<Button  v-if="(!product.fields.selected) && (!product.fields.validate)" class="btn-warning btn-lg btn-block" :transition="transition_select" @click.prevent="select_article_ligneda([[product.pk]])">Selectionnez</button>
+							<button  v-else-if="(product.fields.selected) && (!product.fields.validate)" class="btn-success btn-lg btn-block"  @click.prevent="select_article_ligneda([[product.pk]])" >X</button>
+							<button  v-else-if="product.fields.validate" class="btn-basic disabled btn-lg btn-block"  DISABLED>Produit validé</button>
+						</td>
+				</tr>
+
+      </tbody>
+    </form>
+
+  </table>
+</div>
+<!-- PAGINATION -->
+
+</div>
+
+{% endblock %}
+
+
+{% block extra_js %}
+
+<script type="text/javascript">
+var semaine_of = '{{ semaine_of }}';
+var data_in = "{{object_list}}" ;
+var demande_appro_id = '{{object_list.first.demande_appro}}';
+
+
+$(document).ready(function(){
+	// toggle btn selectionne
+	function toggle_check(event){
+		//checker
+		var button_select = event.target;
+		//$('input:checkbox ')
+		if ($(button_select).is(':checked')){
+		  $(id_lda).prop('checked', false);
+		}else{
+		  $(id_lda).prop('checked', true);
+		}
+	}
+
+	// afficher popup sans barre progress wait
+	//$('#confirm_validation').on('hide.bs.modal.prevent', closeModalEvent);
+	$("#btn_validation").click(function(){
+    $("#confirm_validation").modal("hide");
+		$("#id_validation").trigger('click');
+		console.log("validation et hide modal");
+  });
+
+
+	$('#confirm_validation').on('show.bs.modal.prevent', function(e) {
+		// afficher popup sans barre progress wait
+		//$(this).find('.btn-ok').attr('href', $(e.relatedTarget).data('href'));
+		//e.preventDefault();
+	  //$('#confirm_validation').modal('hide');
+		//$("#id_validation").trigger('click');
+
+	});
+	function closeModalEvent(e){
+		$(this).find('.btn-ok').attr('href', $(e.relatedTarget).data('href'));
+	}
+
+  function select_article_ligneda__(event, ligneda_id)
+    {
+      var url = "{% url 'cart_select_article_ligneda' 'selecteditem' 4321 %}".replace(/4321/, ligneda_id);
+      //alert("ok");
+      // post la demande
+			var self = event.target;
+      $.get( url ).done(function(data, status, error)  {
+
+        $("#id_content_msg").html(status);
+          ligne_id = "#" + ligneda_id
+          console.log("ca marche item update: " +  data);
+					// eviter les effets de bord du click
+    			//$(self).css("background-color", "yellow");
+					$(self).toggleClass('btn-warning', 1000, "easeOutSine" );
+
+					if ($(self).text() == 'Selectionnez'){
+						$(self).text('Delectionner')
+					}else{
+							$(self).text('Delectionner')
+					};
+          //checker
+          var id_lda = "#id_check_" +  ligneda_id
+          //$('input:checkbox ')
+          if ($(id_lda).is(':checked')){
+            $(id_lda).prop('checked', false);
+          }else{
+            $(id_lda).prop('checked', true);
+          }
+
+      }).fail(function(req, status, error) {
+        alert( "error" +  error );
+      });
+
+      //eviter les effets de bord du click
+      event.preventDefault();
+			event.stopPropagation();
+    } // fin de add_item_of
+
+  function checkAll(event){
+    var target = $(event.target);
+    if(target.is(':checked')){
+        $('input:checkbox').not(target).not(':checked').prop('checked', true);
+        console.log("list est checked : ");
+    }else{
+        $('input:checkbox').not(target).prop('checked', false);
+        console.log("list not checked : ");
+    }
+
+		// eviter les effets de bord du click
+    event.preventDefault();
+  }
+    //
+    // valisder la demande approvi
+    $("#form_da_selectionner").on('submit', function (event){
+      //
+        var url = "{% url 'cart_validate_da' 'validateda' 4321 %}".replace(/4321/, '{{demande_appro}}');
+        alert( "on valide " +  url );
+        $.get( url ).done(function(data, status, error)  {
+            $("#id_content_msg").html(status);
+            console.log("ca marche dappro update: " +  data );
+
+        }).fail(function(req, status, error) {
+          alert( "error" +  error );
+        });
+        //eviter les effets de bord du click
+        event.preventDefault();
+    });
+
+});
+  </script>
+
+	<!-- template for the modal component -->
+<script type="text/x-template" id="modal-template">
+  <transition name="modal" >
+    <div class="modal-mask">
+      <div class="modal-wrapper">
+        <div class="modal-container">
+
+          <div class="modal-header">
+            <slot name="header">
+              Validation DA
+            </slot>
+          </div>
+
+          <div class="modal-body">
+            <slot name="body">
+              confirmez-vous la validation de la commande ?
+            </slot>
+          </div>
+
+          <div class="modal-footer">
+            <slot name="footer">
+              <button class="modal-default-button" @click="$emit('close');">
+                Quitter
+              </button>
+							<button id="id_validation"  class="modal-default-button"
+							 @click.prevent="emitValidationDa(demande_appro_id); $emit('close');">
+								<em class="fa fa-save"></em>Validez </button>
+
+            </slot>
+          </div>
+        </div>
+      </div>
+    </div>
+  </transition>
+</script>
+	<!-- VUEJS  -->
+	<script src="{% static 'vuejs/vue.min.js' %}"></script>
+	<script src="{% static 'vuejs/main_2_vue.js' %}"></script>
+	<!-- VUEJS  -->
+
+
+{% endblock %}

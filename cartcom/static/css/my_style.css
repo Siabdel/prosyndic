@@ -1,0 +1,149 @@
+body {
+    font-family: tahoma;
+    color:#282828;
+    margin: 0px;
+  }
+
+  .nav-bar {
+    background: linear-gradient(-90deg, #84CF6A, #16C0B0);
+    height: 60px;
+    margin-bottom: 15px;
+  }
+
+  .product {
+    display: flex;
+  }
+
+
+h1 {
+    color: blue;
+    background-color: #1E95EA;
+    
+    font-size: 19px;
+  }
+
+  img {
+    border: 1px solid #d8d8d8;
+    //width: 50%;
+    //margin: 40px;
+    box-shadow: 0px .5px 1px #d8d8d8;
+  }
+
+  .product-image {
+    flex-basis: 700px;
+  }
+
+  .product-info {
+    margin-top: 10px;
+    flex-basis: 500px;
+  }
+
+  .color-box {
+    width: 40px;
+    height: 40px;
+    margin-top: 5px;
+  }
+
+  .cart {
+    margin-right: 25px;
+    float: right;
+    border: 1px solid #d8d8d8;
+    padding: 5px 20px;
+  }
+
+  button_2 {
+    margin-top: 30px;
+    border: none;
+    background-color: #1E95EA;
+    color: white;
+    height: 40px;
+    width: 100px;
+    font-size: 14px;
+  }
+
+  .disabledButton {
+    background-color: #d8d8d8;
+  }
+
+  .review-form {
+    width: 30%;
+    padding: 20px;
+    border: 1px solid #d8d8d8;
+  }
+
+  input {
+    width: 100%;
+    height: 25px;
+    margin-bottom: 20px;
+  }
+
+  textarea {
+    width: 100%;
+    height: 60px;
+  }
+
+  // fenetre modal
+
+  .modal-mask {
+    position: fixed;
+    z-index: 9998;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, .5);
+    display: table;
+    transition: opacity .3s ease;
+  }
+
+  .modal-wrapper {
+    display: table-cell;
+    vertical-align: middle;
+  }
+
+  .modal-container {
+    width: 300px;
+    margin: 0px auto;
+    padding: 20px 30px;
+    background-color: #fff;
+    border-radius: 2px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, .33);
+    transition: all .3s ease;
+    font-family: Helvetica, Arial, sans-serif;
+  }
+
+  .modal-header h3 {
+    margin-top: 0;
+    color: #42b983;
+  }
+
+  .modal-body {
+    margin: 20px 0;
+  }
+
+  .modal-default-button {
+    float: right;
+  }
+
+  /*
+   * The following styles are auto-applied to elements with
+   * transition="modal" when their visibility is toggled
+   * by Vue.js.
+   *
+   * You can easily play with the modal transition by editing
+   * these styles.
+   */
+
+  .modal-enter {
+    opacity: 0;
+  }
+
+  .modal-leave-active {
+    opacity: 0;
+  }
+
+  .modal-enter .modal-container,
+  .modal-leave-active .modal-container {
+    -webkit-transform: scale(1.1);
+    transform: scale(1.1);
+  }

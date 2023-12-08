@@ -1,0 +1,49 @@
+<!-- template for the modal component -->
+<template class="container" id="cac_template">
+	<table class="table table-striped" >
+				<tr class="text-center" :key=elem.id  v-show="!active" >
+					<td> <input type="checkbox" v-bind:checked="checked" v-on:change="$emit('checker', $event.target.checked)" class="form-check-input" />
+					</td>
+					<td> [[ elem.pk ]] </td>
+					<td> [[ elem.demande_appro_id ]] </td>
+					<td> [[ elem.created | formatDate ]] </td>
+					<td> [[ elem.created_by ]] </td>
+					<td> [[ elem.entrepot  ]] </td>
+					<td> [[ elem.zone_appro]] </td>
+					<td> [[ elem.semaine  ]] </td>
+					<td> [[ elem.annee  ]]  </td>
+					<td>
+						 <button  v-show="false"  title="Ajouter un commentaire" id='bt_12345' type='button'  class="btn btn-lg btn-warning" data-toggle='modal'
+							data-target='#ModalFormMessage'> <span class='fa fa-plus'></span>[[elem.pk]]</button>
+					</td>
+
+					<td v-show="false"> <A @click="form_active=!form_active" title="Ajouter un commentaire" class="btn btn-lg btn-info" >
+						<em class="fa fa-plus"> </em></A>
+						<form id="formComment"  action="#" @submit.prevent="checkComment(elem.pk), form_active=!form_active"   v-show="!form_active">
+							{% csrf_token %}
+							<!-- <input type="hidden"  id="cle_csrf" v-model="csrf_token"  />     -->
+							<textarea name="comment" v-model="comment" placeholder="saisir ici un commentaire" rows="8" cols="80"> </textarea>
+							<input class="btn btn-success" type="submit"   value="sauvegarder" />
+						</form>
+					</td>
+
+
+					<td> <A  :href="url_update_da" title="Modifier l'entete de la demande appro ..." class="btn btn-lg btn-warning" target="_blank" /><em class="fa fa-plus"></em></A> </td>
+					<td> <A  :href="url_show"  data-toggle="tooltip"  title=" Voir Détails" class="btn btn-lg btn-warning" ><em class="fa fa-eye"></em></A> </td>
+					<td> <A  :href="url_print" data-toggle="tooltip"  title="imprimer" class="btn btn-lg btn-warning"  target="_blank"><em class="fa fa-print"></em></A> </td>
+					<td> <A  :href="url_export" data-toggle="tooltip"  title="Exporter en fichier excel"  class="btn btn-lg btn-warning" target="_blank"><em class="fa fa-file"></em></A> </td>
+					<td> <A v-show="true" :href="url_delete_da" data-toggle="tooltip" @click.prevent="emit_open_modal_confirm(elem.pk)" title="Suppression Demande approvisionnement"
+            	v-bind:class="{
+                'btn btn-lg btn-warning' : elem.created_by!=1,
+								'btn btn-lg btn-info  btn-block' : elem.created_by==1,}" >
+              <em  class="fa fa-trash"></em></A></td>
+
+					<td>
+					</td>
+
+
+				<!-- template for the modal component -->
+			  {% include 'modal_template.html' %}
+				</tr>
+	</table>
+</template>

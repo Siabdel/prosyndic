@@ -10,6 +10,10 @@ import io
 import base64
 import math
 
+import numpy as np
+from django_pandas.io import read_frame
+import pandas as pd
+from . import views as of_views
 # from dateutil.parser import *
 from django.db import connection
 import pandas as pd
@@ -36,16 +40,15 @@ from urllib.parse import quote
 from django.contrib.auth.models import User
 from django.db import IntegrityError
 from django.http import JsonResponse
-from .cart import Cart, create_cart_in_database
-from .cart import create_item_in_database
-from .cart import CartDemandeAppro
 from django.views.decorators.csrf import ensure_csrf_cookie
+from django.utils.decorators import method_decorator
+from cartcom import forms
+from cartcom import cart as e_cart
+from cartcom import models as cart_models
 
 # Rendez-vous
 
 TIMEZONE = 'Europe/Paris'
-#date = DT2dt(date) # zope DateTime -> python datetime
-
 # How long ago the timestamp is
 # See timedelta doc http://docs.python.org/lib/datetime-timedelta.html
 #since = datetime.datetime.utcnow() - date
@@ -58,56 +61,15 @@ logger = logging.getLogger(__name__)
 
 #Django listview as JSON and Jquery getJSON example
 
-
-class JsonResponseMixin(object):
-    """
-    Return json
-    """
-    def render_to_json(self, queryset):
-        # queryset  serialise
-        data = serializers.serialize('json', queryset)
-
-        json_data = json.loads( data)
-        # json_data = json.dumps( data)
-
-        # data_light = [ (elem['pk'], elem['fields']) for elem in json_data ]
-        data_light = [ ]
-        for elem in json_data:
-            elem['fields']['pk'] = elem['pk']
-            data_light.append(elem['fields'])
-
-        data_fin = json.dumps(data_light)
-        return HttpResponse(data_fin ,  content_type='application/json')
-
-    def export_as_json(self, ct, ids):
-        queryset = models.DjangoOf.objects.filter(id__in=ids.split(","))
-        response = HttpResponse(content_type="application/json")
-        serializers.serialize("json", queryset, stream=response)
-        return response
-
-    def export_as_cvs(self, ct, ids):
-        queryset = models.DjangoOf.objects.filter(id__in=ids.split(","))
-        # Create the HttpResponse object with the appropriate CSV header.
-        response = HttpResponse(content_type='text/csv')
-        response['Content-Disposition'] = 'attachment; filename=mymodel.csv'
-        writer = csv.writer(response, csv.excel)
-        response.write(u'\ufeff'.encode('utf8')) # BOM (optional...Excel needs it to open UTF-8 file properly)
-        # response['Content-Disposition'] = 'attachment; filename="%s"'% os.path.join('export', 'export_of.csv')
-        writer = csv.writer(response)
-        for obj in queryset:
-            writer.writerow([
-                smart_str(obj.pk),
-                smart_str(obj.code_of),
-                smart_str(obj.client),
-            ])
-        return response
-
+def home(request):
+    return HttpResponse("C'est Home ...")
+                        
 #  la liste des ofs
 @method_decorator(login_required, 'dispatch')
-class ListOfsView(ListView, FormView, CartDemandeAppro):
+class ListOfsView(ListView, FormView, e_cart.Cart):
     template_name = "list_of.html"
     paginate_by = 10  # if pagination is desired
-    form_class = forms.SearchMachineForm
+    ## form_class = forms.SearchMachineForm
     object_list = None
 
     def __init__(self,  **kwargs):
@@ -121,7 +83,7 @@ class ListOfsView(ListView, FormView, CartDemandeAppro):
         # semaine actuelle
         semaine_aujourdhui = datetime.datetime.isocalendar(datetime.datetime.now())[1]
         img_choice = random.choice(range(10))
-        context['form'] = self.form_class
+        #context['form'] = self.form_class
         form = forms.SearchMachineForm()
         # form.initial.update( {'user': self.request.user, 'cle_recherche': v_semaine})
         return context
@@ -327,173 +289,6 @@ class ListOfsView(ListView, FormView, CartDemandeAppro):
 # -----------------------------------------
 # --- Gestion des Demande approv. confirmées
 # -----------------------------------------
-@method_decorator(login_required, 'dispatch')
-class HomeDaOf(ListView, FormView):
-    """
-    """
-    success_url = "/da/home/"
-
-    template_name = "list_of.html"
-    model = planif_models.DjangoOf
-    #paginate_by = 10  # if pagination is desired
-    form_class = forms.SearchMachineForm
-    object_list = None
-
-    def get(self,request, **kwargs):
-        context = self.get_context_data(**kwargs)
-        context['semaine_of'] = kwargs.get('semaine_of')
-        return self.render_to_response(context)
-
-
-    def get_context_data(self, **kwargs):
-        # 1- on cahrge le context
-        # messages.add_message(self.request, messages.INFO, 'HomeDaOf: PROJECT_PATH =%s' %  BASE_DIR)
-        context = super(HomeDaOf, self).get_context_data(**kwargs)
-        semaine_aujourdhui = datetime.datetime.isocalendar(datetime.datetime.now())[1]
-        annee_actuelle  = datetime.datetime.now().strftime("%Y")[-2:]
-
-        # 2- on charge le formulaire avec request.POST
-        if self.request.method == 'POST' :
-            form = forms.SearchMachineForm(self.request.POST)
-            la_semaine = self.request.POST['semaine']
-            annee_saisie = self.request.POST['annee']
-            machine_choisie = self.request.POST['machines']
-            machine_choisie = models.DjangoMachine.objects.get(codemach=machine_choisie)
-            #iquery = LiveDataFeed.objects.values_list('unit_id', flat=True).distinct()
-            form.fields['semaine'].initial = la_semaine
-            try :
-                nom_atelier = planif_models.DjangoLieuProd.objects.get(clieupro=machine_choisie.atelier)
-            except Exception as err:
-                nom_atelier = machine_choisie
-                messages.add_message(self.request, messages.INFO, 'pas atelier trouve en base =%s' % machine_choisie)
-
-            context['machine_choisie'] = nom_atelier
-
-        else:
-            form = forms.SearchMachineForm()
-            # 3- on inialise form par val machines et semaine
-            if 'semaine_of' in context.keys() and 'annee' in context.keys():
-                la_semaine= context.get('semaine_of')
-                annee_saisie = context.get('annee')[-2:]
-            else:
-                la_semaine = semaine_aujourdhui
-                annee_saisie = annee_actuelle
-
-
-        # on charge les machines de la listbox
-        #messages.add_message(self.request, messages.INFO, 'semaine=%s et annee=%s saisie' % (la_semaine, annee_saisie))
-        machines_de_semaine =  planif_models.DjangoOf.objects.filter(
-            semaine=la_semaine ,
-            annee=annee_saisie ,
-            statut__in=['P', 'D'])\
-            .distinct().order_by('machine_travail_id__nommach') \
-            .values_list('machine_travail_id__codemach', 'machine_travail_id__nommach', flat=False)
-
-        # on charge machine dans form
-        machines_de_semaine = [(machine_travail_id__codemach, machine_travail_id__nommach)
-                    for (machine_travail_id__codemach, machine_travail_id__nommach)
-                    in machines_de_semaine.iterator()]
-
-
-        form.fields['machines'].choices = machines_de_semaine
-        form.fields['semaine'].initial = semaine_aujourdhui
-        form.fields['annee'].initial =  annee_saisie
-
-        # 4- on met a jour le context avec autre ariables
-        context['annee_actuelle'] = annee_actuelle
-        context['annee_saisie'] =  annee_saisie
-        context['semaine_of'] = la_semaine
-        context['semaine_actuelle'] = semaine_aujourdhui
-        context['form'] = form
-        context['object_list'] = self.get_queryset(form)
-
-        img_choice = random.choice(range(10))
-        context['range'] = img_choice
-        context['semaines_avenir'] = [ sem for sem in range(semaine_aujourdhui, 53, 1)]
-        return context
-
-
-    def post(self, request, **kwargs):
-        """
-        on traite le formulaire valide pour charger les valeurs postées dans kwargs
-        """
-        form = self.get_form()
-
-        if form.is_valid():
-            # messages.error(request, u"semaine saisie %s" %  str(msg))
-            #messages.add_message(self.request, messages.INFO, 'form valide =%s' %  form.cleaned_data)
-            # on recupere les data user du choix et updater kwargs
-            kwargs.update({
-                'semaine': form.cleaned_data['semaine'],
-                'machines': form.cleaned_data['machines'],
-                'jours_semaine': form.cleaned_data['jours_semaine'],
-                #'annee': form.cleaned_data['annee'],
-
-                           })
-            #
-            # return self.render_to_response(self.get_context_data(form=form))
-            return self.form_invalid(form)
-        else:
-            return self.form_invalid(form)
-
-    def get_queryset(self, form):
-        kwargs = self.get_form_kwargs()
-        v_machine = None
-        # 1- on recuprer les data de l'utilisateur
-        if self.request.method == 'POST':
-            v_semaine = self.request.POST.get('semaine')
-            v_annee = self.request.POST.get('annee')
-            # messages.add_message(self.request, messages.INFO, 'semaine=%s et annee=%s saisie' % (v_semaine, v_annee))
-
-
-            if  form.is_valid():
-                # messages.add_message(self.request, messages.INFO, 'form valide %s' % (form.cleaned_data))
-                v_machine = form.cleaned_data['machines']
-
-            else:
-                messages.add_message(self.request, messages.INFO, 'form en erreurs =%s' % form.errors )
-                return self.object_list
-
-            # jours_semaine': [u'3', u'4'],
-            v_jour_semaine = kwargs.get('jours_semaine', [])
-
-            # Default
-            v_semaine_courante = datetime.datetime.isocalendar( datetime.datetime.now())[1]
-            v_annee_courante  = str(datetime.datetime.isocalendar(datetime.datetime.now())[0])[-2:]
-            v_machine_courante  = 'INCONNUE'
-
-            # 2- composer la requete
-            #v_semaine = '30'
-            # if v_machine :
-            self.object_list = planif_models.DjangoOf.objects.filter(semaine=v_semaine,
-                                                              annee=v_annee,
-                                                          machine_travail_id=v_machine,
-                                                          statut__in=['P', 'D'])
-
-            # 3- convertir les jours semaine en dates
-            # ..jours_semaine': [u'1', u'5'],
-            ofs_du_jours = []
-            if len(form.cleaned_data['jours_semaine']) > 0 :
-                for jour  in  form.cleaned_data['jours_semaine'] :
-                    ofs_du_jours = ofs_du_jours + [of.code_of for of in self.object_list.iterator() if of.date_debut_reelle.weekday() == int(jour) - 1]
-
-                # messages.add_message(self.request, messages.INFO, 'count ofs = %s' % (ofs_du_jours ))
-                self.object_list = self.object_list.filter(code_of__in = ofs_du_jours)
-
-            # 4/ test si OF est deja concerné par une Cac
-            self.object_list= list(self.object_list)
-            for index, of in  enumerate(self.object_list):
-                if  models.DjangoLigneCommandeApprov.objects.filter(code_of=of.code_of).exists():
-                    cac = models.DjangoLigneCommandeApprov.objects.filter(code_of=of.code_of).first()
-                    # messages.add_message(self.request, messages.INFO, 'OF est deja concerne par une Cac=%s' % of.code_of)
-                    if  is_quantite_prevue_completed(of) :
-                        self.object_list[index].comment = "completed"
-                    elif get_sum_quantite_panier(of) > 0 and get_sum_quantite_panier(of) < cac.quantite_pprevue :
-                        self.object_list[index].comment = "partialed"
-                        self.object_list[index].quantite_prevue = self.object_list[index].quantite_prevue - cac.quantite_panier
-
-        # retour
-        return self.object_list
 
 """
 if not created:
@@ -502,38 +297,14 @@ if not created:
 """
 
 
-#----------------------------
-#--- details nomenclature
-#----------------------------
-@method_decorator(login_required, 'dispatch')
-class CacDetailsView(ListView):
-    template_name="details_cac.html"
-    # models = models.DjangoLigneCommandeApprov
-    object_list = None
-
-    def get(self, args, **kwargs):
-        cac_id = kwargs.get('cac_id')
-        context = self.get_context_data(**kwargs)
-
-        if cac_id :
-            self.queryset = models.DjangoLigneCommandeApprov.objects.filter(demande_appro__pk=cac_id)
-            context['cdeappro'] = ofsch_models.DjangoEnteteAppro.get(cac_id=cac_id).cdeappro
-        else :
-            self.queryset =  context['object_list'] = None
-
-        # return
-        context['object_list'] = self.queryset
-        return self.render_to_response(context)
-
-
-
 #  class Cart List items
 @method_decorator(login_required, 'dispatch')
-class ListItemCartView(ListView, CartDemandeAppro):
+class ListItemCartView(ListView, e_cart.CartDevis):
     """
     details des produits nomenclature de DAS
     """
-    template_name="details_das.html"
+    #template_name="details_das.html"
+    template_name="product_list.html"
     object_list = None
     form_class = forms.SearchMachineForm
     # paginate_by = 10  # if pagination is desired
@@ -548,9 +319,8 @@ class ListItemCartView(ListView, CartDemandeAppro):
     def get_context_data(self,  **kwargs):
         context = super(ListItemCartView, self).get_context_data(**kwargs)
         # init panier Cart
-        CartDemandeAppro.__init__(self, self.request)
-        context['object_list'] = context['item_list'] = self.get_items_cart()
-
+        e_cart.Cart.__init__(self, self.request)
+        #context['object_list'] = self.get_items_cart()
         return context
 
 
@@ -633,22 +403,6 @@ class ListItemCartView(ListView, CartDemandeAppro):
             return JsonResponse({'new_cac:new_cac'}, status=200, safe=False)
             #return HttpResponseRedirect("/of/cac/list/")
 
-        elif action == 'update_entete':
-            # 1- recuperation des vars
-            v_cac_id = kwargs.get('cac_id')
-            url_ext_zope = kwargs.get('url_ext')
-            # 2- insert en base entete appro + lignes appro
-            if not (planif_models.DjangoEnteteAppro.objects.filter(cac_id = v_cac_id).exists()):
-                ## new_entete_appro = self.create_da_gestform(v_cac_id)
-                url_ext_zope =  url_ext_zope + "?CODE={}&ZONE=entete-pied".format(new_entete_appro.cdeappro)
-
-            else :
-                entete_appro = planif_models.DjangoEnteteAppro.objects.get(cac_id = v_cac_id)
-                url_ext_zope =  url_ext_zope + "?CODE={}&ZONE=entete-pied".format(entete_appro.cdeappro)
-
-            # redirect
-            return redirect(url_ext_zope)
-
 
         return self.render_to_response(context)
         #return self.get(args, **kwargs)
@@ -668,7 +422,7 @@ class ListItemCartView(ListView, CartDemandeAppro):
         item_list = []
         #
         try:
-            item_list = models.Item.objects.filter(cart=self.cartdb)
+            item_list = cart_models.ItemArticle.objects.filter(cart=self.cartdb)
             # messages.add_message(self.request, messages.INFO, 'je vais dans le panier')
 
         except Exception as err:
@@ -682,7 +436,7 @@ class ListItemCartView(ListView, CartDemandeAppro):
         # messages.add_message(self.request, messages.INFO, 'code of =%s quantitee= %s' % (code_of, self.request.session.get('CART_ID') ))
 
         try:
-            of = planif_models.DjangoOf.objects.get(code_of=code_of)
+            item_list = cart_models.Product.objects.all()
             if not self.is_product_exist_incart(of):
                 # on ajoute dans panier
                 self.add(of, 1, quantitee)
@@ -700,7 +454,7 @@ class ListItemCartView(ListView, CartDemandeAppro):
 
     def del_item_incart(self, item_id):
         try :
-            ii = models.Item.objects.get(id=item_id)
+            ii = cart_models.ItemArticle.objects.get(id=item_id)
             ii.delete()
         except Exception as err:
             messages.add_message(self.request, messages.INFO, 'Erreur del_item_incart = %s ' % item_id)
@@ -708,98 +462,18 @@ class ListItemCartView(ListView, CartDemandeAppro):
 
 
     def empty_cart(self):
-        ii = models.CartOf.objects.get(id=self.cartdb.id)
+        ii = cart_models.CartOf.objects.get(id=self.cartdb.id)
         ii.delete()
 
-    def simulation_demande_approv(self, context):
+    def simulation_devis(self, context):
         # 0- recuperer les ofs du panier
         propositions = []
-
-        # on recupere les variables context
-        code_machine = context.get('code_machine')
-        semaine = context.get('semaine')
-        annee = context.get('annee')
-
-
-        # 1- creation une demande appro simulation
-        """
-        si une aucune DA non valider n'existe pour cette utilisateur
-        on creer une nouvelle DA
-        """
-        # if not models.DemandeApproSimulee.objects.filter(created_by=self.request.user, statut=1).exists():
-        if code_machine and semaine and annee :
-            # creation new entete appro
-            try :
-                machine = models.DjangoMachine.objects.get(codemach=code_machine)
-                # messages.add_message(self.request, messages.INFO, 'error : machine= %s' % (code_machine))
-
-                atelier = planif_models.DjangoLieuProd.objects.get(clieupro=machine.atelier)
-                v_atelier = atelier.llieupro
-
-            except Exception as err :
-                    machine   = None
-                    v_atelier = None
-                    messages.add_message(self.request, messages.INFO, 'error : %s' % (str(err) ))
-
-
-
-            new_da_simu = models.DemandeApproSimulee.objects.create(statut=1,
-                                                     created_by=self.request.user,
-                                                     entrepot='SCE Lentilly', zone_appro=v_atelier,
-                                                     semaine=semaine, annee=annee, machine=machine)
-            # save
-            new_da_simu.save()
-        else:
-            # new_da_simu = models.DemandeApproSimulee.objects.filter( statut=1).first()
-            messages.add_message(self.request, messages.INFO, 'error paramettre incomplet = %s' % (code_machine))
-            return False
-
-        # 2- calculer les DA pour charque of
-
-        # 3- Integrer les ligne de demande appro simule in CartArticleConditionnement
-        mes_articles_of = self.cartdb.item_set.all()
-        # messages.add_message(self.request, messages.INFO, 'mes_produits simulees= %s' % (mes_articles_of))
-
-        for item in mes_articles_of:
-            # messages.add_message(self.request, messages.INFO, 'add ligne DA = %s ' % item.product.code_of )
-            self.add_ligne_appro(new_da_simu, item)
-
-        # 4 afficher la proposition
-        lignes_da = new_da_simu.mes_lignes.all().order_by("code_of")
-
-        # --------------
-        # PANDAS stats
-        # -------------
-        df = read_frame(lignes_da, fieldnames=['code_of', 'quantite_produit'])
-
-        # 5- grouper par of les produits
-        dfg = df.groupby('code_of').count()
-        val = list(dfg.values)
-        index = list(dfg.index)
-        of_count = zip(index, val)
-
-        dfg_count = dfg.items()
-
-        # 6- grouper par of on calcul la somme des quantitée produit
-        df_qte_produit = df.groupby(df['code_of']).sum()
-        sum_qq = df_qte_produit.quantite_produit
-
-        indice = 0
-        for elem in lignes_da:
-            for of, counter in of_count:
-                if of == elem.code_of:
-                    nb = counter[0]
-            elem.comment = nb
-
-
-        #json_data = self.render_json_response(lignes_da)
-
-        return new_da_simu
+        return True
 
     # -------------------------------------------------
     # -- copy cart simulé en commande appro confirmée
     # --------------------------------------------------
-    def transforme_cart_commande_da(self, old):
+    def transforme_cart_commande(self, old):
         # 1 creation entete commande approv
         demande_pa_pk = old.pk
         old_lignes = old.mes_lignes.all()
@@ -849,8 +523,6 @@ class ListItemCartView(ListView, CartDemandeAppro):
                         'Erreur transforme_cart_commande_da: %s new_cde=%s' % (err.message , new_cda))
 
         return new_cda
-
-
 
 #-----------------------
 # API Demande approv
@@ -915,59 +587,11 @@ def api_demande_appro_sim(request):
         # 3 afficher la proposition
         serializers.serialize("json", lignes_da, stream=response)
         #json_data = serializers.serialize('json', lignes_da)
-    #---------------
-    # return HttpResponse(json.dumps(response_data), content_type="application/json")
+        #---------------
+        # return HttpResponse(json.dumps(response_data), content_type="application/json")
         return response
 
 
-def api_get_machines(request, code_machine, semaine, annee):
-
-        response_data = []
-        #machines = models.DjangoMachine.objects.raw('SELECT  codemach as id, nommach   FROM machine')
-        #machines = models.DjangoMachine.objects.exclude(nommach = "INCONNU", codemcond = "").exclude(nommach = "", codemcond = "INCONNU")
-        # ['A9',  'C5', 'F6', 'C4', 'D1', 'A7', '32', 'D3']
-        #machines_of = planif_models.DjangoOf.objects.values('machine_travail').distinct().order_by('machine_travail').filter(machine_travail__in = [  'C4', 'A9'], )
-        # on complete a 2 cars avec '0'
-        semaine_1 = str(get_delta_week(
-            int(annee), int(semaine),  -1)[1]).zfill(2)
-        semaine_plus_1 = str(get_delta_week(
-            int(annee), int(semaine),  +1)[1]).zfill(2)
-        semaine_plus_2 = str(get_delta_week(
-            int(annee), int(semaine),  +2)[1]).zfill(2)
-        semaine_plus_3 = str(get_delta_week(
-            int(annee), int(semaine),  +3)[1]).zfill(2)
-
-        # on charge les ofs de (S-1, S, S+3) pour la vue mensuel
-        #ofs_total = ofs_1  | ofs_2
-
-        machines_of = planif_models.DjangoOf.objects.filter(annee=annee,
-                                                     machine_travail=code_machine,
-                                                     semaine__in=(
-                                                         semaine_1, semaine, semaine_plus_1, semaine_plus_2, semaine_plus_3)
-                                                     ).distinct().order_by('machine_travail').values('machine_travail')  # ofs de semaine +3
-
-        lesmachines = []
-        for elem in machines_of:
-            code_machine = elem['machine_travail']
-            machine = models.DjangoMachine.objects.get(codemach=code_machine)
-            lesmachines.append((code_machine, machine.nommach))
-
-        background_color = '#fff9bf'
-        text_color = 'blue'
-        for code, nommach in lesmachines:
-            ## id: "b", title: "Room B", eventColor: "green"
-            response_data.append({
-                "color": "f33",
-                "backgroundColor": '#fff9bf',
-                "eventColor": '#fff9bf',
-                "id": code,
-                "title": nommach[:20],
-                #"eventColor" : "#4f4" ,
-            })
-
-        # renoie
-        #logger.debug('event !' + str(ofs.first()) )
-        return HttpResponse(json.dumps(response_data), content_type="application/json")
 
 #-----------------------
 #  fonctions generic
@@ -1028,7 +652,7 @@ def get_sum_quantite_panier(of):
     """
     lc = models.DjangoLigneCommandeApprov.objects.filter(code_of="C201906240")
     """
-    queryset = models.DjangoLigneCommandeApprov.objects.filter(code_of=of)
+    queryset = models.ItemCartProduct.objects.filter(code_of=of)
 
     ll = queryset.values_list('code_of', 'article').distinct()
     df = read_frame(ll, fieldnames=['code_of', 'quantite_panier', 'quantite_prevue'])
@@ -1046,80 +670,3 @@ def listp_item_incart(request):
     #  messages.add_message(self.request, messages.INFO, 'in get()= %s' % self.cartdb)
     return render(request, "cart.html", context)
 
-
-class AddCommentDa(FormView):
-    """
-    fetch(apiURL, {
-            method: 'POST',
-            credentials: 'include',
-            headers: {
-              	'X-CSRFToken': cle_csrf,
-            },
-    """
-    template_name = "form_add_message.html"
-    form_class = forms.CommentDaForm
-    model = models.DjangoCommandeApprov
-    success_url = "/da/cac/list/"
-
-
-    #@ensure_csrf_cookie
-    def post(self, request, *args, **kwargs):
-        # 1/ on va recperer le commantaire saisi
-        form = self.form_class(request.POST)
-        data =  json.loads(request.POST.dict().keys()[0])
-        # on verifie si le formulaire est valide
-        if request.method == 'POST'  :
-            # messages.add_message(self.request, messages.INFO, 'form valid() = %s' % data)
-            # 2/ on récupere la semaine, annee, et machine saisie par l'utilsateur
-            v_comment = data["comment"]
-            # 3/ save les elements
-            # cac_id = kwargs.get("pk")
-            cac_id = data["cac_id"]
-            self.object = self.model.objects.filter(pk=cac_id)
-            self.object.update(comment=v_comment)
-
-            return HttpResponse("ok update ...")
-
-        elif not form.is_valid() :
-            return self.form_invalid(form)
-
-        return render(request, self.template_name, locals())
-
-
-
-
-def crud_demande_appro(request):
-    """
-    console liste des commande appro
-    """
-    template = "console/da_crud.html"
-    #And render it!
-    context = dict()
-
-    # qs = models.DjangoOf.objects.filter(semaine='38', annee='18' ).values_list('code_of', 'commande_id', 'machine_travail_id')  # Use the Pandas Manager
-    qs = models.DjangoCommandeApprov.objects.all().order_by('-id', '-semaine', '-annee')  # Use the Pandas Manager
-    # df = read_frame(qs, fieldnames = ['machine_travail', 'quantite_commandee'])
-    columns = [ f.name for f in models.DjangoCommandeApprov._meta.get_fields() ]
-    # 'annee', 'comment', 'created', 'created_by', 'created_by_id', 'demande_appro_id', 'entrepot', id, 'lignes_cda', 'machine', machine_id, semaine, statut, zone_appro
-
-    df = read_frame(qs, fieldnames =  ['id', 'semaine',  'annee', 'created', 'created_by', 'created_by_id', 'demande_appro_id', 'entrepot',  'machine',])
-    # entete de colonnes
-    columns = of_views.construct_columns(df.columns)
-    #Write the DataFrame to JSON (as easy as can be)
-    #json = dfg.to_json(orient='records')  # output just the records (no fieldnames) as a collection of tuples
-    # output just the records (no fieldnames) as a collection of tuples
-    json = df.to_json(orient='records')
-    #Proceed to create your context object containing the columns and the data
-    context = {
-             'data': json,
-             'columns': columns
-            }
-    return render(request, template, context)
-
-
-def liste_commandes_set():
-    from ofschedule import models as ofsch_models
-    commandes = set(ofsch_models.DjangoOf.objects.filter(  semaine='26').values_list('date_debut_reelle',
-                                                                                     'commande_id',
-                                                                                     'quantite_prevue').distinct())
-    return commandes

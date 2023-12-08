@@ -2,87 +2,45 @@
 from __future__ import unicode_literals
 
 from django.contrib import admin
-from . import models
+from cartcom import models as cart_models
 from simulator import models as si_models
+from django.contrib.contenttypes.admin import GenericTabularInline
+from django import forms
 
 # Register your models here.
-
 #-----------------
-# demande appro
+# demande Item Article
 # ---------------
-class DevisAdmin(admin.ModelAdmin) :
-    list_total  = [ f.name for f in si_models.Item._meta.get_fields()]
-    #list_total.remove('id')
-    list_display = list_total
-    ordering = ['-datecdea']
-    search_fields = [ 'cdeappro']
-    list_display = [ 'cdeappro', 'cac_id', 'datecdea', 'pour_qui', 'a_qui', 'delapart', 'delai_ge' ]
+@admin.register(cart_models.ItemArticle)
+class ItemArticleAdmin(admin.ModelAdmin) :
+    #list_total  = [ f.name for f in cart_models.ItemArticle._meta.get_fields()]
+    list_display = [ 'cart', 'quantity', 'unit_price' , 'product', ]
+    fields = [ 'cart', 'quantity', 'unit_price' ,  ]
 
-#-----------------
-# demande appro
-# ---------------
-class ItemLigneAdmin(admin.ModelAdmin) :
-    list_total  = [ f.name for f in si_models.Item._meta.get_fields()]
-    list_total.remove('id')
-    list_display = list_total
-    #ordering = ['-datecdea']
-    search_fields = [ 'cdeappro']
-    list_display = ['cdeappro',  ]
+class ItemArticleInlineAdmin(GenericTabularInline):
+    model = cart_models.ItemArticle
+    extra = 0
 
-
-# demande appro
+class ItemArticleAdminForm(forms.ModelForm):
+    class Meta:
+        model = cart_models.ItemArticle
+        fields = '__all__'  # Keep all fields 
 
 # Cart
+@admin.register(cart_models.CartOf)
 class CartAdmin(admin.ModelAdmin) :
-    list_total  = [ f.name for f in models.CartOf._meta.get_fields()]
-    list_display = [ 'creation_date', 'created_by',  'checked_out'  ]
+    form = ItemArticleAdminForm
+    inlines = [ItemArticleInlineAdmin]
+    
+    list_total  = [ f.name for f in cart_models.CartOf._meta.get_fields()]
+    list_display = [ 'created_by',  'titre', 'checked_out', ]
 
-class ItemAdmin(admin.ModelAdmin) :
-    list_total  = [ f.name for f in models.Item._meta.get_fields()]
-    list_display = [ 'id',  'object_id', 'quantity', 'unit_price'  ]
-
-
-admin.site.register(models.CartOf, CartAdmin)
-admin.site.register(models.Item, ItemAdmin)
-
-# Demande appro simulee
-
-class DemandeApproSimuleeAdmin(admin.ModelAdmin) :
-    list_total  = [ f.name for f in  models.DemandeApproSimulee._meta.get_fields()]
-    #list_display = list_total
-
-    list_display = ['id', 'statut', 'created'  , 'created_by', 'entrepot', 'zone_appro' , 'semaine'  , 'annee', 'machine' ]
-
-
-# Ligne de Demande appro simulee
-
-class LigneDemandeApproSimuleeAdmin(admin.ModelAdmin) :
-    list_total  = [ f.name for f in  models.LigneDemandeApproSimulee._meta.get_fields()]
+@admin.register(cart_models.Product)
+class ProduitAdmin(admin.ModelAdmin) :
+    list_total  = [ f.name for f in cart_models.Product._meta.get_fields()]
     list_display = list_total
-    #list_display = ['demande_appro', 'code_of', 'article', 'commande', 'machine', 'quantite_commandee', 'quantite_produit', 'selected']
 
-
-
-# Demande appro simulee
-
-class DjangoCommandeApproAdmin(admin.ModelAdmin) :
-    list_total  = [ f.name for f in  models.DjangoCommandeApprov._meta.get_fields()]
-    #list_display = list_total
-
-    list_display = ['id', 'statut', 'created'  , 'created_by', 'entrepot', 'zone_appro' , 'semaine'  , 'annee', 'machine', 'comment']
-
-
-# Ligne de Demande appro simulee
-
-class DjangoLigneCommandeApproAdmin(admin.ModelAdmin) :
-    list_total  = [ f.name for f in  models.DjangoLigneCommandeApprov._meta.get_fields()]
+@admin.register(cart_models.Service)
+class ServiceAdmin(admin.ModelAdmin) :
+    list_total  = [ f.name for f in cart_models.Service._meta.get_fields()]
     list_display = list_total
-    # list_display = ['demande_appro', 'code_of', 'article', 'commande', 'quantite_commandee', 'quantite_produit', 'selected']
-    list_display = ['id', 'demande_appro', 'code_of', 'article', 'commande', 'quantite_commandee', 'quantite_produit', 'selected', 'validate']
-
-
-admin.site.register(models.DemandeApproSimulee, DemandeApproSimuleeAdmin)
-admin.site.register(models.LigneDemandeApproSimulee, LigneDemandeApproSimuleeAdmin)
-
-admin.site.register(models.DjangoCommandeApprov, DjangoCommandeApproAdmin)
-admin.site.register(models.DjangoLigneCommandeApprov, DjangoLigneCommandeApproAdmin)

@@ -1,0 +1,46 @@
+<!-- Services Recherche -->
+ {% load i18n   %}
+
+	<form action="" method="post" name="sentSearch" id="contactForm" class="form-inline">
+			 {% csrf_token %}
+			<div class="row">
+				<div class="form-group">
+					<div class='row'>
+						<div class="col-xs-12 col-sm-12 col-md-8 col-lg-8">
+								 <div class="input-group input-group-lg text-large">
+											{{ form.semaines.errors }}
+											<span class="input-group-addon">
+                        <i class="fa fa-calendar"></i></span>
+											{{ form.semaines  }}
+								 </div>
+						</div>
+
+
+						<div class="col-xs-12 col-sm-12 col-md-4 col-lg-4">
+								 <div class="input-group input-group-lg">
+											<span class="input-group-addon bg-warning">
+                        <A   href="/of/listof/{{semaine}}/{{annee}}/{{code_machine}}" <i class="fa fa-search"></i> </A></span>
+								 </div>
+						</div>
+							 </div>
+				</div>
+			</div>
+	</form>
+
+
+
+<script  type='text/javascript'>
+  //$('input').addClass("form-control");
+  $('select').addClass("text-select-option");
+  $('.errorlist').addClass("list-unstyled text-warning");
+
+  // --------------
+  $("#id_semaines").change(function(event) {
+    var semaine = $(this).val();
+    url = "/of/da/listdac/12345/".replace(/12345/, semaine);
+
+    location.href = url;
+    location.replace(url)
+    //window.location.reload(false);
+  });
+</script>

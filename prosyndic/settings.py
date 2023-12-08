@@ -99,6 +99,9 @@ TEMPLATES = [
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [
              os.path.join(BASE_DIR, 'copro', 'templates'),
+             os.path.join(BASE_DIR, 'cartcom', 'templates', ),
+             os.path.join(BASE_DIR, 'cartcom', 'templates', 'da'),
+             os.path.join(BASE_DIR, 'cartcom', 'templates', 'cartcom'),
             ],
         
         'APP_DIRS': True,

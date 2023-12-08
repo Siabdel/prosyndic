@@ -59,7 +59,7 @@ class BaseDonneeDoc(ListView):
         pieces3 = pro_models.Pjointe.objects.all()
         self.object_list = list(chain(pieces1, pieces2, pieces3))
       
-        # self.object_list = pro_model.Document.objects.all().order_by("-created")
+        # self.object_list = pro_models.Document.objects.all().order_by("-created")
         return self.object_list
 
 # Document

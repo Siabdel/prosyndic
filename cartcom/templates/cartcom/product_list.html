@@ -1,88 +1,177 @@
 
-{% extends 'admin/base.html' %}
+{% extends "base/themes/agency/startboot_agency_base.html" %}
 {% load i18n static %}
 {% load of_tag %}
 
 
+{% block header %}
+{% endblock header %}
 
+{% block extra_js %}
+    <script>
+        var vm = new Vue({
+            el: "#app",
+            delimiters: ['[[', ']]'],
+            data: { 
+                message : "OK on est sous vue.js",
+                documents : [],
+                url : "",
+                filterKey : "",
+                sortedKey : "name",
+                sortBy : "nom",
+                currentSort : "nom",
+                order : -1 ,
+            },
+            //----
+            created(){
+                // `this` est une référence à l'instance de vm
+                console.log('this is message: ' + this.message)
+                this.load_docs()
+            },
+            //---
+            computed: {
+                // sinon 
+                sortedDocuments(){
+                    return this.documents.filter(doc => doc.piece_name.includes(this.filterKey)).sort((a, b) =>  {
+                        if(a[this.currentSort] < b[this.currentSort]) return -1 * this.order
+                        if(a[this.currentSort] > b[this.currentSort]) return 1 * this.order
+                        return 0
+                    })
+                }
+            },
+            methods: {
+                load_docs(){
+                    let url = `/cart/api/product/`
+                    // ajax load
+                    fetch(url)
+                    .then(response => response.json())
+                    .then(json => {
+                        this.documents = json;
+                        console.log(" data ok = " + this.documents[0].name )
+                        })  
+                    .catch(err => {
+                        console.log("erreur fetch load_docs", err)
+                        })
+                    //console.log("vous chercher ...!" + this.filterKey)
+                },
+                //-------
+                addToCart(product_id){
+                    console.log("add to cart  product_id = " + product_id);
 
-{% block main_side %}
+                    let url = '/api/add_to_cart/'
+                    let data = {
+                    'product_id' : '{{product.id}}', 
+                    'quantity': 1,
+                    'title': `{{ product.name}}`,
+                    },
+            
+                fetch(url, {
+                        method : 'POST', 
+                        headers :{
+                        'Content-Type': "application/json",
+                        'X-CSRFToken' : csrftoken,
+                    },
+                    credentials: 'same-origin',
+                    body : JSON.stringify(data),
+                    })      
+                    .then(response => {
+                        result = response.json()
+                        return result
+                    })
+                    .then(result =>{
+                        console.log("added to cart " + result)  
+                    }).catch(function(error){
+                        console.log(error)
+                    })
+            }, // fin add to cart
+        },
 
-<h4>Proposition Demande approvisionnment </h4>
-<div class="container-fluid" id="app">
-	<div class="jumbotron">
-	  <div class="card-heading row">
-	        <div class="col-lg-10">
-					{% if object %}
-	          <ul class="list-unstyled text-info">
-		          <li> <h3> Proposition Demande approvisionnment : DA_{{ object  }} </h3></li>
-							<li> <h3>Semaine : {{ object.semaine }} / 20{{ object.annee }}  </h3> </li>
-	          	<li class="text-info"> [[message]]</li>
-	          </ul>
-					{% else %}
-						<p> pas de proposiiton DA active ! </p>
-					{% endif %}
-	        </div>
+            }
+        });
+        // mount
+        vm.$mount('.app')
+    </script>
+{% endblock extra_js%}
 
-	        <span id="id_content_msg" class="text-warning"></span>
-
-	        <div class="col-lg-2">
-	          <span class=""> 2 </span>
-						<A href="/da/cart/listitem/" >
-							<img class="pull-left " src="{% static 'images/chariot.jpeg' %}" height="82" width="100" />
-						</A>
-	        </div>
-	    </div>
-	</div>
-
-    <!-- ** -->
-    <div class="row"  @validation.prevent="alert('validation a ete emit !');">
-        <div class="nav nav-tabs nav-tabs-horizontal text-white col-md-12">
-        <div class="bg-warning__" style="background-color:grey">
-            <A href="print_of?code_of=<dtml-var code_of>"  target="_blank" >
-
-            <A href="#" class="btn btn-primary btn-lg"  onclick="history.back();" ><em class="fa fa-close"></em>Annuler</A>
-                <button  v-show="articles.length"  class="btn btn-primary btn-lg" id="show-modal" @click="showModal = true"><em class="fa fa-save"></em>Validez</button>
-
-        </div>
-    </div>
-
-    <div class="row">
-        <!-- use the modal component, pass in the prop -->
-        <modal v-if="showModal" @close="showModal = false">
-            <!-- -->
-            <h3 slot="header">Confirmation de la validation DA</h3>
-        </modal>
-    </div>
-
-    <table class="table table-striped">
-        <form id="form_da_selectionner" action="#" >
-        <thead class="thead thead-inverse">
-            <tr>
-            <th> <input type="checkbox"  class="btn btn-large" @change.prevent="checkAll(event);" v-bind:value=[[selectAll]] v-model='selectAll'/>Check all </th>
-            <th>Code of</th> <th>Ref. Produit</th> <th>Num. Commande</th> <th>Quantite prevue</th><th>Taux de perte MP</th><th>Quantite finale</th>
-            <th class="text-center" colspan=3><em class="fa fa-cogs fa-lg">Action</em></th>
-            </tr>
-        </thead>
-        <tbody>
-
-                    <td> [[ product.fields.quantite_produit  | arrondi(2) ]]  <input type="hidden" v-model="product.fields.code_of" @change="alertOFChange()" >  </td>
-                            <td> [[ product.fields.taux_perte_mp  | arrondi(2) ]] %s <input type="hidden" v-model="product.fields.code_of" @change="alertOFChange()" >  </td>
-                            <td> [[ product.fields.quantite_produit * (1 + product.fields.taux_perte_mp / 100) | arrondi(2) ]]  <input type="hidden" v-model="product.fields.code_of" @change="alertOFChange()" >  </td>
-                            <td>
-                                <Button  v-if="(!product.fields.selected) && (!product.fields.validate)" class="btn-warning btn-lg btn-block" :transition="transition_select"
-                                    @click.prevent="select_article_ligneda(event, [[product.pk]])">Selectionnez</button>
-                                <button  v-else-if="(product.fields.selected) && (!product.fields.validate)" class="btn-success btn-lg btn-block"
-                                    @click.prevent="select_article_ligneda(event, [[product.pk]])" >X</button>
-                                <button  v-else-if="product.fields.validate" class="btn-basic disabled btn-lg btn-block"  DISABLED>Produit validé</button>
-                            </td>
-                    </tr>
-
-        </tbody>
-        </form>
-
-    </table>
+{% block content %}
+<div class="container" id="app">
+    <h3> Store </h3>
+   <table class="table table-stripted">
+      <thead>
+       <th>Name </th> <th> Description</th>  <th>Prix</th>
+      </thead>
+      <tbody>
+        {% for product in products %}
+        <tr>
+          <td>  <a class="text-truncate" href="{% url 'product_detail' product.id %}"> {{ product.name |slice:":50" }}</a></td>
+          <td> {{product.description |slice:"0:30" }}</td> 
+          <td> {{product.unit_price}} €</td>
+          <td> <a class="btn btn-warning btn-block" href="{% url 'product_detail' product.id %}">Ajouter</a></td>
+        </tr>
+        {% endfor %}
+      </tbody>
+     
+   </table>
 </div>
-<!-- PAGINATION -->
 
+
+{% block extra_javascipt %}
+    <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
 {% endblock %}
+
+<script>
+    const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+    var prodcuapp = new Vue({
+        el : "#app",
+        delimeters : [ '[[', ']]' ],
+        data(){
+            return{
+                message : "Welcome V ecommerce",
+            }
+          },
+        // mount
+        mounted(){
+            console.log("Vue mounted !")
+        },
+
+        methods:{
+          addToCart(product_id){
+            console.log("add to cart  product_id = " + product_id);
+
+            let url = '/api/add_to_cart/'
+            let data = {
+                'product_id' : '{{product.id}}', 
+                'quantity': 1,
+                'title': `{{ product.name}}`,
+                }
+
+            
+            fetch(url, {
+              method : 'POST', 
+              headers :{
+                'Content-Type': "application/json",
+                'X-CSRFToken' : csrftoken,
+              },
+              credentials: 'same-origin',
+              body : JSON.stringify(data),
+            })      
+            .then(response => {
+              result = response.json()
+              return result
+            })
+            .then(result =>{
+              console.log("added to cart " + result)  
+            }).catch(function(error){
+              console.log(error)
+            })
+          }, // fin add to cart
+        },
+
+        // remove item
+      
+    }) 
+
+</script>
+
+  {% endblock %}

@@ -142,8 +142,8 @@ class ListOfsView(ListView, FormView, e_cart.Cart):
             # 4/ test si OF est deja concerné par une Cac
             self.object_list= list(self.object_list)
             for index, of in  enumerate(self.object_list):
-                if not models.DjangoLigneCommandeApprov.filter(code_of=of.code_of).exists():
-                    messages.add_message(self.request, messages.INFO, 'Of completed DA=%s' % of.code_of)
+                if not models.DjangoLigneCommandeApprov.filter(product_id=of.product_id).exists():
+                    messages.add_message(self.request, messages.INFO, 'Of completed DA=%s' % of.product_id)
                     of.completetd=True
 
 
@@ -174,11 +174,11 @@ class ListOfsView(ListView, FormView, e_cart.Cart):
         new_da_simu = models.DemandeApproSimulee.objects.get(pk=214)
 
         # 4 afficher la proposition
-        all_columns = ['demande_appro', 'code_of', 'article', 'commande',
+        all_columns = ['demande_appro', 'product_id', 'article', 'commande',
                        'machine', 'quantite_commandee', 'quantite_produit', 'selected']
 
         lignes_da = new_da_simu.mes_lignes.all()
-        #.values_list( 'demande_appro', 'code_of', 'article', 'commande', 'machine', 'quantite_commandee', 'quantite_produit', 'selected' )
+        #.values_list( 'demande_appro', 'product_id', 'article', 'commande', 'machine', 'quantite_commandee', 'quantite_produit', 'selected' )
         #lignes_da  = models.LigneDemandeApproSimulee.objects.filter(demande_appro = 110)
         # messages.add_message(self.request, messages.INFO, 'lignes DA = %s' % lignes_da)
 
@@ -208,7 +208,7 @@ class ListOfsView(ListView, FormView, e_cart.Cart):
         v_annee = kwargs.get('annee')
         v_machine = kwargs.get('code_machine')
 
-        code_of = kwargs.get('code_of')
+        product_id = kwargs.get('product_id')
         quantitee = abs(float(kwargs.get('quantitee', 0)))
 
         action = kwargs.get('action')
@@ -287,17 +287,8 @@ class ListOfsView(ListView, FormView, e_cart.Cart):
 
         return data_final
 # -----------------------------------------
-# --- Gestion des Demande approv. confirmées
-# -----------------------------------------
-
-"""
-if not created:
-    for attr, value in fields.iteritems():
-        setattr(instance, attr, value)
-"""
-
-
 #  class Cart List items
+# -----------------------------------------
 @method_decorator(login_required, 'dispatch')
 class ListItemCartView(ListView, e_cart.CartDevis):
     """
@@ -320,7 +311,8 @@ class ListItemCartView(ListView, e_cart.CartDevis):
         context = super(ListItemCartView, self).get_context_data(**kwargs)
         # init panier Cart
         e_cart.Cart.__init__(self, self.request)
-        #context['object_list'] = self.get_items_cart()
+        # context['object_list'] = self.get_items_cart()
+        context['products'] = cart_models.Product.objects.all()
         return context
 
 
@@ -332,19 +324,19 @@ class ListItemCartView(ListView, e_cart.CartDevis):
         context = self.get_context_data(**kwargs)
         #-------------------------
         action = kwargs.get('action', 'listitem')
-        code_of = kwargs.get('code_of', "")
+        product_id = kwargs.get('product_id',)
         quantitee = kwargs.get('quantitee', 0)
 
 
         if action == "listitem":
             context = self.get_context_data(**kwargs)
             context['item_list'] = self.get_list_items(context)
-            #  messages.add_message(self.request, messages.INFO, 'in get()= %s' % self.cartdb)
+            messages.add_message(self.request, messages.INFO, 'in get()= %s' % self.cartdb)
             return render(self.request, "cart.html", context)
 
-        elif action == "additem" and code_of:
+        elif action == "additem" and product_id:
             # ajout of dans panier
-            data = self.add_item_of_incart(code_of, quantitee)
+            data = self.add_item_of_incart(product_id, quantitee)
 
         elif action == "delitem":
             item_id = kwargs.get('element_id')
@@ -407,9 +399,6 @@ class ListItemCartView(ListView, e_cart.CartDevis):
         return self.render_to_response(context)
         #return self.get(args, **kwargs)
 
-
-  
-    # ---------------
     # --
     def get_items_cart(self):
         """
@@ -424,30 +413,26 @@ class ListItemCartView(ListView, e_cart.CartDevis):
         try:
             item_list = cart_models.ItemArticle.objects.filter(cart=self.cartdb)
             # messages.add_message(self.request, messages.INFO, 'je vais dans le panier')
-
         except Exception as err:
             messages.add_message(self.request, messages.INFO,
                                  'Erreur list panier = %s ' % str(err))
         return item_list
 
     # ajout de of dans le panier
-    def add_item_of_incart(self, code_of, quantitee=0):
+    def add_item_of_incart(self, product_id, quantitee=0):
         resp = {}
-        # messages.add_message(self.request, messages.INFO, 'code of =%s quantitee= %s' % (code_of, self.request.session.get('CART_ID') ))
-
+        # messages.add_message(self.request, messages.INFO, 'code of =%s quantitee= %s' % (product_id, self.request.session.get('CART_ID') ))
         try:
             item_list = cart_models.Product.objects.all()
-            if not self.is_product_exist_incart(of):
+            if not self.is_product_exist_incart(product_id):
                 # on ajoute dans panier
-                self.add(of, 1, quantitee)
-                resp['status'] = "OK of ajouter dans panier = %s  " % (code_of)
-
+                self.add(product_id, 1, quantitee)
+                resp['status'] = "OK of ajouter dans panier = %s  " % (product_id)
             else:
-                messages.add_message(self.request, messages.INFO, '%s  Article existe deja ! code of=' % code_of)
-                resp['status'] = '%s  Article existe deja ! code of=' % code_of
-
+                messages.add_message(self.request, messages.INFO, '%s  Article existe deja ! code of=' % product_id)
+                resp['status'] = '%s  Article existe deja ! code of=' % product_id
         except Exception as err:
-            messages.add_message(self.request, messages.INFO, 'Erreur add of err = %s ' %  err.message)
+            messages.add_message(self.request, messages.INFO, 'Erreur add of err = %s ' %  err)
             resp['status'] = "KO error=%s  " % (str(err))
 
         return resp
@@ -503,9 +488,9 @@ class ListItemCartView(ListView, e_cart.CartDevis):
                     new_ligne_cda.completed = False
                     """
                     # verificatin si ce produit est complet
-                    if is_quantite_prevue_completed(new_ligne_cda.code_of) :
+                    if is_quantite_prevue_completed(new_ligne_cda.product_id) :
                         new_ligne_cda.completed = True
-                    elif (get_sum_quantite_panier(new_ligne_cda.code_of) > 0) and (get_sum_quantite_panier(new_ligne_cda.code_of) < cac.quantite_pprevue) :
+                    elif (get_sum_quantite_panier(new_ligne_cda.product_id) > 0) and (get_sum_quantite_panier(new_ligne_cda.product_id) < cac.quantite_pprevue) :
                         #new_ligne_cda.completed = False
                         self.object_list[index].quantite_prevue = self.object_list[index].quantite_prevue - cac.quantite_panier
                     """
@@ -525,10 +510,18 @@ class ListItemCartView(ListView, e_cart.CartDevis):
         return new_cda
 
 #-----------------------
+# Produit Details   
+#-----------------------
+def product_detail(request, slug):
+    product = get_object_or_404(models.Product, slug=slug)
+    return render(request, "store/product_detail.html", locals())
+
+
+#-----------------------
 # API Demande approv
 #-----------------------
 
-def api_add_item_of_incart(request, code_of):
+def api_add_item_of_incart(request, product_id):
     """
     add of in cart
     permettre d’associer un article au
@@ -547,14 +540,14 @@ def api_add_item_of_incart(request, code_of):
 
     # create_item_in_database(cart, product, quantity=1, unit_price=Decimal("100")):
     try:
-        of = planif_models.DjangoOf.objects.get(code_of=code_of)
-        #messages.add_message(request, messages.INFO, 'ajout de of dans le panier.%s' % code_of)
+        of = planif_models.DjangoOf.objects.get(product_id=product_id)
+        #messages.add_message(request, messages.INFO, 'ajout de of dans le panier.%s' % product_id)
         messages.add_message(request, messages.INFO,  ' mon panier in request= %s ' % str(
             request.session.get('CART_ID')))
         item = create_item_in_database(panier, of)
     except Exception as err:
         messages.add_message(request, messages.INFO,
-                             'Erreur dans add_item_of_incart: %s pour code of %s' % (str(err), code_of))
+                             'Erreur dans add_item_of_incart: %s pour code of %s' % (str(err), product_id))
 
     resp['status'] = "OK"
     return HttpResponse(json.dumps(resp))
@@ -580,7 +573,7 @@ def api_demande_appro_sim(request):
         da_encours = models.DemandeApproSimulee.objects.filter( statut=1).first()
 
         # 2- calculer les DA pour charque of
-        lignes_da = da_encours.mes_lignes.all().order_by("code_of")
+        lignes_da = da_encours.mes_lignes.all().order_by("product_id")
         # lignes_da_json =  calcul_demande_appo_cumulee(9 )
         # messages.add_message(request, messages.INFO, 'Erreur dans api_demande_appro_sim %s' % (lignes_da_json))
 
@@ -617,7 +610,7 @@ def traite_form_produit(request):
         existed = models.LigneDemandeApproSimulee.objects.filter(pk=id).exists()
         if existed:
             occurrence = models.LigneDemandeApproSimulee.objects.get(
-                code_of=id)
+                product_id=id)
             # save
             occurrence.quantite_prevue = request.POST.get(
                 'quantite_prevue').strip()
@@ -635,33 +628,33 @@ def update_object(obj, **kwargs):
 def is_quantite_prevue_completed(of):
     """
     """
-    queryset = models.DjangoLigneCommandeApprov.objects.filter(code_of=of.code_of)
+    queryset = models.DjangoLigneCommandeApprov.objects.filter(product_id=of.product_id)
 
-    ll = queryset.values_list('code_of', 'article').distinct()
-    df = read_frame(ll, fieldnames=['code_of', 'quantite_panier', 'quantite_prevue'])
+    ll = queryset.values_list('product_id', 'article').distinct()
+    df = read_frame(ll, fieldnames=['product_id', 'quantite_panier', 'quantite_prevue'])
     # on sum la qte Panier
-    dfg = df.groupby('code_of').sum()
+    dfg = df.groupby('product_id').sum()
     aa = dfg.aggregate('quantite_panier')
     # ---
     row = dict(aa.items())
-    somme_qte_panier = int(row[queryset.first().code_of])
+    somme_qte_panier = int(row[queryset.first().product_id])
     return somme_qte_panier >= queryset.first().quantite_prevue
 
 
 def get_sum_quantite_panier(of):
     """
-    lc = models.DjangoLigneCommandeApprov.objects.filter(code_of="C201906240")
+    lc = models.DjangoLigneCommandeApprov.objects.filter(product_id="C201906240")
     """
-    queryset = models.ItemCartProduct.objects.filter(code_of=of)
+    queryset = models.ItemCartProduct.objects.filter(product_id=of)
 
-    ll = queryset.values_list('code_of', 'article').distinct()
-    df = read_frame(ll, fieldnames=['code_of', 'quantite_panier', 'quantite_prevue'])
+    ll = queryset.values_list('product_id', 'article').distinct()
+    df = read_frame(ll, fieldnames=['product_id', 'quantite_panier', 'quantite_prevue'])
     # on sum la qte Panier
-    dfg = df.groupby('code_of').sum()
+    dfg = df.groupby('product_id').sum()
     aa = dfg.aggregate('quantite_panier')
     #---
     row = dict(aa.items())
-    somme_qte_panier = int(row[queryset.first().code_of])
+    somme_qte_panier = int(row[queryset.first().product_id])
     return somme_qte_panier
 
 def listp_item_incart(request):

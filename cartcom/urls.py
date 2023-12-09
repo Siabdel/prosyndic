@@ -8,9 +8,12 @@ from cartcom import api as api_cartcom
 urlpatterns = [
     # CART
     path('', v_cartcom.home, name='home'),
-    path('cart/<slug:action>/', v_cartcom.ListItemCartView.as_view(), name='list_item_incart'),
+    path('<slug:action>/<int:product_id>/', v_cartcom.ListItemCartView.as_view(), name='list_item_incart'),
     path('ajax/detail/<slug:action>/<int:pk>', v_cartcom.home, name='cart_select_article_ligneda'),
     ##
+    path('home/<slug:action>/', v_cartcom.ListItemCartView.as_view(), name='product_list'),
+    path('product/detail/<int:pk>/', v_cartcom.ListItemCartView.as_view(), name='product_detail'),
+    
     # API
     path('api/product/', api_cartcom.ProduitApiList.as_view(), name='api_list_product'),
     

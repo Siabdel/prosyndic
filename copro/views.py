@@ -57,7 +57,8 @@ class BaseDonneeDoc(ListView):
         pieces1 = pro_models.PJEtude.objects.all()
         pieces2 = pro_models.PJEvent.objects.all()
         pieces3 = pro_models.Pjointe.objects.all()
-        self.object_list = list(chain(pieces1, pieces2, pieces3))
+        pieces4 = pro_models.Piece.objects.all()
+        self.object_list = list(chain(pieces1, pieces2, pieces3, pieces4))
       
         # self.object_list = pro_models.Document.objects.all().order_by("-created")
         return self.object_list

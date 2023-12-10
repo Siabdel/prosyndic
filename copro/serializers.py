@@ -9,7 +9,6 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta :
         model = User
         fields = '__all__'
-
 # Document
 class DocumentApiSerializer(serializers.ModelSerializer):
     created_by = serializers.StringRelatedField(many=False, read_only=True)
@@ -22,11 +21,6 @@ class DocumentApiSerializer(serializers.ModelSerializer):
         fields = ('name', 'piece_name', 'piece_path',
                   'modified', 'created', 'created_by',
                   'init_date_created')
-        
-        
-   
-   
-
 class IncidentApiSerializer(serializers.ModelSerializer):
     # author = serializers.StringRelatedField(many=False, read_only=True)
     # author = serializers.SerializerMethodField()
@@ -44,3 +38,8 @@ class IncidentApiSerializer(serializers.ModelSerializer):
         #fields = '__all__'
         fields  = ('id', 'title', 'comment',  'created_at', 'author', )
    
+
+class ResidenceApiSerializer(serializers.ModelSerializer):
+    class Meta :
+        model = pro_models.Residence
+        fields = '__all__'

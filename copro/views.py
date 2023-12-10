@@ -13,6 +13,7 @@ from copro import serializers as pro_seriz
 from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib import messages
 from django.utils.decorators import method_decorator
+# from prosyndic.permissions import IsAuthorOrReadOnly
 
 # Create your views here.
 
@@ -74,3 +75,32 @@ class DocumentApiList(generics.ListCreateAPIView):
      
     #queryset = list(chain(pieces1, pieces2, pieces3, pieces4, ))
     queryset = pro_models.Piece.objects.all()
+
+
+# Residence
+class ResidenceApiList(generics.ListCreateAPIView):
+    serializer_class = pro_seriz.ResidenceApiSerializer 
+    queryset = pro_models.Residence.objects.all().order_by('name')
+
+class ResidenceDetails(generics.RetrieveUpdateDestroyAPIView):
+    queryset = pro_models.Residence.objects.all().order_by('name')
+    serializer_class = pro_seriz.ResidenceApiSerializer 
+    
+# Incident
+class IncidentApiList(generics.ListCreateAPIView):
+    serializer_class = pro_seriz.IncidentApiSerializer 
+    queryset = pro_models.Ticket.objects.all().order_by('title')
+
+class IncidentDetails(generics.RetrieveUpdateDestroyAPIView):
+    queryset = pro_models.Ticket.objects.all().order_by('title')
+    serializer_class = pro_seriz.IncidentApiSerializer 
+
+# Document
+class DocumentApiList(generics.ListCreateAPIView):
+    serializer_class = pro_seriz.DocumentApiSerializer 
+    queryset = pro_models.Document.objects.all().order_by('-id')
+
+class DocumentDetails(generics.RetrieveUpdateDestroyAPIView):
+    queryset = pro_models.Document.objects.all().order_by('-id')
+    serializer_class = pro_seriz.DocumentApiSerializer 
+

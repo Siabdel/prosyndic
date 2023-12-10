@@ -15,7 +15,18 @@ from cartcom import models as cart_models
 from cartcom import serializers as cart_serializ
 
     
-# Document
-class ProduitApiList(generics.ListCreateAPIView):
-    serializer_class = cart_serializ.ProduitApiSerializer 
+# Product list
+class ProductApiList(generics.ListCreateAPIView):
+    serializer_class = cart_serializ.ProductApiSerializer
     queryset = cart_models.Product.objects.all().order_by('-id')
+
+# Product detail
+class ProductDetails(generics.RetrieveUpdateDestroyAPIView):
+    serializer_class = cart_serializ.ProductApiSerializer
+    queryset = cart_models.Product.objects.all().order_by('id')
+
+
+# Devis
+class cartOfApiList(generics.ListCreateAPIView):
+    serializer_class = cart_serializ.CartoftApiSerializer 
+    queryset = cart_models.CartOf.objects.all().order_by('-id')

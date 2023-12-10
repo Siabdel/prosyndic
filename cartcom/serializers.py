@@ -24,7 +24,7 @@ class ItemArticleSerializer(serializers.ModelSerializer):
                   'init_date_created')
         
 
-class ProduitApiSerializer(serializers.ModelSerializer):
+class ProductApiSerializer(serializers.ModelSerializer):
     # author = serializers.SerializerMethodField()
     # author = UserSerializer()
     # documents = serializers.StringRelatedField(many=True, read_only=True)
@@ -35,5 +35,8 @@ class ProduitApiSerializer(serializers.ModelSerializer):
     class Meta :
         model = cart_models.Product
         fields = '__all__'
-        #fields  = ('id', 'title', 'comment',  'created_at', 'author', )
    
+class CartOftApiSerializer(serializers.ModelSerializer):
+    class Meta :
+        model = cart_models.CartOf
+        fields = '__all__'

@@ -3,7 +3,7 @@ from django.urls import path, include
 from django.conf import settings
 from django.views.generic.list import ListView
 from cartcom import views as v_cartcom
-from cartcom import api as api_cartcom
+from cartcom import api_view as api_cartcom
 
 urlpatterns = [
     # CART
@@ -15,6 +15,6 @@ urlpatterns = [
     path('product/detail/<int:pk>/', v_cartcom.ListItemCartView.as_view(), name='product_detail'),
     
     # API
-    path('api/product/', api_cartcom.ProduitApiList.as_view(), name='api_list_product'),
+    path('api/product/', api_cartcom.ProductApiList.as_view(), name='api_list_product'),
     
 ]

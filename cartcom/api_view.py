@@ -28,5 +28,5 @@ class ProductDetails(generics.RetrieveUpdateDestroyAPIView):
 
 # Devis
 class cartOfApiList(generics.ListCreateAPIView):
-    serializer_class = cart_serializ.CartoftApiSerializer 
+    serializer_class = cart_serializ.CartOftApiSerializer 
     queryset = cart_models.CartOf.objects.all().order_by('-id')

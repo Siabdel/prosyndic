@@ -109,7 +109,7 @@ class ItemArticle(models.Model):
     
 
     def __str__(self):
-        return "product : {}".format(self.product)
+        return "product : {}".format(self.product.titre)
 # ------------------------------------
 # -- Abstarct Service & Produits
 # -----------------------------------

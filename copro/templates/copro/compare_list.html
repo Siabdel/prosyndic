@@ -1,0 +1,123 @@
+{% extends "base/themes/agency/startboot_agency_base.html" %}
+{% load  static %}
+{% load l10n %}
+
+{% block header %}
+{% endblock header %}
+
+{% block extra_js %}
+    <script>
+        var vm = new Vue({
+            el: "#app",
+            delimiters: ['[[', ']]'],
+            data: { 
+                message : "Compare List",
+                candidats : [],
+                url : "",
+                filterKey : "",
+                sortedKey : "societe",
+                sortBy : "societe",
+                currentSort : "societe",
+                order : 1 ,
+                entree : 0,
+            },
+            //----
+            created(){
+                // `this` est une référence à l'instance de vm
+                console.log('this is message: ' + this.message)
+                this.load_candidats()
+            },
+            //---
+            computed: {
+                // resultat
+                resultat(){
+                    return this.entree * 1.20 * 12
+                }, 
+                // sinon 
+                sortedcandidats(){
+                    return this.candidats.filter(syndic => syndic.societe.includes(this.filterKey)).sort((a, b) =>  {
+                        if(a[this.currentSort] < b[this.currentSort]) return -1 * this.order
+                        if(a[this.currentSort] > b[this.currentSort]) return 1 * this.order
+                        return 0
+                    })
+                }
+            },
+            methods: {
+                load_candidats(){
+                    let url = `/api/syndic/`
+                    // ajax load
+                    fetch(url)
+                    .then(response => response.json())
+                    .then(json => {
+                        this.candidats = json;
+                        console.log(" data ok = "  )
+                        })  
+                    .catch(err => {
+                        console.log("erreur fetch load_candidats", err)
+                        })
+                    //console.log("vous chercher ...!" + this.filterKey)
+                },
+                //-------
+            }
+        });
+        // mount
+        vm.$mount('.app')
+    </script>
+{% endblock extra_js%}
+
+{% block content %}
+
+<hr>
+<div class="container row" id="app">
+    <div class="col-10">
+        <h3> [[ message ]] </h3>
+        <h3 v-show=""> [[ resultat ]] </h3>
+        <form class="d-flex" action="/admin/" method="post" @submit.prevent="">
+                {% csrf_token %}
+            <input v-show=""  class="form-control me-2" v-model="entree" type="text" placeholder="saisie un montant" >
+            <input class="form-control me-2" v-model="filterKey" type="text" placeholder="saisie un mot de recherche" >
+            <input class="btn btn-outline-success" type="submit" value="Rechercher" />
+        </form>
+        <hr/>
+
+        <table class="table table-striped">
+            <thead>
+                <tr> <th>Societe </th> <th>Agence Locale </th>
+                <th>Offre</th> <th>visite Effectue </th> <th>Remuneration </th>
+                <th>Budget Globale</th> <th>Budget Securite </th> <th>Budget Jardinage </th>
+                <th>Budget Picine</th> <th>Budget Menage </th> <th>Budget Maintenance </th>
+                <th>Agent de Suivi</th>
+                 </tr>
+            </thead>
+            <tbody v-if="sortedcandidats">
+                <tr v-for="(candidat, index) in sortedcandidats" :key=index>
+                    <td scope="row"> 
+                        <a :href="candidat.id"  target='_blanc'>
+                            [[ candidat.societe ]]
+                        </a>  
+                    </td>
+                    <td> 
+                        <span v-if="candidat.agence_locale" > Oui </span>
+                        <span v-else> Pas agence locale </span>
+                    </td>
+                    <td v-if="candidat.offre_recu" > Oui </td>
+                    <td v-if="candidat.visite" > Oui </td>
+                    <td> [[ candidat.remuneration ]] </td>
+                    <td> [[ candidat.budget_global ]] </td>
+                    <td> [[ candidat.budget_securite ]] </td>
+                    <td> [[ candidat.budget_jardinage ]] </td>
+                    <td> [[ candidat.budget_picine ]] </td>
+                    <td> [[ candidat.budget_menage ]] </td>
+                    <td> [[ candidat.budget_maintenance ]] </td>
+                    <td> [[ candidat.budget_agent_suivi ]] </td>
+                </tr>
+                
+            </tbody>
+        </table> 
+    </div>
+    <div class="col-2">
+        <img src="/media/upload/prestigia_001.jpg" width="50%" />
+    </div>
+</div>
+ 
+{% endblock content %}

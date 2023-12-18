@@ -14,17 +14,21 @@ from django import forms
 @admin.register(cart_models.ItemArticle)
 class ItemArticleAdmin(admin.ModelAdmin) :
     #list_total  = [ f.name for f in cart_models.ItemArticle._meta.get_fields()]
-    list_display = [ 'cart', 'quantity', 'unit_price' , 'product', ]
-    fields = [ 'cart', 'quantity', 'unit_price' ,  ]
+    list_display = [ 'cart', 'content_type',  'quantity', 'unit_price' , 'product', ]
+    fields = [ 'cart',  'quantity', 'unit_price' ,  ]
 
 class ItemArticleInlineAdmin(GenericTabularInline):
     model = cart_models.ItemArticle
     extra = 0
+    
 
 class ItemArticleAdminForm(forms.ModelForm):
     class Meta:
         model = cart_models.ItemArticle
         fields = '__all__'  # Keep all fields 
+    
+    def get_product(self, obj):
+        return obj.product.titre
 
 # Cart
 @admin.register(cart_models.CartOf)
@@ -34,6 +38,7 @@ class CartAdmin(admin.ModelAdmin) :
     
     list_total  = [ f.name for f in cart_models.CartOf._meta.get_fields()]
     list_display = [ 'created_by',  'titre', 'checked_out', ]
+    #fields = [ 'cart',  'quantity', 'unit_price' ,  ]
 
 @admin.register(cart_models.Product)
 class ProduitAdmin(admin.ModelAdmin) :

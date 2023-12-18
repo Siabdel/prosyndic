@@ -43,3 +43,9 @@ class ResidenceApiSerializer(serializers.ModelSerializer):
     class Meta :
         model = pro_models.Residence
         fields = '__all__'
+
+## Api Syndic Candidat 
+class CandidatApiSerializer(serializers.ModelSerializer):
+    class Meta :
+        model = pro_models.LigneDeCandidature
+        fields = '__all__'

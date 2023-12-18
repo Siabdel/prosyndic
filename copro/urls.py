@@ -5,10 +5,11 @@ from copro import views as pro_view
 urlpatterns = [
     path('', views.Home.as_view(), name='home'),
     path('services/', views.PortailHome.as_view(), name='home_page'),
-    path('basedoc/', views.BaseDonneeDoc.as_view(), name="basdoc"), # Document
     # API framework 
     ## API
     path('api/doc/',  pro_view.DocumentApiList.as_view(), ), # new
+    path('api/syndic/',  pro_view.SyndicApiList.as_view(), ), # new
     ## Vue.js
-    path('basedoc/', views.BaseDonneeDoc.as_view(), name="basdoc"),
+    path('basedoc/', views.BaseDonneeDoc.as_view(), name="basdoc"), # Document
+    path('compare/', views.CompareViewList.as_view(), name="compare"),
 ] 

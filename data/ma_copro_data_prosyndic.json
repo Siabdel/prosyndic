@@ -1,0 +1,608 @@
+[
+{
+  "model": "copro.category",
+  "pk": 1,
+  "fields": {
+    "parent": null,
+    "title": "Reunion CS",
+    "slug": "REUNION-CS"
+  }
+},
+{
+  "model": "copro.category",
+  "pk": 2,
+  "fields": {
+    "parent": null,
+    "title": "Assemblée Générale",
+    "slug": "ASSEMBLEE-GENERALE"
+  }
+},
+{
+  "model": "copro.document",
+  "pk": 1,
+  "fields": {
+    "created": null,
+    "document": "documents/Questionnaire_Avant-contrat.pdf",
+    "do_title": "Questionnaire contrat",
+    "do_description": "Questionnaire contrat",
+    "file_basename": null,
+    "thumbnail_file": null,
+    "file_type": null,
+    "file_size": null,
+    "initial_name": null,
+    "active": false
+  }
+},
+{
+  "model": "copro.pjointe",
+  "pk": 1,
+  "fields": {
+    "created": "2023-12-08",
+    "name": "Courriel Thais 10-2023",
+    "piece": "upload/Courriel_Thais_10-2023_KoKKnRJ.pdf",
+    "modified": "2023-11-13T12:48:16.902Z",
+    "created_by": 1,
+    "candidature": 2
+  }
+},
+{
+  "model": "copro.pjointe",
+  "pk": 2,
+  "fields": {
+    "created": "2023-12-08",
+    "name": "python learn .pdf",
+    "piece": "upload/python_learn_.pdf",
+    "modified": "2023-12-08T07:37:20.218Z",
+    "created_by": 1,
+    "candidature": 1
+  }
+},
+{
+  "model": "copro.piece",
+  "pk": 1,
+  "fields": {
+    "created": "2023-12-08",
+    "name": "FastAPI simple endpoint versioning.pdf",
+    "piece": "upload/FastAPI_simple_endpoint_versioning.pdf",
+    "modified": "2023-12-08T08:04:39.751Z",
+    "created_by": 1,
+    "residence": 1
+  }
+},
+{
+  "model": "copro.piece",
+  "pk": 2,
+  "fields": {
+    "created": "2023-12-08",
+    "name": "Polymorphism in Python and Django.pdf",
+    "piece": "upload/Polymorphism_in_Python_and_Django.pdf",
+    "modified": "2023-12-08T08:05:27.798Z",
+    "created_by": 1,
+    "residence": 1
+  }
+},
+{
+  "model": "copro.piece",
+  "pk": 3,
+  "fields": {
+    "created": "2023-12-08",
+    "name": "Quels sont les types de contenu de Django et comment permettent-ils des relations dynamiques.pdf",
+    "piece": "upload/Quels_sont_les_types_de_contenu_de_Django_et_comment_permettent-ils_des_relations_h8uJQDr.pdf",
+    "modified": "2023-12-08T08:05:59.797Z",
+    "created_by": 1,
+    "residence": 1
+  }
+},
+{
+  "model": "copro.piece",
+  "pk": 4,
+  "fields": {
+    "created": "2023-12-08",
+    "name": "fastapi-contrib-readthedocs-io-en-latest.pdf",
+    "piece": "upload/fastapi-contrib-readthedocs-io-en-latest.pdf",
+    "modified": "2023-12-08T08:05:59.800Z",
+    "created_by": 1,
+    "residence": 1
+  }
+},
+{
+  "model": "copro.residence",
+  "pk": 1,
+  "fields": {
+    "name": "Résidence Opale",
+    "adresse": "Ménara, Marrakech",
+    "comment": "Résidence Opale",
+    "color_code": "FF0101",
+    "image": "upload/prestigia_003_tumb_GNxtyv9.jpg"
+  }
+},
+{
+  "model": "copro.prestationservice",
+  "pk": 1,
+  "fields": {
+    "name": "Gestion Immobiliere",
+    "description": "Gestion Immobiliere",
+    "code": "SYNDIC"
+  }
+},
+{
+  "model": "copro.prestationservice",
+  "pk": 2,
+  "fields": {
+    "name": "Jardinage",
+    "description": "Prestation de Jardinage",
+    "code": "JARDIN"
+  }
+},
+{
+  "model": "copro.prestationservice",
+  "pk": 3,
+  "fields": {
+    "name": "Service de Sécurité",
+    "description": "Service de Sécurité",
+    "code": "SECURITE"
+  }
+},
+{
+  "model": "copro.prestationservice",
+  "pk": 4,
+  "fields": {
+    "name": "Gestion des picines",
+    "description": "Gestion des picines",
+    "code": "PICINE"
+  }
+},
+{
+  "model": "copro.pjetude",
+  "pk": 1,
+  "fields": {
+    "created": "2023-12-08",
+    "name": "Questionnaire avant contrat",
+    "piece": "upload/Questionnaire_Avant-contrat_zfqHBgU.pdf",
+    "modified": "2023-11-13T12:50:28.826Z",
+    "created_by": 1,
+    "etude": 1
+  }
+},
+{
+  "model": "copro.etude",
+  "pk": 1,
+  "fields": {
+    "created_at": "2023-10-24T18:00:17.841Z",
+    "created_by": 1,
+    "modified_at": "2023-11-13T12:50:28.822Z",
+    "title": "Etude de Candidatures syndic Marrakech",
+    "type_presta": 1,
+    "description": "Etude de candidatures de societes de syndic"
+  }
+},
+{
+  "model": "copro.etude",
+  "pk": 2,
+  "fields": {
+    "created_at": "2023-10-31T08:21:45.121Z",
+    "created_by": 1,
+    "modified_at": "2023-11-07T09:30:11.437Z",
+    "title": "Prestataires service Jardinage",
+    "type_presta": 2,
+    "description": "Prestataires service Jardinage"
+  }
+},
+{
+  "model": "copro.etude",
+  "pk": 3,
+  "fields": {
+    "created_at": "2023-10-31T08:22:25.848Z",
+    "created_by": 1,
+    "modified_at": "2023-11-07T09:30:48.514Z",
+    "title": "Prestataires service Sécurite et gardinage",
+    "type_presta": 3,
+    "description": "Prestataires service Sécurite et gardinage"
+  }
+},
+{
+  "model": "copro.lignedecandidature",
+  "pk": 1,
+  "fields": {
+    "created_at": "2023-10-24T20:11:54.369Z",
+    "title": "",
+    "comment": "- 20 ans d'experience dans la gestion immobiliere, en France puis au Maroc\r\n- Tres bonne connaissance du domaine, y compris le fait que le status de\r\nsyndic n'est pas reglemente au Maroc et les problemes que cela pose\r\n- Recouvrement: s'en occupe en interne avec service juridique. Pas d'avocat\r\n(chers + pas de suivi serieux)\r\n- Travaille avec des prestataires externes pour gardiennage / jardinage etc. A\r\nses partenaires preferentiels mais n'impose aucun prestataire (appels d'offres\r\netc)\r\n- Experience dans la gestion de residences de plusieurs centaines d'unites\r\n- Experience avec badges piscines nominatifs pour eviter les abus\r\n- Base a Casablanca, gere residences dans plusieurs villes au Maroc",
+    "etude": 1,
+    "societe": "Energy Real Estate",
+    "status": "OP",
+    "notation": null,
+    "adresse": null,
+    "email": "info@energy-real-estate.ma",
+    "site_web": null,
+    "contacte": "Mr Nabil Rafki (rafki@energy-real-estate.ma)",
+    "role": "Coproprietaire",
+    "reference": null,
+    "telephone": "+212-6-71-30-06-08",
+    "recommande_par": "Coproprietaire Opale (Mr Sebti)",
+    "visite": true,
+    "offre_recu": false,
+    "remuneration": null,
+    "budget_global": null,
+    "budget_securite": null,
+    "budget_jardinage": null,
+    "author": 1,
+    "description": ""
+  }
+},
+{
+  "model": "copro.lignedecandidature",
+  "pk": 2,
+  "fields": {
+    "created_at": "2023-10-24T21:36:35.535Z",
+    "title": "",
+    "comment": "- Base a Marrakech, gere plusieurs immeubles et residences, y compris\r\ncomplexe residentiel de 1,100 Apts + magasins\r\n- Gere les residences avec ses 2 freres. Gestion controlee entre les 3 freres\r\n- Tres bonne experience en recouvrement: pas de \"dolm\", mais pas de\r\nquartiers pour les non-payeurs, y compris les gens soit-disant haut places etc.\r\n- domaine de Ssi Mohammed = la loi, il connait ca tres bien et m'a explique\r\nque ce que nous raconte Thais (delais etc) n'est pas vraiment exact\r\n- modele de travail: PAS de prestataire externe (sinon les couts augmentent\r\npour la residence). Ils font tout avec leurs employes (salaries) et les 3 freres\r\ngerants encadrent le personnel avec suivi sur place",
+    "etude": 1,
+    "societe": "Salam Gestion",
+    "status": "AB",
+    "notation": 1,
+    "adresse": "Av. Moulay El Hassan, Marrakech 40000, Maroc",
+    "email": "salamgestion@gmail.com",
+    "site_web": "https://salamgestion.com/syndic.html",
+    "contacte": "Mr Mohamed",
+    "role": "Gerant (avec ses 2 freres)",
+    "reference": "immeubles et residences, y compris complexe residentiel de 1,100 Apts + magasins",
+    "telephone": "+212-6-61-26-62-96",
+    "recommande_par": "Contact FB / Expatries Marrakech",
+    "visite": false,
+    "offre_recu": false,
+    "remuneration": null,
+    "budget_global": null,
+    "budget_securite": null,
+    "budget_jardinage": null,
+    "author": 1,
+    "description": ""
+  }
+},
+{
+  "model": "copro.lignedecandidature",
+  "pk": 6,
+  "fields": {
+    "created_at": "2023-11-04T13:18:35.259Z",
+    "title": "",
+    "comment": "",
+    "etude": 1,
+    "societe": "Gestsyn",
+    "status": "OP",
+    "notation": null,
+    "adresse": null,
+    "email": "contact@gestsyn.com",
+    "site_web": null,
+    "contacte": "Mme Chaimaa Bouaanani",
+    "role": "Management (poste exact TBD)",
+    "reference": null,
+    "telephone": "+212-6-61-69-40-86",
+    "recommande_par": "Contact FB / Expatries Marrakech",
+    "visite": false,
+    "offre_recu": false,
+    "remuneration": null,
+    "budget_global": null,
+    "budget_securite": null,
+    "budget_jardinage": null,
+    "author": 1,
+    "description": "- Equipe jeune et dynamique\r\n- Dans le domaine depuis 10 ans\r\n- Base a Casablanca, mais a deja un chef de zone base a Marrakech\r\n- Gere des residences a Casa, Marrakech et Saidia, y compris une residence de + de 400 Apts\r\n- Focus sur gestion immobiliere, y compris animations et autre (pendant Ramadan, fetes etc)\r\n- Grosse experience avec jardinage et piscine (problemes de pompe etc)\r\n- Capable de me donner en detail leur processus de recouvrement (amiable / lettre de relance / mise en demeure / dossier avocat au tribunal / jugement), et d'expliquer qu'il y a 2-3 ans tout etait tres lent mais que maintenant les jugements sont faits et appliques rapidement (isti3jaliya)\r\n- Connait bien Mr Bennani et Thais, a des contacts chez Thais qu'elle peut activer au cas ou Thais nous met des batons dans les roues / ne veut pas faire de passation correctement etc"
+  }
+},
+{
+  "model": "copro.lignedecandidature",
+  "pk": 7,
+  "fields": {
+    "created_at": "2023-11-04T13:18:35.288Z",
+    "title": "",
+    "comment": "",
+    "etude": 1,
+    "societe": "ViaSyndic",
+    "status": "OP",
+    "notation": null,
+    "adresse": null,
+    "email": "Info@via-syndic.com",
+    "site_web": null,
+    "contacte": "Mr Yassine Alaoui",
+    "role": "Directeur / Gerant",
+    "reference": null,
+    "telephone": "+212-6-61-24-75-74",
+    "recommande_par": "Contact FB / Expatries Marrakech",
+    "visite": false,
+    "offre_recu": false,
+    "remuneration": null,
+    "budget_global": null,
+    "budget_securite": null,
+    "budget_jardinage": null,
+    "author": 1,
+    "description": "- Base a Marrakech, dans le domaine depuis 2008\r\n- Gere 12 residences (demeures de Marrakech, Jouhara Mogador etc). La plus grande fait 128 Apts \r\n- Bonnes vibes au telephone, tres a l'ecoute et semble tres serieux\r\n- A quitte la residence ou habite la dame qui l'a recommande en 2017 (et elle le recommande quand meme, 6 ans apres). Bonne marque de confiance\r\n- Travaille avec prestataires externes pour gardiennage / jardinage. Appels d'offres + recommendations"
+  }
+},
+{
+  "model": "copro.lignedecandidature",
+  "pk": 20,
+  "fields": {
+    "created_at": "2023-11-04T13:18:35.605Z",
+    "title": "",
+    "comment": "",
+    "etude": 1,
+    "societe": "PacoClean",
+    "status": "OP",
+    "notation": null,
+    "adresse": null,
+    "email": "Cleanpaco@gmail.com",
+    "site_web": null,
+    "contacte": "Mr Youness El Gazouir (Elgazouiryouness@gmail.com)",
+    "role": "Gerant",
+    "reference": null,
+    "telephone": "+212-6-58-83-31-02",
+    "recommande_par": "Contact FB / Expatries Marrakech",
+    "visite": false,
+    "offre_recu": false,
+    "remuneration": null,
+    "budget_global": null,
+    "budget_securite": null,
+    "budget_jardinage": null,
+    "author": 1,
+    "description": "- Base a Marrakech, gere uniquement une residence pour l'instant, a Safi (Garden City : 128 villas, piscine, club de sport etc)\r\n- Utilise salaries pour toutes les prestations (gardiennage / jardinage / gestion des dechets / securite etc). Emploie 15 personnes a ce jour, et croie en l'embauche et la formation continue \r\n- Approche tres pragmatique: ne veut pas choisir n'importe quoi comme 2eme residence a gerer, veut etre realiste sur les objectifs (reductions de couts peut etre pas possibles la 1ere annee si contrats avec prestataires existants sont toujours en cours, mais devraient etre tres faisables a partir de la 2eme annee). Aime travailler de concert avec le CS pour trouver les meilleures solutions\r\n- N'a pas hesite a proposer, puis m'a envoye une video de leurs realisations, des documents de recouvrement qu'il a gere lui-meme"
+  }
+},
+{
+  "model": "copro.lignedecandidature",
+  "pk": 26,
+  "fields": {
+    "created_at": "2023-11-04T22:24:51.495Z",
+    "title": "",
+    "comment": "",
+    "etude": 1,
+    "societe": "N2F OP BAYTI SAKANE",
+    "status": "OP",
+    "notation": null,
+    "adresse": "Azzouzia Marrakech",
+    "email": "mustaphabrel@gmail.com",
+    "site_web": null,
+    "contacte": "Mr Mustapha Brel n2f.solutions21@gmail.com",
+    "role": "Directeur?",
+    "reference": null,
+    "telephone": "+212-7-07-00-63-99",
+    "recommande_par": "Coproprietaire Opale (Mr Abdelaziz)",
+    "visite": false,
+    "offre_recu": false,
+    "remuneration": null,
+    "budget_global": null,
+    "budget_securite": null,
+    "budget_jardinage": null,
+    "author": 1,
+    "description": "nan"
+  }
+},
+{
+  "model": "copro.lignedecandidature",
+  "pk": 27,
+  "fields": {
+    "created_at": "2023-11-12T09:16:19.504Z",
+    "title": "",
+    "comment": "Offre rémunération couvre ces services :\r\n\r\nGestion opérationnelle, administrative, technique, juridique, financière.\r\nGestion des parties communes et des équipements communs\r\nRecouvrement, contentieux et actions en justice\r\nMise en ligne de votre copropriété sur notre application mobile\r\nPrésentation de huit tableaux de gestion par mois : ( Grand livre comptable,",
+    "etude": 1,
+    "societe": "VALOR Syndic",
+    "status": "OP",
+    "notation": null,
+    "adresse": "Résidence Yaacoub El Mansour IMM B. 3ème étage N° 5. Angle Avenue Yaacoub El Mansour et Khalid Ibn El Oualid. Guéliz. Marrakech -",
+    "email": "contact@valorsyndic.ma",
+    "site_web": "http://www.valorsyndic.ma",
+    "contacte": "Aziz Hadi",
+    "role": "Gerant",
+    "reference": null,
+    "telephone": "+212 524 36 43 49 GSM : +212 661 64 69 55",
+    "recommande_par": "Mr SALAH",
+    "visite": true,
+    "offre_recu": true,
+    "remuneration": 28890,
+    "budget_global": null,
+    "budget_securite": null,
+    "budget_jardinage": null,
+    "author": 1,
+    "description": "VALOR GROUP intervient\r\nprincipalement dans le domaine des services à valeur ajoutée\r\norientés copropriétés, promoteurs immobiliers et résidences touristiques et immobilière à qui nous offrons, l’excellence, la perfection et le sur-mesure.\r\nDans un esprit de services complémentaires dédiés à la copropriété, le groupe est ainsi présent dans les métiers de la gestion de copropriété, la conciergerie résidentielle, la conception et l’entretien des\r\nespaces verts, le gardiennage et le \r\nnettoyage.\r\n\r\nVALOR SYNDIC est une société de gestion de copropriété à taille humaine basée à\r\nMarrakech avec une implantation nationale.\r\n\r\nGestion opérationnelle, administrative, technique, juridique, financière.\r\nGestion des parties communes et des équipements communs\r\nRecouvrement, contentieux et actions en justice\r\nMise en ligne de votre copropriété sur notre application mobile\r\nPrésentation de huit tableaux de gestion par mois : ( Grand livre comptable,"
+  }
+},
+{
+  "model": "copro.lignedecandidature",
+  "pk": 28,
+  "fields": {
+    "created_at": "2023-11-12T09:50:37.833Z",
+    "title": "",
+    "comment": "",
+    "etude": 1,
+    "societe": "Sofagec",
+    "status": "OP",
+    "notation": null,
+    "adresse": "N° 02 IMM . AMNASR, Av. MOULAY ABDELLAH - AGADIR +212 528 821 428",
+    "email": "syndic@sofagec.com",
+    "site_web": "http://sofagec.com/",
+    "contacte": null,
+    "role": null,
+    "reference": "Syndic de la residence Ambr, Résidence Paraiso Del Sol, Résidence Khemissa,Résidence Tafraout",
+    "telephone": "+212-5-28-84-44-72",
+    "recommande_par": null,
+    "visite": false,
+    "offre_recu": false,
+    "remuneration": null,
+    "budget_global": null,
+    "budget_securite": null,
+    "budget_jardinage": null,
+    "author": 1,
+    "description": "Syndic de référence membre fondateur de la chambre nationale des syndics de copropriété.\r\nUne expertise reconnue qui fait de SOFAGEC Syndic un Partenaire Indispensable pour  gérer au mieux vos intérêts,\r\n \r\nAider le syndicat à choisir les meilleures solutions au moindre coût."
+  }
+},
+{
+  "model": "copro.lignedecandidature",
+  "pk": 29,
+  "fields": {
+    "created_at": "2023-11-12T10:10:50.051Z",
+    "title": "",
+    "comment": "",
+    "etude": 1,
+    "societe": "SIDI SYNDIC",
+    "status": "OP",
+    "notation": null,
+    "adresse": null,
+    "email": null,
+    "site_web": null,
+    "contacte": null,
+    "role": null,
+    "reference": null,
+    "telephone": "+212 06-62-18-98-59",
+    "recommande_par": null,
+    "visite": false,
+    "offre_recu": false,
+    "remuneration": null,
+    "budget_global": null,
+    "budget_securite": null,
+    "budget_jardinage": null,
+    "author": 1,
+    "description": "Piece n1 bureau n15 etage 3 residence badr boulevard mohamed v gueliz  -\r\n Marrakech-Médina (AR)"
+  }
+},
+{
+  "model": "copro.lignedecandidature",
+  "pk": 30,
+  "fields": {
+    "created_at": "2023-11-12T10:12:09.794Z",
+    "title": "",
+    "comment": "",
+    "etude": 1,
+    "societe": "SYNDIC PREMIUM",
+    "status": "OP",
+    "notation": null,
+    "adresse": "57, rue mauritania bp 2609 marrakech principale - guéliz - Gueliz",
+    "email": null,
+    "site_web": null,
+    "contacte": null,
+    "role": null,
+    "reference": null,
+    "telephone": null,
+    "recommande_par": null,
+    "visite": false,
+    "offre_recu": false,
+    "remuneration": null,
+    "budget_global": null,
+    "budget_securite": null,
+    "budget_jardinage": null,
+    "author": 1,
+    "description": ""
+  }
+},
+{
+  "model": "copro.lignedecandidature",
+  "pk": 31,
+  "fields": {
+    "created_at": "2023-11-12T10:12:57.322Z",
+    "title": "",
+    "comment": "",
+    "etude": 1,
+    "societe": "SYNDIC MARRAKECH",
+    "status": "OP",
+    "notation": null,
+    "adresse": "55 Bd Mohamed V Imm Jakar 5ème Étage App 33 Guéliz - Gueliz",
+    "email": null,
+    "site_web": null,
+    "contacte": null,
+    "role": null,
+    "reference": null,
+    "telephone": null,
+    "recommande_par": null,
+    "visite": false,
+    "offre_recu": false,
+    "remuneration": null,
+    "budget_global": null,
+    "budget_securite": null,
+    "budget_jardinage": null,
+    "author": 1,
+    "description": ""
+  }
+},
+{
+  "model": "copro.lignedecandidature",
+  "pk": 32,
+  "fields": {
+    "created_at": "2023-11-12T10:18:11.792Z",
+    "title": "",
+    "comment": "",
+    "etude": 1,
+    "societe": "GESTIS",
+    "status": "OP",
+    "notation": null,
+    "adresse": "7 Rue Bachir Laalej, Casablanca 20340, Maroc",
+    "email": null,
+    "site_web": "https://gestis.ma/",
+    "contacte": null,
+    "role": null,
+    "reference": null,
+    "telephone": "+212 0522-994327",
+    "recommande_par": null,
+    "visite": false,
+    "offre_recu": false,
+    "remuneration": null,
+    "budget_global": null,
+    "budget_securite": null,
+    "budget_jardinage": null,
+    "author": 1,
+    "description": "GESTIS Le leader de la gestion de\r\nSyndic professionnelle au Maroc\r\nGESTIS à Marrakech +212 5229-94327\r\nMarrakech est une présence inscrite dans la politique d’expansion de GESTIS grâce à la confiance de ses clients. Cette ouverture s’inscrit dans une dynamique d’expansion, politique renforcée après l’ouverture en 2019 des bureaux de GESTIS à Marrakech.\r\n\r\nInstallée à Casablanca dans son siège sociale de Abdelmoumen, GESTIS proposera l’ensemble des services ayant fait sa renommée, la gestion de syndic professionnelle et le Facility Management\r\nLa succursale de Marrakech desservira Essaouira et Agadir.\r\nMarrakech se démarque par le caractère estival et saisonnier de la fréquentation de ses grandes copropriétés et cette particularité nous la prenant en compte dans le cadre d’une gestion agile.\r\nL’équipe de GESTIS se démarque par une grande compétence en matière de droit de la copropriété délivrant un service et savoir-faire sans égal à tous ses clients.\r\n\r\nLes équipes de Marrakech ne bénéficient pas uniquement du capital sympathie, de l’image ou encore des procédures et GESTIS mais aussi et surtout d’un réseau trié sur le volet de partenaires et prestataires locaux.\r\n\r\n\r\n\r\nAppelez nous pour une consultation juridique sans engagement 0522-994327"
+  }
+},
+{
+  "model": "copro.lignedecandidature",
+  "pk": 33,
+  "fields": {
+    "created_at": "2023-11-12T17:36:35.688Z",
+    "title": "",
+    "comment": "",
+    "etude": 1,
+    "societe": "HONA Protect",
+    "status": "OP",
+    "notation": null,
+    "adresse": "80 RDC ANG RUE OUSSAMA BNOU ZAID ET AHMED JOUMARI CASABLANCA",
+    "email": "group.honaprotect@gmail.com",
+    "site_web": null,
+    "contacte": null,
+    "role": null,
+    "reference": null,
+    "telephone": null,
+    "recommande_par": null,
+    "visite": false,
+    "offre_recu": false,
+    "remuneration": null,
+    "budget_global": null,
+    "budget_securite": null,
+    "budget_jardinage": null,
+    "author": 1,
+    "description": "SURVEILLANCE ET PROTECTION CONTRE LE VOL (ENTREPRENEUR DE) N’OCCUPANT PAS PLUS DE CINQ PERSONNES\r\n80 RDC ANG RUE OUSSAMA BNOU ZAID ET AHMED JOUMARI CASABLANCA"
+  }
+},
+{
+  "model": "copro.evenement",
+  "pk": 1,
+  "fields": {
+    "created": "2023-11-04T20:15:48.673Z",
+    "title": "Reunion du CS",
+    "description": "Reunion du CS",
+    "author": 1,
+    "start": "2023-11-02T19:02:14Z",
+    "end": "2023-11-02T19:58:15Z",
+    "closed": "2023-11-04T20:15:46Z",
+    "categories": 1
+  }
+},
+{
+  "model": "copro.evenement",
+  "pk": 2,
+  "fields": {
+    "created": "2023-11-07T08:25:38.503Z",
+    "title": "Assemblée Générale de la Residence GC OPALE",
+    "description": "Derrniere Assemblée Générale de la Residence GC OPALE avec THAIS comme syndic",
+    "author": 1,
+    "start": "2024-01-26T09:24:47Z",
+    "end": "2024-01-27T17:23:35Z",
+    "closed": null,
+    "categories": 2
+  }
+}
+]

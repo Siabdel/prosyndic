@@ -12,7 +12,7 @@ __pycache__/*
 *.xls
 *.pyc
 *.cpython-39
-*.md
+bin/
 
 # Distribution / packaging
 .Python

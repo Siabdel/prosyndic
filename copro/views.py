@@ -64,7 +64,17 @@ class BaseDonneeDoc(ListView):
         # self.object_list = pro_models.Document.objects.all().order_by("-created")
         return self.object_list
 
-# Document
+class CompareViewList(ListView):
+   model=pro_models.LigneDeCandidature
+   template_name = "copro/compare_list.html"  
+   
+   def get_queryset(self):
+        queryset = pro_models.LigneDeCandidature.objects.all().order_by('societe')
+        ## return super().get_queryset()
+        return queryset 
+##-----------------------------------------------------------
+# API API API 
+##-----------------------------------------------------------
 class DocumentApiList(generics.ListCreateAPIView):
     serializer_class = pro_seriz.DocumentApiSerializer 
     pieces1 = pro_models.PJEtude.objects.all()
@@ -103,4 +113,12 @@ class DocumentApiList(generics.ListCreateAPIView):
 class DocumentDetails(generics.RetrieveUpdateDestroyAPIView):
     queryset = pro_models.Document.objects.all().order_by('-id')
     serializer_class = pro_seriz.DocumentApiSerializer 
+
+# Api sydic 
+class SyndicApiList(generics.ListCreateAPIView):
+    serializer_class = pro_seriz.CandidatApiSerializer
+
+    def get_queryset(self):
+        queryset = pro_models.LigneDeCandidature.objects.filter(status='OP').order_by('societe', '-id')
+        return queryset
 

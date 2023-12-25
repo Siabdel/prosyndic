@@ -1,5 +1,19 @@
-from typing import Any
+# -*- coding:UTF-8 -*-
+from __future__ import unicode_literals
+import os, sys
 import datetime
+from django.db.models.query import QuerySet
+import pytz
+import json
+import io
+import random
+from django.http import HttpResponse
+from django.core import serializers
+from django.http import Http404
+from rest_framework.views import APIView
+import numpy as np
+import pandas as pd
+from typing import Any
 from django.utils import timezone
 from django.shortcuts import render
 from django.conf import settings
@@ -13,9 +27,26 @@ from copro import serializers as pro_seriz
 from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib import messages
 from django.utils.decorators import method_decorator
+from django.http import JsonResponse
+from django_pandas.io import read_frame
+from django.forms.models import model_to_dict
+
+##from copro.utils import Dict2Obj
 # from prosyndic.permissions import IsAuthorOrReadOnly
 
 # Create your views here.
+
+## convert dict to Obj
+class Dict2Obj(object):
+    """
+    Turns a dictionary into a class
+    """
+    #----------------------------------------------------------------------
+    def __init__(self, dictionary):
+        """Constructor"""
+        for key in dictionary:
+            setattr(self, key, dictionary[key])
+
 
 def home(request):
     context = {}
@@ -72,9 +103,77 @@ class CompareViewList(ListView):
         queryset = pro_models.LigneDeCandidature.objects.all().order_by('societe')
         ## return super().get_queryset()
         return queryset 
+    
+    
+class CandidatPivotList(ListView):
+    template_name = "copro/compare_pivot_list.html"  
+    model = pro_models.LigneDeCandidature
+  
 ##-----------------------------------------------------------
-# API API API 
+## API API API 
 ##-----------------------------------------------------------
+
+class ApiCandidatPivotList(APIView):
+    model = pro_models.LigneDeCandidature
+    
+    
+    def get(self, request, action='list', format='json'):
+        ## return self.get_queryset()
+        json_data = self.queryset_to_json()
+        # return JsonResponse(json_data, status=200, safe=False)
+        return JsonResponse({ 'data' : json_data })
+           
+    
+        
+    
+    def queryset_to_json(self, queryset=None):
+        # queryset  serialise
+        if not queryset :
+            queryset = pro_models.LigneDeCandidature.objects.all().order_by('societe')# Convert the QuerySet to a Pandas DataFrame
+            # Convert the QuerySet to a Pandas DataFrame
+            candidat_df = read_frame(queryset)
+            # replace NaN to None
+            # candidat_df = candidat_df.replace(np.nan, None) 
+            # candidat_df = candidat_df.astype(object).where(pd.notnull(candidat_df),None)
+            
+            # pivote table
+            dpivot = candidat_df.pivot_table(values=
+                                             ['remuneration', 'budget_global', 'budget_securite', 
+                                              'budget_jardinage', 'budget_picine', 
+                                              'budget_menage', 'budget_maintenance'
+                                              ] ,  columns=['societe'])
+
+            
+            # n array 
+            lignes_array = dpivot.values 
+            lignes_list = lignes_array.data.tolist()
+            lignes_json = []
+            for ind, index in enumerate(dpivot.index):
+                lignes_json.append({index : lignes_list[ind]})
+                
+            ##return json.dumps(lignes_json, indent=2)
+            return lignes_json
+            
+            
+    #--- 
+    def to_json(self):
+        queryset = pro_models.LigneDeCandidature.objects.all().order_by('societe')# Convert the QuerySet to a Pandas DataFrame
+        # Convert the QuerySet to a Pandas DataFrame
+        candidat_df = read_frame(queryset)
+        dpivot = candidat_df.pivot_table(values=
+                        ['remuneration', 'budget_global', 'budget_securite', 
+                        'budget_jardinage', 'budget_picine', 
+                        'budget_menage', 'budget_maintenance'
+                        ] ,  columns=['societe'])
+
+        data_string = dpivot.to_json()
+        ##data_json2 = [elem   for elem in data_json]
+        json_data = json.loads( data_string)
+        print(type(json_data))
+        return [json_data]
+
+    
+    
 class DocumentApiList(generics.ListCreateAPIView):
     serializer_class = pro_seriz.DocumentApiSerializer 
     pieces1 = pro_models.PJEtude.objects.all()

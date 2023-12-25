@@ -1,6 +1,17 @@
 class Container:
     pass
 
+## convert dict to Obj
+class Dict2Obj(object):
+    """
+    Turns a dictionary into a class
+    """
+    #----------------------------------------------------------------------
+    def __init__(self, dictionary):
+        """Constructor"""
+        for key in dictionary:
+            setattr(self, key, dictionary[key])
+
 
 def revert(obj):
     if isinstance(obj, Container):

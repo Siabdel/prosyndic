@@ -121,7 +121,7 @@ class ApiCandidatPivotList(APIView):
         ## return self.get_queryset()
         json_data = self.queryset_to_json()
         # return JsonResponse(json_data, status=200, safe=False)
-        return JsonResponse({ 'data' : json_data })
+        return JsonResponse(json_data )
            
     
         
@@ -145,14 +145,17 @@ class ApiCandidatPivotList(APIView):
 
             
             # n array 
-            lignes_array = dpivot.values 
-            lignes_list = lignes_array.data.tolist()
+            dpivot = dpivot.replace(np.nan, None)
+            lignes_list = dpivot.values.tolist()
             lignes_json = []
             for ind, index in enumerate(dpivot.index):
                 lignes_json.append({index : lignes_list[ind]})
                 
-            ##return json.dumps(lignes_json, indent=2)
-            return lignes_json
+            #return json.dumps(lignes_json, indent=2)
+            all_data = {'index': list(dpivot.index), 
+                        'columns': list(dpivot.columns), 
+                        'data' : lignes_json }
+            return all_data
             
             
     #--- 

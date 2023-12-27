@@ -13,6 +13,7 @@ __pycache__/*
 *.pyc
 *.cpython-39
 bin/
+*.md
 
 # Distribution / packaging
 .Python

@@ -86,33 +86,29 @@
         <table class="table table-striped">
             <thead>
                 <tr> <th>Societe / items </th>
-                <th>Budget Globale</th> <th>Budget Securite </th> <th>Budget Jardinage </th>
-                <th>Budget Picine</th> <th>Budget Menage </th> <th>Budget Maintenance </th>
+                <th v-for='column in ligne_data.columns'> [[column]] </th>
                  </tr>
             </thead>
             <tbody>
 
                 <tr v-for="(ligne, index) in ligne_data.data" :key=index>
+                    <td v-if="index==0"> budget_global </td>
+                    <td v-for="elem in ligne.budget_global"> [[ elem ]] </td>
+                    
+                    <td v-if="index==1"> budget_jardinage </td>
+                    <td v-for="elem in ligne.budget_jardinage"> [[ elem ]] </td>
+                    
+                    <td v-if="index==2"> budget maintenance </td>
+                    <td v-for="elem in ligne.budget_maintenance"> [[ elem ]] </td>
+                    
+                    <td v-if="index==3"> budget ménage </td>
+                    <td v-for="elem in ligne.budget_menage"> [[ elem ]] </td>
+                    
+                    <td v-if="index==4"> budget picine </td>
+                    <td v-for="elem in ligne.budget_picine"> [[ elem ]] </td>
 
-                    <td scope="row"> 
-                        <a :href="ligne.id"  target='_blanc'>
-                            [[ ligne]]
-                        </a>  
-                    </td>
-                    <td> 
-                        <span v-if="ligne.agence_locale" > Oui </span>
-                        <span v-else> Pas agence locale </span>
-                    </td>
-                    <td v-if="ligne.offre_recu" > Oui </td>
-                    <td v-if="ligne.visite" > Oui </td>
-                    <td> [[ ligne.remuneration ]] </td>
-                    <td> [[ ligne.budget_global ]] </td>
-                    <td> [[ ligne.budget_securite ]] </td>
-                    <td> [[ ligne.budget_jardinage ]] </td>
-                    <td> [[ ligne.budget_picine ]] </td>
-                    <td> [[ ligne.budget_menage ]] </td>
-                    <td> [[ ligne.budget_maintenance ]] </td>
-                    <td> [[ ligne.budget_agent_suivi ]] </td>
+                    <td v-if="index==5"> budget sécurité </td>
+                    <td v-for="elem in ligne.budget_securite"> [[ elem ]] </td>
                 </tr>
                 
             </tbody>

@@ -376,6 +376,13 @@ class LigneDeCandidature(AbstractLigneDoc):
     description = MarkdownxField( blank=True, null=True)    
     comments = GenericRelation(Comment)
     
+    @property 
+    def total_budget(self) : 
+        total = self.budget_agent_suivi + self.budget_jardinage \
+                + self.budget_maintenance + self.budget_maitre_nageur \
+                + self.budget_menage + self.budget_securite + self.budget_agent_suivi
+        return total
+
     def candidat_comments(self) : 
         return  self.comments.all()
 

@@ -70,6 +70,9 @@
             if (typeof value !== "number") {
                 return value;
             }
+            else if (value == 0.0) {
+                return ""
+            }
             var formatter = new Intl.NumberFormat('fr-Fr', {
                 style: 'currency',
                 currency: 'MAD'
@@ -87,7 +90,7 @@
 <div class="container row" id="app">
     <div class="col-10">
         <h3> [[ message ]] </h3>
-        <h3 v-show=""> [[ ligne_data]] </h3>
+        <h3 v-show=""> [[resultat]] </h3>
         <form class="d-flex" action="/admin/" method="post" @submit.prevent="">
                 {% csrf_token %}
             <input v-show=""  class="form-control me-2" v-model="entree" type="text" placeholder="saisie un montant" >
@@ -105,28 +108,11 @@
             <tbody>
 
                 <tr v-for="(ligne, index) in ligne_data.data" :key=index>
-                    <td v-if="index==0"> budget_global </td>
-                    <td v-for="elem  in ligne.budget_global"
-                    :class="[elem > 3000000 ? 'text-danger' : 'text-info', errorMax]" > [[ elem | toCurrency ]] </td>
-                    
-                    <td v-if="index==1"> budget_jardinage </td>
-                    <td v-for="elem in ligne.budget_jardinage"> [[ elem | toCurrency ]]
-                          </td>
-                    
-                    <td v-if="index==2"> budget maintenance </td>
-                    <td v-for="elem in ligne.budget_maintenance"> [[ elem | toCurrency ]]
-                          </td>
-                    
-                    <td v-if="index==3"> budget ménage </td>
-                    <td v-for="elem in ligne.budget_menage"> [[ elem | toCurrency ]] 
-                         </td>
-                    
-                    <td v-if="index==4"> budget picine </td>
-                    <td v-for="elem in ligne.budget_picine"> [[ elem | toCurrency ]]  </td>
+                    <td> [[ligne.name]]  </td>
+                    <td v-for="elem  in ligne.data"
+                    :class="[elem > 3000000 ? 'text-danger' : 
+                    'text-info', errorMax]" > [[ elem | toCurrency ]] </td>
 
-                    <td v-if="index==5"> budget sécurité </td>
-                    <td v-for="elem in ligne.budget_securite"> [[ elem | toCurrency ]] 
-                         </td>
                 </tr>
                 
             </tbody>

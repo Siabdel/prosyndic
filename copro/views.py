@@ -129,7 +129,7 @@ class ApiCandidatPivotList(APIView):
     def queryset_to_json(self, queryset=None):
         # queryset  serialise
         if not queryset :
-            queryset = pro_models.LigneDeCandidature.objects.all().order_by('societe')# Convert the QuerySet to a Pandas DataFrame
+            queryset = pro_models.LigneDeCandidature.objects.filter(offre_recu=True).order_by('societe')# Convert the QuerySet to a Pandas DataFrame
             # Convert the QuerySet to a Pandas DataFrame
             candidat_df = read_frame(queryset)
             # replace NaN to None
@@ -140,7 +140,8 @@ class ApiCandidatPivotList(APIView):
             dpivot = candidat_df.pivot_table(values=
                                              ['remuneration', 'budget_global', 'budget_securite', 
                                               'budget_jardinage', 'budget_picine', 
-                                              'budget_menage', 'budget_maintenance'
+                                              'budget_menage', 'budget_maintenance',
+                                              'budget_agent_suivi',
                                               ] ,  columns=['societe'])
 
             
@@ -149,7 +150,7 @@ class ApiCandidatPivotList(APIView):
             lignes_list = dpivot.values.tolist()
             lignes_json = []
             for ind, index in enumerate(dpivot.index):
-                lignes_json.append({index : lignes_list[ind]})
+                lignes_json.append({'name':index, 'data' : lignes_list[ind]})
                 
             #return json.dumps(lignes_json, indent=2)
             all_data = {'index': list(dpivot.index), 

@@ -141,7 +141,8 @@ class ApiCandidatPivotList(APIView):
                                              ['remuneration', 'budget_global', 'budget_securite', 
                                               'budget_jardinage', 'budget_picine', 
                                               'budget_menage', 'budget_maintenance',
-                                              'budget_agent_suivi',
+                                              'budget_agent_suivi', 'consommation_eau',
+                                              'consommation_electricite', 'provison_investissement',
                                               ] ,  columns=['societe'])
 
             

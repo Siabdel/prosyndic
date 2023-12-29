@@ -242,7 +242,9 @@ class AbstractPieceJointe(models.Model):
 
     def save(self): 
         if self.piece.name : 
-            self.name = self.piece.name
+            new_name = os.path.basename(self.piece_name)[:50]
+            new_name = new_name.split(".")[0]
+            self.name = new_name
         # super save
         super(AbstractPieceJointe, self).save()
         
@@ -359,7 +361,7 @@ class LigneDeCandidature(AbstractLigneDoc):
 
     reponse_questionnaire = models.BooleanField(_("reponse au questionnaire "), default=False)
     proposition_transition = models.BooleanField(_("proposition transition"), default=False)
-    propostion_recouverement = models.BooleanField(_("Proposition de recouverement "), default=False)
+    propostion_recouverement = models.BooleanField(_("Proposition de recouvrement "), default=False)
     contrat_engagement = models.BooleanField(_("contrat engagement "), default=False)
     agence_locale = models.BooleanField(_("Agence locale"), default=False)
 
@@ -372,6 +374,9 @@ class LigneDeCandidature(AbstractLigneDoc):
     budget_maintenance = models.PositiveIntegerField(blank=True, null=True)
     budget_agent_suivi = models.PositiveIntegerField(blank=True, null=True)
     budget_maitre_nageur = models.PositiveIntegerField(blank=True, null=True)
+    provison_investissement = models.PositiveIntegerField(blank=True, null=True)
+    consommation_electricite = models.PositiveIntegerField(blank=True, null=True)
+    consommation_eau = models.PositiveIntegerField(blank=True, null=True)
     author = models.ForeignKey(settings.AUTH_USER_MODEL, default=1, on_delete=models.CASCADE)
     description = MarkdownxField( blank=True, null=True)    
     comments = GenericRelation(Comment)

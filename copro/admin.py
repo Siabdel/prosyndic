@@ -39,7 +39,7 @@ class PieceInline(admin.StackedInline):
     
     def save_form(self, request, obj, form, change):
         # save residance
-        obj.name = obj.file.name
+        obj.name = obj.file.name[:45]
         print("Toto ....... !")
         obj.save()
         

@@ -63,6 +63,20 @@
                     //console.log("vous chercher ...!" + this.filterKey)
                 },
                 //-------
+                classObject(elem, ligne){
+                    return {
+                    'text-danger' : (elem > 3000000 && ligne.name=='budget_global')  |
+                    (elem > 500000 && ligne.name=='budget_jardinage') |
+                    (elem > 400000 && ligne.name=='remuneration') |
+                    (elem > 700000 && ligne.name=='budget_securite' ) |
+                    (elem > 200000 && ligne.name=='budget_menage' ) |
+                    (elem > 300000 && ligne.name=='budget_picine' ) |
+                    (elem > 140000 && ligne.name=='budget_maintenance' )| 
+                    (elem > 180000 && ligne.name=='consommation_eau' )|
+                    (elem > 300000 && ligne.name=='consommation_electricite' ) 
+                    //'text-danger': this.error && this.error.type === 'fatal'
+                    } 
+                },
             }
         });
         // Filters 
@@ -102,16 +116,17 @@
         <table class="table table-striped">
             <thead>
                 <tr> <th>items/Societe </th>
-                <th v-for='column in ligne_data.columns'> [[column]] </th>
+                <th :class="[(column == 'THAIS')? 'text-danger':'']" 
+                    v-for="column in ligne_data.columns"> [[column]] </th>
                  </tr>
             </thead>
             <tbody>
 
                 <tr v-for="(ligne, index) in ligne_data.data" :key=index>
-                    <td> [[ligne.name]]  </td>
+                    <td > [[ligne.name]]  </td>
                     <td v-for="elem  in ligne.data"
-                    :class="[elem > 3000000 ? 'text-danger' : 
-                    'text-info', errorMax]" > [[ elem | toCurrency ]] </td>
+                    :class="classObject(elem, ligne)"                    
+                    > [[ elem | toCurrency ]] </td>
 
                 </tr>
                 
@@ -119,7 +134,7 @@
         </table> 
     </div>
     <div class="col-2">
-        <img src="/media/upload/prestigia_001.jpg" width="50%" />
+        <img src="/media/upload/prestigia_001.jpg" width="70%" />
     </div>
 </div>
  

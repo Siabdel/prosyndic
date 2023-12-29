@@ -13,5 +13,5 @@ urlpatterns = [
     ## Vue.js
     path('basedoc/', views.BaseDonneeDoc.as_view(), name="basdoc"), # Document
     path('compare/', views.CompareViewList.as_view(), name="compare"),
-    path('pivote/<str:action>/', views.CandidatPivotList.as_view(), name="piv_compare"),
+    path('pivote/', views.CandidatPivotList.as_view(), name="piv_compare"),
 ] 

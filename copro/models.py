@@ -356,15 +356,26 @@ class LigneDeCandidature(AbstractLigneDoc):
     reference = models.CharField(_("Les réferences de la societe"), max_length=100, blank=True, null=True)
     telephone = models.CharField(_("Téléphone"), max_length=50, blank=True, null=True)
     recommande_par = models.CharField(max_length=100, blank=True, null=True)
+    # indicateurs
     visite = models.BooleanField(_("Visite effectuée"), default=False)
     offre_recu = models.BooleanField(_("Candidat a fait une offre"), default=False)
-
     reponse_questionnaire = models.BooleanField(_("reponse au questionnaire "), default=False)
     proposition_transition = models.BooleanField(_("proposition transition"), default=False)
     propostion_recouverement = models.BooleanField(_("Proposition de recouvrement "), default=False)
     contrat_engagement = models.BooleanField(_("contrat engagement "), default=False)
-    agence_locale = models.BooleanField(_("Agence locale"), default=False)
-
+    agence_locale = models.BooleanField(_("Siege a Marrakech"), default=False)
+    budget_prev_2024 = models.BooleanField(_("Budget Previsionnel 2024"), default=False)
+    budget_prev_2025 = models.BooleanField(_("Budget Previsionnel 2025"), default=False)
+    process_suivi_prests = models.BooleanField(_("Processus suivi prestataires"), default=False)
+    ressource_sur_place = models.BooleanField(_("Ressource sur place"), default=False)
+    model_prestataires_ext = models.BooleanField(_("Model prestataires externe"), default=False)
+    # autre indicateurs
+    taille_entreprise = models.IntegerField(_("Taille entreprise"), blank=True, null=True)
+    anciennete = models.IntegerField(_("Anciennete entreprise"), blank=True, null=True)
+    avis_negatif = models.IntegerField(verbose_name="Avis Negatif", blank=True, null=True)
+    avis_positif = models.IntegerField(_("Avis Positif"), blank=True, null=True)
+    # montants 
+    effectif_sur_place = models.PositiveIntegerField(_("Effectif sur place"), default=0, blank=True, null=True)
     remuneration = models.PositiveIntegerField(blank=True, null=True)
     budget_global = models.PositiveIntegerField(blank=True, null=True)
     budget_securite = models.PositiveIntegerField(blank=True, null=True)

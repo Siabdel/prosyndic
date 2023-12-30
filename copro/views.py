@@ -95,6 +95,7 @@ class BaseDonneeDoc(ListView):
         # self.object_list = pro_models.Document.objects.all().order_by("-created")
         return self.object_list
 
+@method_decorator(login_required(login_url="/admin/login"), 'dispatch')
 class CompareViewList(ListView):
    model=pro_models.LigneDeCandidature
    template_name = "copro/compare_list.html"  
@@ -105,6 +106,12 @@ class CompareViewList(ListView):
         return queryset 
     
     
+@method_decorator(login_required(login_url="/admin/login"), 'dispatch')
+class ComparateurIndicateurstList(ListView):
+    template_name = "copro/compare_indicateur_list.html" 
+    model = pro_models.LigneDeCandidature
+## 
+@method_decorator(login_required(login_url="/admin/login"), 'dispatch')
 class CandidatPivotList(ListView):
     template_name = "copro/compare_pivot_list.html"  
     model = pro_models.LigneDeCandidature
@@ -113,6 +120,46 @@ class CandidatPivotList(ListView):
 ## API API API 
 ##-----------------------------------------------------------
 
+class ApiIndicateursList(APIView):
+    model = pro_models.LigneDeCandidature
+    
+    def get(self, request, action='list', format='json'):
+        json_data = self.queryset_to_json()
+        return JsonResponse(json_data )
+            
+    def queryset_to_json(self, queryset=None):
+        # queryset  serialise
+        if not queryset :
+            queryset = pro_models.LigneDeCandidature.objects.filter(offre_recu=True).order_by('societe')# Convert the QuerySet to a Pandas DataFrame
+            candidat_df = read_frame(queryset)
+            # replace NaN to None
+            # candidat_df = candidat_df.replace(np.nan, None) 
+            # pivote table
+            dpivot = candidat_df.pivot_table(values=
+                    [
+                    'visite', 'offre_recu', 'reponse_questionnaire', 'proposition_transition',
+                    'propostion_recouverement', 'contrat_engagement', 'agence_locale',
+                    'budget_prev_2024', 'budget_prev_2025', 'process_suivi_prests',
+                    'ressource_sur_place', 'effectif_sur_place', 'model_prestataires_ext', 'taille_entreprise',
+                    'anciennete', 'avis_negatif', 'avis_positif',
+                    ] ,  columns=['societe'])
+
+            
+            # n array 
+            dpivot = dpivot.replace(np.nan, None)
+            lignes_list = dpivot.values.tolist()
+            lignes_json = []
+            for ind, index in enumerate(dpivot.index):
+                lignes_json.append({'name':index, 'data' : lignes_list[ind]})
+                
+            #return json.dumps(lignes_json, indent=2)
+            all_data = {'index': list(dpivot.index), 
+                        'columns': list(dpivot.columns), 
+                        'data' : lignes_json }
+            return all_data
+                                              
+                      
+##
 class ApiCandidatPivotList(APIView):
     model = pro_models.LigneDeCandidature
     

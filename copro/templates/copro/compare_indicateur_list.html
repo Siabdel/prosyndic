@@ -11,7 +11,7 @@
             el: "#app",
             delimiters: ['[[', ']]'],
             data: { 
-                message : "Comparateur de budget ",
+                message : "Comparateur indicateurs candidats ",
                 ligne_data : [],
                 url : "",
                 filterKey : "",
@@ -49,7 +49,7 @@
             },
             methods: {
                 load_data(){
-                    let url = `/api/pivote/`
+                    let url = `/api/indicateur/`
                     // ajax load
                     fetch(url)
                     .then(response => response.json())
@@ -65,16 +65,25 @@
                 //-------
                 classObject(elem, ligne){
                     return {
-                    'text-danger' : (elem > 3000000 && ligne.name=='budget_global')  |
-                    (elem > 500000 && ligne.name=='budget_jardinage') |
-                    (elem > 400000 && ligne.name=='remuneration') |
-                    (elem > 700000 && ligne.name=='budget_securite' ) |
-                    (elem > 200000 && ligne.name=='budget_menage' ) |
-                    (elem > 300000 && ligne.name=='budget_picine' ) |
-                    (elem > 140000 && ligne.name=='budget_maintenance' )| 
-                    (elem > 180000 && ligne.name=='consommation_eau' )|
-                    (elem > 300000 && ligne.name=='consommation_electricite' ) 
-                    //'text-danger': this.error && this.error.type === 'fatal'
+                        "bg bg-success text-white-50 text-lg" :  
+                        (elem==true && ligne.name=='propostion_recouverement')| 
+                        (elem==true && ligne.name=='proposition_transition')| 
+                        (elem==true && ligne.name=='reponse_questionnaire')| 
+                        (elem==true && ligne.name=='contrat_engagement')| 
+                        (elem==true && ligne.name=='agence_locale')|
+                        (elem==true && ligne.name=='budget_prev_2024')|
+                        (elem >= 5 && ligne.name=='anciennete')|
+                        (elem >= 1 && ligne.name=='effectif_sur_place')|
+                        (elem >= 15 && ligne.name=='taille_entreprise')|
+                        (elem==true && ligne.name=='budget_prev_2025')
+                        ,
+                        "bg bg-warning text-white-50 text-xl":
+                                (elem==true  && ligne.name=='model_prestataires_ext')|
+                                (elem==false && ligne.name=='agence_locale'),
+                        "bg bg-danger text-white-50 text-xl":
+                                (elem > 0 && ligne.name=='avis_negatif')|
+                                (elem==0 && ligne.name=='effectif_sur_place'),
+                        "text-bold text-xl" : (elem==false)
                     } 
                 },
             }
@@ -105,29 +114,23 @@
     <div class="col-10">
         <h3> [[ message ]] </h3>
         <h3 v-show=""> [[resultat]] </h3>
-        <form class="d-flex" action="/admin/" method="post" @submit.prevent="">
-                {% csrf_token %}
-            <input v-show=""  class="form-control me-2" v-model="entree" type="text" placeholder="saisie un montant" >
-            <input class="form-control me-2" v-model="filterKey" type="text" placeholder="saisie un mot de recherche" >
-            <input class="btn btn-outline-success" type="submit" value="Rechercher" />
-        </form>
-        <hr/>
-
         <table class="table table-striped">
             <thead>
                 <tr> <th>items/Societe </th>
                 <th :class="[(column == 'THAIS')? 'text-danger':'']" 
                     v-for="column in ligne_data.columns"> [[column]] </th>
-                 </tr>
+                </tr>
             </thead>
             <tbody>
 
                 <tr v-for="(ligne, index) in ligne_data.data" :key=index>
-                    <td > [[ligne.name]]  </td>
+                    <td > [[ligne.name ]]  </td>
                     <td v-for="elem  in ligne.data"
-                    :class="classObject(elem, ligne)"                    
-                    > [[ elem | toCurrency ]] </td>
-
+                        class="text-info" :class="classObject(elem, ligne)"> 
+                        <span v-if="elem==true">OUI</span>
+                        <span v-else-if="elem > 0"> [[elem]] </span>
+                        <span v-else> Non </span>
+                    </td>
                 </tr>
                 
             </tbody>

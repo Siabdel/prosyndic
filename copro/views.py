@@ -190,10 +190,15 @@ class ApiCandidatPivotList(APIView):
             # replace NaN to None
             # candidat_df = candidat_df.replace(np.nan, None) 
             # candidat_df = candidat_df.astype(object).where(pd.notnull(candidat_df),None)
-            
+            # add column cout moyen mensuel  charge syndic 
+            bgobal = candidat_df["budget_global"]
+            cout_moyen_mensuel = [bg/312 for bg in bgobal]
+            candidat_df.insert(2, "a_cout_moyen_mensuel", cout_moyen_mensuel, True)
+  
             # pivote table
             dpivot = candidat_df.pivot_table(values=
-                                             ['remuneration', 'budget_global', 'budget_securite', 
+                                             ['a_cout_moyen_mensuel', 'remuneration',
+                                              'budget_global', 'budget_securite', 
                                               'budget_jardinage', 'budget_picine', 
                                               'budget_menage', 'budget_maintenance',
                                               'budget_agent_suivi', 'consommation_eau',

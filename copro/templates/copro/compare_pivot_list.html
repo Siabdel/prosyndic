@@ -74,8 +74,8 @@
                     (elem > 300000 && ligne.name=='budget_picine' ) |
                     (elem > 140000 && ligne.name=='budget_maintenance' )| 
                     (elem > 180000 && ligne.name=='consommation_eau' )|
-                    (elem > 300000 && ligne.name=='consommation_electricite' ) 
-                    //'text-danger': this.error && this.error.type === 'fatal'
+                    (elem > 300000 && ligne.name=='consommation_electricite' ), 
+                    'text-bold bg-secondary text-wrap' : (elem && ligne.name=='a_cout_moyen_mensuel'), 
                     } 
                 },
             }

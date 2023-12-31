@@ -140,7 +140,15 @@ class ApiIndicateursList(APIView):
                     'visite', 'offre_recu', 'reponse_questionnaire', 'proposition_transition',
                     'propostion_recouverement', 'contrat_engagement', 'agence_locale',
                     'budget_prev_2024', 'budget_prev_2025', 'process_suivi_prests',
-                    'ressource_sur_place', 'effectif_sur_place', 'model_prestataires_ext', 'taille_entreprise',
+                    'ressource_sur_place',
+                    'agent_suivi_local',
+                    'effectif_jardinage',
+                    'effectif_securite',
+                    'effectif_piciniste',
+                    'effectif_agent_polyvalent',
+                    'effectif_maitre_nageur',
+                    'effectif_agent_proprete',
+                    'model_prestataires_ext', 'taille_entreprise',
                     'anciennete', 'avis_negatif', 'avis_positif',
                     ] ,  columns=['societe'])
 

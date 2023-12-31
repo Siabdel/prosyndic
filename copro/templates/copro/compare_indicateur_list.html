@@ -11,7 +11,7 @@
             el: "#app",
             delimiters: ['[[', ']]'],
             data: { 
-                message : "Comparateur indicateurs candidats ",
+                message : "Comparateur indicateurs clé de performance de qualté",
                 ligne_data : [],
                 url : "",
                 filterKey : "",
@@ -21,7 +21,8 @@
                 order : 1 ,
                 entree : 0,
                 isActive : true,
-                errorMax:false
+                errorMax:false,
+                compteur:0,
             },
             //----
             created(){
@@ -48,6 +49,7 @@
                 }
             },
             methods: {
+                // load ligne data candidats 
                 load_data(){
                     let url = `/api/indicateur/`
                     // ajax load
@@ -63,6 +65,7 @@
                     //console.log("vous chercher ...!" + this.filterKey)
                 },
                 //-------
+                //calcul sum points
                 classObject(elem, ligne){
                     return {
                         "bg bg-success text-white-50 text-lg" :  
@@ -73,7 +76,7 @@
                         (elem==true && ligne.name=='agence_locale')|
                         (elem==true && ligne.name=='budget_prev_2024')|
                         (elem >= 5 && ligne.name=='anciennete')|
-                        (elem >= 1 && ligne.name=='effectif_sur_place')|
+                        (elem >= 1 && ligne.name=='agent_suivi_local')|
                         (elem >= 15 && ligne.name=='taille_entreprise')|
                         (elem==true && ligne.name=='budget_prev_2025')
                         ,
@@ -82,11 +85,13 @@
                                 (elem==false && ligne.name=='agence_locale'),
                         "bg bg-danger text-white-50 text-xl":
                                 (elem > 0 && ligne.name=='avis_negatif')|
+                                (elem < 1 && ligne.name=='agent_suivi_local')|
                                 (elem==0 && ligne.name=='effectif_sur_place'),
-                        "text-bold text-xl" : (elem==false)
+                        "text-bold text-xl" : (elem==false),
                     } 
                 },
-            }
+                
+            }// fin methodes
         });
         // Filters 
         Vue.filter('toCurrency', function (value) {
@@ -110,34 +115,42 @@
 {% block content %}
 
 <hr>
-<div class="container row" id="app">
-    <div class="col-10">
-        <h3> [[ message ]] </h3>
-        <h3 v-show=""> [[resultat]] </h3>
-        <table class="table table-striped">
-            <thead>
-                <tr> <th>items/Societe </th>
-                <th :class="[(column == 'THAIS')? 'text-danger':'']" 
-                    v-for="column in ligne_data.columns"> [[column]] </th>
-                </tr>
-            </thead>
-            <tbody>
+<div class="container-fluid" id="app">
+    
+    <div class="row">
+        <div class="col-11">
+            <h3> [[ message ]] </h3>
+            <h3 v-show=""> [[resultat]] </h3>
+            <table class="table table-striped">
+                <thead>
+                    <tr> <th class="bg-light">items/Societe </th>
+                    <th :class="[(column == 'THAIS')? 'bg-secondary text-danger':'bg-info']" 
+                        v-for="column in ligne_data.columns"> [[column]] </th>
+                    </tr>
+                </thead>
+                <tbody>
 
-                <tr v-for="(ligne, index) in ligne_data.data" :key=index>
-                    <td > [[ligne.name ]]  </td>
-                    <td v-for="elem  in ligne.data"
-                        class="text-info" :class="classObject(elem, ligne)"> 
-                        <span v-if="elem==true">OUI</span>
-                        <span v-else-if="elem > 0"> [[elem]] </span>
-                        <span v-else> Non </span>
-                    </td>
-                </tr>
-                
-            </tbody>
-        </table> 
-    </div>
-    <div class="col-2">
-        <img src="/media/upload/prestigia_001.jpg" width="70%" />
+                    <tr v-for="(ligne, index) in ligne_data.data" :key=index>
+                        <td > [[ligne.name ]]  </td>
+                        <td v-for="elem  in ligne.data"
+                            class="text-info" :class="classObject(elem, ligne)"> 
+                            <span v-if="elem==true">OUI</span>
+                            <span v-else-if="elem > 0"> [[elem]] </span>
+                            <span v-else> Non </span>
+                        </td>
+                    </tr>
+                    
+                </tbody>
+            </table> 
+        </div>
+        <div class="col-1">
+            <img src="/media/upload/prestigia_001.jpg" width="70%" />
+            <div> 
+                <span class="bg-success">Positif </span>
+                <span class="bg-warning">Inconvenient </span>
+                <span class="bg-danger">Négatif</span>
+            </div>
+        </div>
     </div>
 </div>
  

@@ -62,6 +62,7 @@
                         })
                     //console.log("vous chercher ...!" + this.filterKey)
                 },
+                
                 //-------
                 classObject(elem, ligne){
                     return {
@@ -115,8 +116,8 @@
 
         <table class="table table-striped">
             <thead>
-                <tr> <th>items/Societe </th>
-                <th :class="[(column == 'THAIS')? 'text-danger':'']" 
+                <tr> <th class="bg-light">items/Societe </th>
+                <th :class="[(column == 'THAIS')? 'bg-secondary text-danger':'bg-primary']" 
                     v-for="column in ligne_data.columns"> [[column]] </th>
                  </tr>
             </thead>

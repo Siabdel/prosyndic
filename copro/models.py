@@ -363,7 +363,6 @@ class LigneDeCandidature(AbstractLigneDoc):
     proposition_transition = models.BooleanField(_("proposition transition"), default=False)
     propostion_recouverement = models.BooleanField(_("Proposition de recouvrement "), default=False)
     contrat_engagement = models.BooleanField(_("contrat engagement "), default=False)
-    agence_locale = models.BooleanField(_("Siege a Marrakech"), default=False)
     budget_prev_2024 = models.BooleanField(_("Budget Previsionnel 2024"), default=False)
     budget_prev_2025 = models.BooleanField(_("Budget Previsionnel 2025"), default=False)
     process_suivi_prests = models.BooleanField(_("Processus suivi prestataires"), default=False)
@@ -375,7 +374,6 @@ class LigneDeCandidature(AbstractLigneDoc):
     avis_negatif = models.IntegerField(verbose_name="Avis Negatif", blank=True, null=True)
     avis_positif = models.IntegerField(_("Avis Positif"), blank=True, null=True)
     # montants 
-    effectif_sur_place = models.PositiveIntegerField(_("Effectif sur place"), default=0, blank=True, null=True)
     remuneration = models.PositiveIntegerField(blank=True, null=True)
     budget_global = models.PositiveIntegerField(blank=True, null=True)
     budget_securite = models.PositiveIntegerField(blank=True, null=True)
@@ -391,6 +389,16 @@ class LigneDeCandidature(AbstractLigneDoc):
     author = models.ForeignKey(settings.AUTH_USER_MODEL, default=1, on_delete=models.CASCADE)
     description = MarkdownxField( blank=True, null=True)    
     comments = GenericRelation(Comment)
+    # effectif sur place
+    agence_locale = models.BooleanField(_("Siege a Marrakech"), default=False)
+    agent_suivi_local = models.PositiveIntegerField(_("Agent suivi sur place"), default=0)
+    effectif_jardinage = models.PositiveIntegerField(_("Effectif jardinage"), default=0)
+    effectif_securite = models.PositiveIntegerField(_("Effectif sécurité"), default=0)
+    effectif_piciniste = models.PositiveIntegerField(_("Piciniste"), default=0)
+    effectif_agent_polyvalent = models.PositiveIntegerField(_("Agent polyvalent"), default=0)
+    effectif_maitre_nageur = models.PositiveIntegerField(_("maitre_nageur"), default=0)
+    effectif_agent_proprete = models.PositiveIntegerField(_("agent proprete"), default=0)
+    
     
     @property 
     def total_budget(self) : 

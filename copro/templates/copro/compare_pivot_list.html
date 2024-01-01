@@ -75,7 +75,13 @@
                     (elem > 140000 && ligne.name=='budget_maintenance' )| 
                     (elem > 180000 && ligne.name=='consommation_eau' )|
                     (elem > 300000 && ligne.name=='consommation_electricite' ), 
-                    'text-bold bg-secondary text-wrap' : (elem && ligne.name=='a_cout_moyen_mensuel'), 
+                    'text-bold bg-secondary text-wrap text-white text-bold'  : 
+                        (elem && ligne.name=='a_cout_moyen_mensuel')| 
+                        (elem && ligne.name=='ab_ecart_budget_global')| 
+                        (elem && ligne.name=='ac_total_intervenant')| 
+                        (elem && ligne.name=='ad_remuneration')| 
+                        (elem && ligne.name=='ae_ecart_remuneration')| 
+                        (elem && ligne.name=='af_provision_invest'), 
                     } 
                 },
             }
@@ -125,9 +131,11 @@
 
                 <tr v-for="(ligne, index) in ligne_data.data" :key=index>
                     <td > [[ligne.name]]  </td>
-                    <td v-for="elem  in ligne.data"
-                    :class="classObject(elem, ligne)"                    
-                    > [[ elem | toCurrency ]] </td>
+                    <td v-for="elem  in ligne.data" :class="classObject(elem, ligne)"> 
+                    <span v-if="ligne.name=='ab_ecart_budget_global'" >  [[elem]] % </span>  
+                    <span v-else-if="ligne.name=='ac_total_intervenant'" >  [[elem]] salariés </span>  
+                    <span v-else>  [[elem | toCurrency ]] </span>  
+                 </td>
 
                 </tr>
                 

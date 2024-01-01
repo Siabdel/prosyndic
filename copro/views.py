@@ -194,16 +194,41 @@ class ApiCandidatPivotList(APIView):
             bgobal = candidat_df["budget_global"]
             cout_moyen_mensuel = [bg/312 for bg in bgobal]
             candidat_df.insert(2, "a_cout_moyen_mensuel", cout_moyen_mensuel, True)
+            # ecart par rapport budget global 
+            thais_q = pro_models.LigneDeCandidature.objects.filter(societe__contains="Thais").first()
+            ecart_budget_global = [round(((bg - thais_q.budget_global )/thais_q.budget_global)*100, 2)  for bg in bgobal]
+            ecart_budget_global_2 = ["{:.2f} %".format(bg) for bg in ecart_budget_global]
+            # inser column ecart 
+            candidat_df.insert(3, "ab_ecart_budget_global", ecart_budget_global, True)
+            # total des intervenenant dans la copro
+            effectif = [(elem.effectif_jardinage + elem.effectif_securite +
+                        elem.effectif_piciniste + elem.effectif_agent_polyvalent +
+                        elem.effectif_maitre_nageur + elem.effectif_agent_proprete)  for elem in queryset
+                        ]
+            
+            candidat_df.insert(4, "ac_total_intervenant", effectif, True)
+            # Remuneration 
+            remuneration = candidat_df["remuneration"]
+            candidat_df.insert(4, "ad_remuneration", remuneration, True)
+            # ecart_remuneration
+            ecart_remuneration = [((honoraire - thais_q.remuneration)/thais_q.remuneration)*100 for honoraire in remuneration ]
+            candidat_df.insert(5, "ae_ecart_remuneration", ecart_remuneration, True)
+            # provision inverstissement 
+            investissements = candidat_df["provision_investissement"]
+            candidat_df.insert(3, "af_provision_invest", investissements, True)
+
+             
   
             # pivote table
             dpivot = candidat_df.pivot_table(values=
-                                             ['a_cout_moyen_mensuel', 'remuneration',
+                                             ['a_cout_moyen_mensuel', 'ab_ecart_budget_global',
+                                              'ac_total_intervenant', 'ad_remuneration',
+                                              'ae_ecart_remuneration', 'af_provision_invest',
                                               'budget_global', 'budget_securite', 
                                               'budget_jardinage', 'budget_picine', 
                                               'budget_menage', 'budget_maintenance',
                                               'budget_agent_suivi', 'consommation_eau',
-                                              'consommation_electricite', 'provison_investissement',
-                                              ] ,  columns=['societe'])
+                                              'consommation_electricite' ] ,  columns=['societe'])
 
             
             # n array 

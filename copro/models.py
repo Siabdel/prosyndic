@@ -383,7 +383,7 @@ class LigneDeCandidature(AbstractLigneDoc):
     budget_maintenance = models.PositiveIntegerField(blank=True, null=True)
     budget_agent_suivi = models.PositiveIntegerField(blank=True, null=True)
     budget_maitre_nageur = models.PositiveIntegerField(blank=True, null=True)
-    provison_investissement = models.PositiveIntegerField(blank=True, null=True)
+    provision_investissement = models.PositiveIntegerField(blank=True, null=True)
     consommation_electricite = models.PositiveIntegerField(blank=True, null=True)
     consommation_eau = models.PositiveIntegerField(blank=True, null=True)
     author = models.ForeignKey(settings.AUTH_USER_MODEL, default=1, on_delete=models.CASCADE)

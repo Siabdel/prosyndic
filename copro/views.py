@@ -193,7 +193,7 @@ class ApiCandidatPivotList(APIView):
             # add column cout moyen mensuel  charge syndic 
             bgobal = candidat_df["budget_global"]
             cout_moyen_mensuel = [bg/312 for bg in bgobal]
-            candidat_df.insert(2, "a_cout_moyen_mensuel", cout_moyen_mensuel, True)
+            candidat_df.insert(2, "aa_cout_moyen_mensuel", cout_moyen_mensuel, True)
             # ecart par rapport budget global 
             thais_q = pro_models.LigneDeCandidature.objects.filter(societe__contains="Thais").first()
             ecart_budget_global = [round(((bg - thais_q.budget_global )/thais_q.budget_global)*100, 2)  for bg in bgobal]
@@ -209,19 +209,23 @@ class ApiCandidatPivotList(APIView):
             candidat_df.insert(4, "ac_total_intervenant", effectif, True)
             # Remuneration 
             remuneration = candidat_df["remuneration"]
-            candidat_df.insert(4, "ad_remuneration", remuneration, True)
+            candidat_df.insert(5, "ad_remuneration", remuneration, True)
             # ecart_remuneration
             ecart_remuneration = [((honoraire - thais_q.remuneration)/thais_q.remuneration)*100 for honoraire in remuneration ]
-            candidat_df.insert(5, "ae_ecart_remuneration", ecart_remuneration, True)
+            candidat_df.insert(6, "ae_ecart_remuneration", ecart_remuneration, True)
             # provision inverstissement 
             investissements = candidat_df["provision_investissement"]
-            candidat_df.insert(3, "af_provision_invest", investissements, True)
+            candidat_df.insert(7, "af_provision_invest", investissements, True)
+            # Budget global
+            budget_global = candidat_df["budget_global"]
+            candidat_df.insert(8, "aa_budget_global", budget_global, True)
 
              
   
             # pivote table
             dpivot = candidat_df.pivot_table(values=
-                                             ['a_cout_moyen_mensuel', 'ab_ecart_budget_global',
+                                             ['aa_budget_global', 
+                                              'aa_cout_moyen_mensuel', 'ab_ecart_budget_global',
                                               'ac_total_intervenant', 'ad_remuneration',
                                               'ae_ecart_remuneration', 'af_provision_invest',
                                               'budget_global', 'budget_securite', 

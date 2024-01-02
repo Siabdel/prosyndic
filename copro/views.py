@@ -211,7 +211,7 @@ class ApiCandidatPivotList(APIView):
             remuneration = candidat_df["remuneration"]
             candidat_df.insert(5, "ad_remuneration", remuneration, True)
             # ecart_remuneration
-            ecart_remuneration = [((honoraire - thais_q.remuneration)/thais_q.remuneration)*100 for honoraire in remuneration ]
+            ecart_remuneration = [round(((honoraire - thais_q.remuneration)/thais_q.remuneration)*100, 2) for honoraire in remuneration ]
             candidat_df.insert(6, "ae_ecart_remuneration", ecart_remuneration, True)
             # provision inverstissement 
             investissements = candidat_df["provision_investissement"]

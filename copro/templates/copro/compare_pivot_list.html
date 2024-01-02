@@ -134,6 +134,7 @@
                     <td > [[ligne.name]]  </td>
                     <td v-for="elem  in ligne.data" :class="classObject(elem, ligne)"> 
                     <span v-if="ligne.name=='ab_ecart_budget_global'" >  [[elem]] % </span>  
+                    <span v-else-if="ligne.name=='ae_ecart_remuneration'" >  [[elem]] % </span>  
                     <span v-else-if="ligne.name=='ac_total_intervenant'" >  [[elem]] salariés </span>  
                     <span v-else>  [[elem | toCurrency ]] </span>  
                  </td>

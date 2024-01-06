@@ -73,19 +73,19 @@
                         (elem==true && ligne.name=='proposition_transition')| 
                         (elem==true && ligne.name=='reponse_questionnaire')| 
                         (elem==true && ligne.name=='contrat_engagement')| 
-                        (elem==true && ligne.name=='agence_locale')|
+                        (elem==true && ligne.name=='gestionnaire_a_marrakech')|
                         (elem==true && ligne.name=='budget_prev_2024')|
                         (elem >= 5 && ligne.name=='anciennete')|
-                        (elem >= 1 && ligne.name=='agent_suivi_local')|
+                        (elem >= 1 && ligne.name=='agent_suivi_sur_place')|
                         (elem >= 15 && ligne.name=='taille_entreprise')|
                         (elem==true && ligne.name=='budget_prev_2025')
                         ,
                         "bg bg-warning text-white-50 text-xl":
                                 (elem==true  && ligne.name=='model_prestataires_ext')|
-                                (elem==false && ligne.name=='agence_locale'),
+                                (elem==false && ligne.name=='agence_locale')|
+                                (elem < 1 && ligne.name=='agent_suivi_sur_place')|
+                                (elem > 0 && ligne.name=='avis_negatif'),
                         "bg bg-danger text-white-50 text-xl":
-                                (elem > 0 && ligne.name=='avis_negatif')|
-                                (elem < 1 && ligne.name=='agent_suivi_local')|
                                 (elem==0 && ligne.name=='effectif_sur_place'),
                         "text-bold text-xl" : (elem==false),
                     } 

@@ -130,18 +130,21 @@ class ApiIndicateursList(APIView):
     def queryset_to_json(self, queryset=None):
         # queryset  serialise
         if not queryset :
-            queryset = pro_models.LigneDeCandidature.objects.filter(offre_recu=True).order_by('societe')# Convert the QuerySet to a Pandas DataFrame
+            ## queryset = pro_models.LigneDeCandidature.objects.filter(offre_recu=True).order_by('societe')# Convert the QuerySet to a Pandas DataFrame
+            queryset = pro_models.LigneDeCandidature.objects.filter(
+                societe__in=["VALOR Syndic", "GESTIS", "VERY GESTION"])
             candidat_df = read_frame(queryset)
             # replace NaN to None
             # candidat_df = candidat_df.replace(np.nan, None) 
             # pivote table
+            # rename columns
+            candidat_df.rename(
+                columns={'agent_suivi_local':'agent_suivi_sur_place',
+                         'agence_locale':'gestionnaire_a_marrakech'}, inplace=True)
             dpivot = candidat_df.pivot_table(values=
                     [
-                    'visite', 'offre_recu', 'reponse_questionnaire', 'proposition_transition',
-                    'propostion_recouverement', 'contrat_engagement', 'agence_locale',
-                    'budget_prev_2024', 'budget_prev_2025', 'process_suivi_prests',
-                    'ressource_sur_place',
-                    'agent_suivi_local',
+                    'agent_suivi_sur_place',
+                    'gestionnaire_a_marrakech',
                     'effectif_jardinage',
                     'effectif_securite',
                     'effectif_piciniste',
@@ -150,6 +153,10 @@ class ApiIndicateursList(APIView):
                     'effectif_agent_proprete',
                     'model_prestataires_ext', 'taille_entreprise',
                     'anciennete', 'avis_negatif', 'avis_positif',
+                    'visite', 'offre_recu', 'reponse_questionnaire', 'proposition_transition',
+                    'propostion_recouverement', 'contrat_engagement',
+                    'budget_prev_2024', 'budget_prev_2025', 'process_suivi_prests',
+                    'ressource_sur_place',
                     ] ,  columns=['societe'])
 
             
@@ -184,7 +191,9 @@ class ApiCandidatPivotList(APIView):
     def queryset_to_json(self, queryset=None):
         # queryset  serialise
         if not queryset :
-            queryset = pro_models.LigneDeCandidature.objects.filter(offre_recu=True).order_by('societe')# Convert the QuerySet to a Pandas DataFrame
+            # queryset = pro_models.LigneDeCandidature.objects.filter(offre_recu=True).order_by('societe')# Convert the QuerySet to a Pandas DataFrame
+            queryset = pro_models.LigneDeCandidature.objects.filter(societe__in=["VALOR Syndic", "THAIS", "GESTIS", "VERY GESTION"])
+
             # Convert the QuerySet to a Pandas DataFrame
             candidat_df = read_frame(queryset)
             # replace NaN to None
@@ -197,7 +206,6 @@ class ApiCandidatPivotList(APIView):
             # ecart par rapport budget global 
             thais_q = pro_models.LigneDeCandidature.objects.filter(societe__contains="Thais").first()
             ecart_budget_global = [round(((bg - thais_q.budget_global )/thais_q.budget_global)*100, 2)  for bg in bgobal]
-            ecart_budget_global_2 = ["{:.2f} %".format(bg) for bg in ecart_budget_global]
             # inser column ecart 
             candidat_df.insert(3, "ab_ecart_budget_global", ecart_budget_global, True)
             # total des intervenenant dans la copro
@@ -210,15 +218,32 @@ class ApiCandidatPivotList(APIView):
             # Remuneration 
             remuneration = candidat_df["remuneration"]
             candidat_df.insert(5, "ad_remuneration", remuneration, True)
+            # Remuneration par appart
+            remuneration_appart = [(honoraire/312)/12 for honoraire in remuneration]
+            candidat_df.insert(6, "ada_remuner_appart", remuneration_appart, True)
+            
             # ecart_remuneration
             ecart_remuneration = [round(((honoraire - thais_q.remuneration)/thais_q.remuneration)*100, 2) for honoraire in remuneration ]
-            candidat_df.insert(6, "ae_ecart_remuneration", ecart_remuneration, True)
+            candidat_df.insert(7, "ae_ecart_remuneration", ecart_remuneration, True)
             # provision inverstissement 
             investissements = candidat_df["provision_investissement"]
-            candidat_df.insert(7, "af_provision_invest", investissements, True)
+            candidat_df.insert(8, "af_provision_invest", investissements, True)
             # Budget global
             budget_global = candidat_df["budget_global"]
-            candidat_df.insert(8, "aa_budget_global", budget_global, True)
+            candidat_df.insert(9, "aa_budget_global", budget_global, True)
+            # cout salaire des intervenant 
+            total_intervenant = candidat_df["ac_total_intervenant"]
+            cout_salariale_intervenants = [(effectif * 4500)*12 for effectif in total_intervenant]
+            candidat_df.insert(10, "aca_cout_intervenant", cout_salariale_intervenants, True)
+            # rename comumn
+            candidat_df.rename(
+              columns={
+                  'agent_suivi_local':'honoraire_syndic',
+                  'ad_remuneration': 'ad_honoraire_syndic', 
+                  'ae_ecart_remuneration': 'ae_ecart_honoraire_syndic',
+                  'ada_remuner_appart': 'ada_honoraire_syndic_appart',
+                  },
+                    inplace=True)
 
              
   
@@ -226,8 +251,11 @@ class ApiCandidatPivotList(APIView):
             dpivot = candidat_df.pivot_table(values=
                                              ['aa_budget_global', 
                                               'aa_cout_moyen_mensuel', 'ab_ecart_budget_global',
-                                              'ac_total_intervenant', 'ad_remuneration',
-                                              'ae_ecart_remuneration', 'af_provision_invest',
+                                              'ac_total_intervenant', 'aca_cout_intervenant',
+                                              'ad_honoraire_syndic', 
+                                              'ae_ecart_honoraire_syndic',
+                                              'af_provision_invest',
+                                              'ada_honoraire_syndic_appart',
                                               'budget_global', 'budget_securite', 
                                               'budget_jardinage', 'budget_picine', 
                                               'budget_menage', 'budget_maintenance',

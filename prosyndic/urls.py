@@ -29,6 +29,8 @@ urlpatterns = [
     path('cart/', include('cartcom.urls')),
     path("polls/", include("polls.urls")),
     path('markdownx/', include('markdownx.urls')), # MarkdownX URL patterns
+    path("doc/", include("drivedoc.urls")),
+    
 ]
 
 # ... the rest of your URLconf goes here ...

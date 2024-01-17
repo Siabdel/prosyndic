@@ -2,7 +2,6 @@ import os, json
 import datetime
 import time
 from django.db import models
-from django.db import models
 from django.utils.translation import gettext as _
 from django.conf import settings
 from django.utils.text import slugify

@@ -11,7 +11,7 @@ from markdownx.admin import MarkdownxModelAdmin
 from django.contrib.contenttypes.admin import GenericStackedInline
 from django.utils import timezone
 from itertools import chain
-
+from rest_framework import serializers
 
 admin.site.site_header = "PROSYNDIC Admin"
 admin.site.site_title = "PROSYNDIC Admin Portal"
@@ -231,6 +231,7 @@ class TicketAdmin(admin.ModelAdmin) :
     list_display = list_total
     list_display = ['title', 'description', 'residence', 'status', 'due_date',  ]
 
+""" 
 # base de données de documents 
 @admin.register(pro_models.Document)
 class BaseDocuments(admin.ModelAdmin):
@@ -248,7 +249,8 @@ class BaseDocuments(admin.ModelAdmin):
                 .format(ff.piece.name, os.path.basename(ff.piece.name))
                 for ff in all_pieces])
         return mark_safe(pj)
-    
+"""    
     
 # registre
 admin.site.register(pro_models.Category, )
+

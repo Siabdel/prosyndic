@@ -10,6 +10,7 @@ import random
 from django.http import HttpResponse
 from django.core import serializers
 from django.http import Http404
+import  rest_framework
 from rest_framework.views import APIView
 import numpy as np
 import pandas as pd
@@ -18,6 +19,8 @@ from django.utils import timezone
 from django.shortcuts import render
 from django.conf import settings
 from django.views.generic import ListView, TemplateView
+
+from django.shortcuts import get_object_or_404
 # local 
 from copro import models as pro_models
 from accounts import models as acc_models
@@ -30,6 +33,13 @@ from django.utils.decorators import method_decorator
 from django.http import JsonResponse
 from django_pandas.io import read_frame
 from django.forms.models import model_to_dict
+from django.shortcuts import render, get_object_or_404
+from django.http import HttpResponse
+from django.conf import settings
+import os
+from rest_framework import generics
+from .models import Document
+
 
 ##from copro.utils import Dict2Obj
 # from prosyndic.permissions import IsAuthorOrReadOnly
@@ -343,3 +353,12 @@ class SyndicApiList(generics.ListCreateAPIView):
         queryset = pro_models.LigneDeCandidature.objects.filter(status='OP').order_by('societe', '-id')
         return queryset
 
+
+def render_pdf(request, document_id):
+    document = get_object_or_404(Document, id=document_id)
+    document_path = os.path.join(settings.MEDIA_ROOT, str(document.file))
+    with open(document_path, 'rb') as file:
+        response = HttpResponse(file.read(), content_type='application/pdf')
+    return response
+##
+## API 

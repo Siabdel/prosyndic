@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     "polls.apps.PollsConfig",
     "cartcom.apps.CartcomConfig",
     "simulator.apps.SimulatorConfig",
+    "drivedoc.apps.DrivedocConfig",
     
     # contribs
     'django.contrib.admin',
@@ -82,7 +83,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     # Add the account middleware:
-    #"allauth.account.middleware.AccountMiddleware",
+    "allauth.account.middleware.AccountMiddleware",
     # debug 
     'debug_toolbar.middleware.DebugToolbarMiddleware',
 ]

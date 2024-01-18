@@ -86,12 +86,17 @@ MIDDLEWARE = [
     "allauth.account.middleware.AccountMiddleware",
     # debug 
     'debug_toolbar.middleware.DebugToolbarMiddleware',
+    # ... autres middlewares ...
 ]
+
+##X_FRAME_OPTIONS = 'SAMEORIGIN'  # ou 'ALLOWALL' pour autoriser l'intégration dans tous les cadres
+X_FRAME_OPTIONS = 'ALLOWALL' 
 # pour resoudre erreur No 'Access-Control-Allow-Origin' header is
 CORS_ORIGIN_ALLOW_ALL = True
 # Add here your frontend URL
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:8000",
+    "http://localhost:8080",
 ]
 
 ROOT_URLCONF = 'prosyndic.urls'
@@ -226,7 +231,8 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')
 
 REST_FRAMEWORK = {  # new
     "DEFAULT_PERMISSION_CLASSES": [
-        "rest_framework.permissions.IsAuthenticated",
+        ##"rest_framework.permissions.IsAuthenticated",
+        'rest_framework.permissions.AllowAny',
         ## 'rest_framework.permissions.IsAdminUser'
     ],
     "DEFAULT_AUTHENTICATION_CLASSES": [  # new

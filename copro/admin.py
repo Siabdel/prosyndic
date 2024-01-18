@@ -231,7 +231,6 @@ class TicketAdmin(admin.ModelAdmin) :
     list_display = list_total
     list_display = ['title', 'description', 'residence', 'status', 'due_date',  ]
 
-""" 
 # base de données de documents 
 @admin.register(pro_models.Document)
 class BaseDocuments(admin.ModelAdmin):
@@ -249,7 +248,6 @@ class BaseDocuments(admin.ModelAdmin):
                 .format(ff.piece.name, os.path.basename(ff.piece.name))
                 for ff in all_pieces])
         return mark_safe(pj)
-"""    
     
 # registre
 admin.site.register(pro_models.Category, )

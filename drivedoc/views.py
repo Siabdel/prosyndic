@@ -8,11 +8,19 @@ from django.http import HttpResponse
 from django.conf import settings
 
 # Create your views here.
+
 def render_pdf(request, document_id):
     document = get_object_or_404(drive_models.Document, id=document_id)
     document_path = os.path.join(settings.MEDIA_ROOT, str(document.file))
     with open(document_path, 'rb') as file:
         response = HttpResponse(file.read(), content_type='application/pdf')
+
+    # Définir l'en-tête Content-Disposition
+    response['Content-Disposition'] = f'inline; filename="{document.title}"'
+
+    # Autoriser l'intégration dans tous les cadres
+    response['X-Frame-Options'] =  'ALLOWALL' 
+
     return response
 ##
 ## API 
@@ -23,6 +31,7 @@ class DocumentListCreateView(generics.ListCreateAPIView):
 
 
 class DocumentListCreateView(generics.ListCreateAPIView):
+    queryset = drive_models.Document.objects.all()
     serializer_class = drive_serialize.DocumentSerializer
 
     def perform_create(self, serializer):

@@ -19,6 +19,9 @@ from simulator import forms
 from django.contrib import messages
 from cartcom.cart import Cart
 from cartcom import models as cart_models
+from .models import Rubrique, SousRubrique, ChargesFonctionnement
+from simulator.serializers import RubriqueSerializer, SousRubriqueSerializer, ChargesFonctionnementSerializer
+from rest_framework import generics
 
 # Create your views here.
 
@@ -109,3 +112,16 @@ class ListItemCartView(ListView, Cart, JsonResponseMixin):
 
         return self.render_to_response(context)
 
+
+
+class RubriqueListCreateView(generics.ListCreateAPIView):
+    queryset = Rubrique.objects.all()
+    serializer_class = RubriqueSerializer
+
+class SousRubriqueListCreateView(generics.ListCreateAPIView):
+    queryset = SousRubrique.objects.all()
+    serializer_class = SousRubriqueSerializer
+
+class ChargesFonctionnementListCreateView(generics.ListCreateAPIView):
+    queryset = ChargesFonctionnement.objects.all()
+    serializer_class = ChargesFonctionnementSerializer

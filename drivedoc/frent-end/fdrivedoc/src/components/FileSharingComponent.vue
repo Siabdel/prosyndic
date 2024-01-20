@@ -3,7 +3,7 @@
 <template>
   <div class="container">
     <div class="row">
-      <div class="col-md-8">
+      <div class="col-md-4">
         <h2>Documents disponibles XXXX</h2>
         <ul class="list-group">
           <li v-for="document in documents" :key="document.id" class="list-group-item">
@@ -18,12 +18,16 @@
           </li>
         </ul>
       </div>
-      <div class="col-md-4 mt-3 mt-md-0">
+
+       <div class="col-md-8 mt-3 mt-md-0">
         <div v-if="selectedDocument">
           <h3>{{ selectedDocument.title }}</h3>
-          <iframe :src="pdfUrl" width="100%" height="500px" frameborder="0"></iframe>
+          <div class="pdf-container">
+            <canvas ref="pdfCanvas"></canvas>
+          </div>
         </div>
       </div>
+
     </div>
   </div>
 </template>
@@ -83,6 +87,7 @@ export default {
       const pdfPath = this.pdfUrl;  // Assurez-vous que votre API renvoie l'URL du PDF
       const loadingTask = window.pdfjsLib.getDocument(pdfPath);
 
+
       loadingTask.promise
         .then(pdf => {
           // Définir le contexte du canevas
@@ -90,22 +95,23 @@ export default {
           const context = canvas.getContext('2d');
 
           // Définir la première page à afficher
-          const pageNumber = 1;
-          pdf.getPage(pageNumber).then(page => {
-            const viewport = page.getViewport({ scale: 1.5 });
-            canvas.width = viewport.width;
-            canvas.height = viewport.height;
+          // Rendre toutes les pages du PDF
+      for (let pageNumber = 1; pageNumber <= pdf.numPages; pageNumber++) {
+        pdf.getPage(pageNumber).then(page => {
+          const viewport = page.getViewport({ scale: 1.5 });
+          canvas.width = viewport.width;
+          canvas.height = viewport.height;
 
-            // Dessiner la page PDF sur le canevas
-            const renderContext = {
-              canvasContext: context,
-              viewport: viewport,
-            };
-            page.render(renderContext);
-          });
+          const renderContext = {
+            canvasContext: context,
+            viewport: viewport,
+          };
+          page.render(renderContext);
+        });
+        }
         })
         .catch(error => {
-          console.error('Erreur lors du chargement du document PDF', error);
+          console.error('Erreur LoadingTask ## : lors du chargement du document PDF', error);
         });
       },
         /////
@@ -113,3 +119,20 @@ export default {
     },// fin methods
 };
 </script>
+
+<style scoped>
+/* Ajoutez des styles spécifiques au composant ici si nécessaire */
+.pdf-container {
+  overflow-y: auto; /* Ajoutez le défilement vertical */
+  max-height: 500px; /* ou la hauteur souhaitée */
+}
+.download
+{
+    display:none !important;    
+}
+
+.print
+{
+    display:none !important;
+}
+</style>

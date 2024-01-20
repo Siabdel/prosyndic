@@ -4,8 +4,9 @@ from simulator import models as ss_models
 from cartcom import models as cart_models
 from django.contrib.contenttypes.admin import GenericTabularInline
 from django import forms
+from django.contrib import admin
+from .models import Rubrique, SousRubrique, ChargesFonctionnement
 
- 
     
 class ItemArticleInlineAdmin(GenericTabularInline):
     model = cart_models.ItemArticle
@@ -31,3 +32,7 @@ class DevisAdmin(admin.ModelAdmin) :
     list_total  = [ f.name for f in ss_models.Devis._meta.get_fields()]
     list_display = list_total
     
+
+admin.site.register(Rubrique)
+admin.site.register(SousRubrique)
+admin.site.register(ChargesFonctionnement)

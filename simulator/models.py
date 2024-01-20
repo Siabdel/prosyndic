@@ -57,5 +57,35 @@ class Devis(models.Model):
     def __str__(self):
         return "Devis : {}".format(self.title)
 
-    
+#------------------------
+# ChatGpt models DEVIS 
+#------------------------
+class Rubrique(models.Model):
+    nom = models.CharField(max_length=255)
+
+    def __str__(self):
+        return self.nom
+
+class SousRubrique(models.Model):
+    rubrique = models.ForeignKey(Rubrique, on_delete=models.CASCADE)
+    nom = models.CharField(max_length=255)
+
+    def __str__(self):
+        return f"{self.rubrique} - {self.nom}"
+
+class ChargesFonctionnement(models.Model):
+    sous_rubrique = models.ForeignKey(SousRubrique, on_delete=models.CASCADE)
+    prix_unitaire_mensuel = models.FloatField(default=0)
+    quantite = models.FloatField(default=0)
+    nombre_mois_annuel = models.FloatField(default=12)
+
+    def montant_mensuel(self):
+        return self.prix_unitaire_mensuel * self.quantite
+
+    def total_annuel(self):
+        return self.montant_mensuel() * self.nombre_mois_annuel
+
+    def __str__(self):
+        return f"{self.sous_rubrique} - Montant Mensuel: {self.montant_mensuel()} - Total Annuel: {self.total_annuel()}"
+
     

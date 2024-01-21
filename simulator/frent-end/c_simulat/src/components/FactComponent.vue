@@ -1,41 +1,47 @@
-
 <template>
-  <div class="container mt-4">
+  <div class="container col-12 mt-4">
     <!-- Tableau pour les charges de fonctionnement -->
-    <table class="table table-responsive">
-      <thead>
-        <tr>
-          <th scope="col">Rubrique</th>
-          <th scope="col">Nom</th>
-          <th scope="col">Prix unitaire mensuel</th>
-          <th scope="col">Quantité</th>
-          <th scope="col">Nombre de mois annuel</th>
-          <th scope="col">Montant mensuel</th>
-          <th scope="col">Total annuel</th>
-        </tr>
-      </thead>
+    <table class="table table-responsive table-striped">
+      <caption class="text-bold text-xl"> Proposition de devis </caption>
+            <thead>
+              <tr> 
+                <th colspan="3">Rubrique</th>
+                <th scope="col">Proposition Devis </th>
+              </tr>
+            </thead>
       <tbody>
-        <tr v-for="field in chargesFonctionnementAvecTotal" :key="field.name">
-          <td>{{ field.rubrique }}</td>
-          <td>{{ field.name }}</td>
-          <td>
-            <input v-model="field.prixUnitaireMensuel" class="form-control" placeholder="Prix unitaire" />
-          </td>
-          <td>
-            <input v-model="field.quantite" class="form-control" placeholder="Quantité" />
-          </td>
-          <td>
-            <input v-model="field.nombreMoisAnnuel" class="form-control" placeholder="Nombre de mois annuel" />
-          </td>
-
-          <td>{{ field.montantMensuel }}</td>
-          <td>{{ field.totalAnnuel }}</td>
-
+        <tr v-for="(elem, index) in chargesFonctionnement" :key="index">
+          <td colspan="3">{{ elem.title }}</td>
+          <table class="table table-striped ">
+             <thead v-if="index==0" class="thead-dark">
+              <tr>
+                <th scope="col">Nom</th>
+                <th scope="col">Prix unitaire mensuel</th>
+                <th scope="col">Quantité</th>
+                <th scope="col">Nombre de mois annuel</th>
+                <th scope="col">Montant mensuel</th>
+                <th scope="col">Total annuel</th>
+              </tr>
+            </thead>
+            <tr v-for="field in elem.fields" :key="field.name">
+              <td>{{ field.name }} </td>
+              <td><input v-model="field.prixUnitaireMensuel" class="form-control" 
+                placeholder="Prix unitaire" />
+              </td>
+              <td> <input v-model="field.quantite" class="form-control" placeholder="Quantité" /> </td>
+              <td> <input v-model="field.nombreMoisAnnuel" class="form-control" 
+                placeholder="Nombre de mois annuel" /> </td>
+              <td>{{ field.prixUnitaireMensuel * field.quantite }} </td>
+              <td>{{ field.totalAnnuel }} </td>
+            </tr>
+          </table>
         </tr>
       </tbody>
     </table>
   </div>
 </template>
+    <!-- Tableau pour les charges de fonctionnement -->
+  
 
 <script>
 export default {

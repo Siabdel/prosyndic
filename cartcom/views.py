@@ -27,7 +27,7 @@ from django.views.generic import TemplateView
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required, permission_required
 from django.core import serializers
-from django.shortcuts import render, HttpResponse, HttpResponseRedirect, redirect
+from django.shortcuts import render, HttpResponse, HttpResponseRedirect, redirect, reverse
 from django.views.generic.edit import UpdateView, CreateView, DeleteView, ModelFormMixin, ProcessFormView, FormView, FormMixin
 from django.views.generic.detail import DetailView
 from django.views.generic.list import ListView
@@ -311,6 +311,8 @@ class ListItemCartView(ListView, e_cart.CartDevis):
         context = super(ListItemCartView, self).get_context_data(**kwargs)
         # init panier Cart
         e_cart.Cart.__init__(self, self.request)
+        messages.add_message(self.request, messages.INFO, 'in get_context_data cartdb= %s' % self.cartdb)
+        
         # context['object_list'] = self.get_items_cart()
         context['products'] = cart_models.Product.objects.all()
         return context
@@ -325,7 +327,10 @@ class ListItemCartView(ListView, e_cart.CartDevis):
         #-------------------------
         action = kwargs.get('action', 'listitem')
         product_id = kwargs.get('product_id',)
-        quantitee = kwargs.get('quantitee', 0)
+        quantitee = kwargs.get('quantitee', 1)
+        messages.add_message(self.request, messages.INFO, 
+                             "get action={} product_id={} cartdb={}"
+                             .format(action, product_id, self.cartdb))
 
 
         if action == "listitem":
@@ -337,6 +342,7 @@ class ListItemCartView(ListView, e_cart.CartDevis):
         elif action == "additem" and product_id:
             # ajout of dans panier
             data = self.add_item_of_incart(product_id, quantitee)
+            messages.add_message(self.request, messages.INFO, 'add item in cart= %s' % self.cartdb)
 
         elif action == "delitem":
             item_id = kwargs.get('element_id')
@@ -419,20 +425,22 @@ class ListItemCartView(ListView, e_cart.CartDevis):
         return item_list
 
     # ajout de of dans le panier
-    def add_item_of_incart(self, product_id, quantitee=0):
+    def add_item_of_incart(self, product_id, quantitee=1):
         resp = {}
-        # messages.add_message(self.request, messages.INFO, 'code of =%s quantitee= %s' % (product_id, self.request.session.get('CART_ID') ))
+        messages.add_message(self.request, messages.INFO, 'in add_item code produit =%s quantitee= %s' % (product_id, self.request.session ))
         try:
             item_list = cart_models.Product.objects.all()
             if not self.is_product_exist_incart(product_id):
                 # on ajoute dans panier
                 self.add(product_id, 1, quantitee)
                 resp['status'] = "OK of ajouter dans panier = %s  " % (product_id)
+                messages.add_message(self.request, messages.INFO, 'type of self.cardOf %s ' %  type(self.cartdb))
             else:
                 messages.add_message(self.request, messages.INFO, '%s  Article existe deja ! code of=' % product_id)
                 resp['status'] = '%s  Article existe deja ! code of=' % product_id
         except Exception as err:
-            messages.add_message(self.request, messages.INFO, 'Erreur add of err = %s ' %  err)
+            messages.add_message(self.request, messages.INFO, 'Erreur add product err = %s ' %  err)
+            messages.add_message(self.request, messages.INFO, 'type of self.cardOf %s ' %  type(self.cartdb))
             resp['status'] = "KO error=%s  " % (str(err))
 
         return resp

@@ -19,102 +19,77 @@ class ItemDoesNotExist(Exception):
     pass
 
 
+CART_ID = 'cart_id'  # Assurez-vous que CART_ID est défini dans votre code
+
+
+from django.contrib import messages
+from .models import CartOf, ItemArticle
+from django.utils.translation import gettext_lazy as _
+
+CART_ID = 'cart_id'  # Assurez-vous que CART_ID est défini dans votre code
+
 class Cart(object):
-    """
-    Panier viruel
-    """
-    cardb = None
     def __init__(self, request):
         self.session = request.session
         cart_id = self.session.get(CART_ID)
         self.cartdb = None
         self.request = request
 
-        # messages.add_message(self.request, messages.INFO, 'init objet cart_id.%s' % cart_id)
-        cartDB = None
-        if cart_id: # on trouve un dans la session
+        if cart_id:
             try:
-                self.cartdb = models.CartOf.objects.get(id=cart_id, checked_out=False)
-            # except  models.CartOf.DoesNotExist:
-            except Exception as err:
-                messages.add_message(self.request, messages.INFO, 'pas de panier pour cart_id.%s' % err)
-                try :
-                    self.cartdb = models.CartOf.objects.filter( created_by = request.user).order_by('id').last()
-                    # on update CART_ID en session
+                self.cartdb = CartOf.objects.get(id=cart_id, checked_out=False)
+            except CartOf.DoesNotExist:
+                messages.add_message(self.request, messages.INFO, 'Pas de panier pour cart_id {}'.format(cart_id))
+                try:
+                    self.cartdb = CartOf.objects.filter(created_by=request.user).order_by('id').last()
                     request.session[CART_ID] = self.cartdb.pk
                 except Exception as err:
+                    messages.add_message(self.request, messages.INFO, 'Erreur: {}'.format(err))
                     self.cartdb = self.new(request)
-
-        # sinon dernier panier pour cet user
-        elif models.CartOf.objects.filter(created_by = self.request.user).exists():
-            try :
-                self.cartdb = models.CartOf.objects.filter( created_by = self.request.user).order_by('id').last()
-                messages.add_message(self.request, messages.INFO, ' sinon dernier panier pour cet user en base = %s' % self.cartdb)
-                # on update CART_ID en session
+        elif CartOf.objects.filter(created_by=request.user).exists():
+            try:
+                self.cartdb = CartOf.objects.filter(created_by=request.user).order_by('id').last()
                 request.session[CART_ID] = self.cartdb.pk
             except Exception as err:
-                messages.add_message(self.request, messages.INFO, 'Erreur dernier panier pour cet user en base = %s' % err.message)
-
-        else:  # sinon on cree un nouveau panier
-            self.cartdb= self.new(request)
-            messages.add_message(self.request, messages.INFO, ' sinon on cree un nouveau panier %s' % self.cartdb.pk)
-
-
-    def get(self, request,  *args,  **kwargs):
-        self.object_list = models.CartOf.objects.all().group_by("-created")
-        cart_id = request.session.get(CART_ID)
-        return self.render()
-
-    def __iter__(self):
-        for item in self.cartdb.item_set.all():
-            yield item
+                messages.add_message(self.request, messages.INFO, 'Erreur: {}'.format(err))
+        else:
+            self.cartdb = self.new(request)
 
     def new(self, request):
-        cart = models.CartOf.objects.create(creation_date=datetime.datetime.now(), created_by = self.request.user)
-        cart.save()
+        cart = CartOf.objects.create(created_by=request.user)
         request.session[CART_ID] = cart.id
-        messages.add_message(self.request, messages.INFO, 'on cree un panier .%s' % cart.id)
+        messages.add_message(self.request, messages.INFO, 'On crée un panier {}'.format(cart.id))
         return cart
 
     def add(self, product, unit_price, quantity=1):
         try:
-            item = models.Item.objects.get(
-                cart=self.cartdb,
-                product=product,
-            )
-        except models.Item.DoesNotExist:
-            item = models.Item()
+            item = ItemArticle.objects.get(cart=self.cartdb, product=product)
+        except ItemArticle.DoesNotExist:
+            item = ItemArticle()
             item.cart = self.cartdb
             item.product = product
             item.unit_price = unit_price
             item.quantity = quantity
             item.save()
-        else: #ItemAlreadyExists
+        else:
             item.unit_price = unit_price
             item.quantity += int(quantity)
             item.save()
 
     def remove(self, product):
         try:
-            item = models.Item.objects.get(
-                cart=self.cartdb,
-                product=product,
-            )
-        except models.Item.DoesNotExist:
+            item = ItemArticle.objects.get(cart=self.cartdb, product=product)
+        except ItemArticle.DoesNotExist:
             raise ItemDoesNotExist
         else:
             item.delete()
 
     def update(self, product, quantity, unit_price=None):
         try:
-            item = models.Item.objects.get(
-                cart=self.cartdb,
-                product=product,
-            )
-        except Exception :
-            #DoesNotExist:
+            item = ItemArticle.objects.get(cart=self.cartdb, product=product)
+        except ItemArticle.DoesNotExist:
             raise ItemDoesNotExist
-        else: #ItemAlreadyExists
+        else:
             if quantity == 0:
                 item.delete()
             else:
@@ -124,18 +99,18 @@ class Cart(object):
 
     def count(self):
         result = 0
-        for item in self.cartdb.item_set.all():
-            result += 1 * item.quantity
+        for item in self.cartdb.items.all():
+            result += item.quantity
         return result
 
     def summary(self):
         result = 0
-        for item in self.cartdb.item_set.all():
+        for item in self.cartdb.items.all():
             result += item.total_price
         return result
 
     def clear(self):
-        for item in self.cartdb.item_set.all():
+        for item in self.cartdb.items.all():
             item.delete()
 
     def is_empty(self):
@@ -143,7 +118,7 @@ class Cart(object):
 
     def cart_serializable(self):
         representation = {}
-        for item in self.cartdb.item_set.all():
+        for item in self.cartdb.items.all():
             itemID = str(item.object_id)
             itemToDict = {
                 'total_price': item.total_price,
@@ -157,12 +132,11 @@ class Cart(object):
 
         for item in data:
             itemID = str(item.object_id)
-            #new_row = dict([(fld.name, getattr(item, fld.name))
-            new_row = dict([(fld.name, item) for fld in new_class._meta.fields if fld.name != new_class._meta.pk ])
+            new_row = dict([(fld.name, item) for fld in new_class._meta.fields if fld.name != new_class._meta.pk])
             data_final.append(new_row)
 
-
         return data_final
+
 #------------------
 #-----
 #------------------
@@ -181,10 +155,10 @@ class CartDevis(Cart):
         else:
             return 0
 
-    def is_product_exist_incart(self, of):
+    def is_product_exist_incart(self, product):
         # messages.add_message(self.request, messages.INFO, 'type of self.cartdb  = %s ' %  self.cartdb.item_set.all())
-        for item in self.cartdb.item_set.all():
-            if item.product.code_of == of.code_of:
+        for item in self.cartdb.itemarticle_set.all():
+            if item.product.pk == product:
                 return True
         return False
 def create_cart_in_database( creation_date=datetime.datetime.now(), checked_out=False):
@@ -201,7 +175,7 @@ def create_item_in_database(cart, product, quantity=1, unit_price=Decimal("100")
     """
         Helper function so I don't repeat myself
     """
-    item = models.Item()
+    item = models.ItemArticle()
     item.cart = cart
     item.product = product
     item.quantity = quantity

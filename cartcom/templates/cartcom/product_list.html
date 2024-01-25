@@ -7,91 +7,6 @@
 {% block header %}
 {% endblock header %}
 
-{% block extra_js %}
-    <script>
-        var vm = new Vue({
-            el: "#app",
-            delimiters: ['[[', ']]'],
-            data: { 
-                message : "OK on est sous vue.js",
-                documents : [],
-                url : "",
-                filterKey : "",
-                sortedKey : "name",
-                sortBy : "nom",
-                currentSort : "nom",
-                order : -1 ,
-            },
-            //----
-            created(){
-                // `this` est une référence à l'instance de vm
-                console.log('this is message: ' + this.message)
-                this.load_docs()
-            },
-            //---
-            computed: {
-                // sinon 
-                sortedDocuments(){
-                    return this.documents.filter(doc => doc.piece_name.includes(this.filterKey)).sort((a, b) =>  {
-                        if(a[this.currentSort] < b[this.currentSort]) return -1 * this.order
-                        if(a[this.currentSort] > b[this.currentSort]) return 1 * this.order
-                        return 0
-                    })
-                }
-            },
-            methods: {
-                load_docs(){
-                    let url = `/cart/api/product/`
-                    // ajax load
-                    fetch(url)
-                    .then(response => response.json())
-                    .then(json => {
-                        this.documents = json;
-                        console.log(" data ok = " + this.documents[0].name )
-                        })  
-                    .catch(err => {
-                        console.log("erreur fetch load_docs", err)
-                        })
-                    //console.log("vous chercher ...!" + this.filterKey)
-                },
-                //-------
-                addToCart(product_id){
-                    console.log("add to cart  product_id = " + product_id);
-
-                    let url = '/api/add_to_cart/'
-                    let data = {
-                    'product_id' : '{{product.id}}', 
-                    'quantity': 1,
-                    'title': `{{ product.name}}`,
-                    },
-            
-                fetch(url, {
-                        method : 'POST', 
-                        headers :{
-                        'Content-Type': "application/json",
-                        'X-CSRFToken' : csrftoken,
-                    },
-                    credentials: 'same-origin',
-                    body : JSON.stringify(data),
-                    })      
-                    .then(response => {
-                        result = response.json()
-                        return result
-                    })
-                    .then(result =>{
-                        console.log("added to cart " + result)  
-                    }).catch(function(error){
-                        console.log(error)
-                    })
-            }, // fin add to cart
-        },
-
-            }
-        });
-        // mount
-        vm.$mount('.app')
-    </script>
-{% endblock extra_js%}
 
 {% block content %}
 <div class="container" id="app">
@@ -106,7 +21,8 @@
           <td>  <a class="text-truncate" href="{% url 'product_detail' product.id %}"> {{ product.name |slice:":50" }}</a></td>
           <td> {{product.description |slice:"0:30" }}</td> 
           <td> {{product.unit_price}} €</td>
-          <td> <a class="btn btn-warning btn-block" href="{% url 'product_detail' product.id %}">Ajouter</a></td>
+          <td> <a class="btn btn-warning btn-block" href="{% url 'product_detail' product.id %}">Details</a></td>
+          <td> <a class="btn btn-warning btn-block" href="{% url 'add_product_tocart' 'additem' product.id %}">Ajouter</a></td>
         </tr>
         {% endfor %}
       </tbody>
@@ -115,12 +31,11 @@
 </div>
 
 
-{% block extra_javascipt %}
-    <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
-{% endblock %}
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
 
 <script>
-    const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+    //const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
 
     var prodcuapp = new Vue({
         el : "#app",
@@ -139,15 +54,13 @@
           addToCart(product_id){
             console.log("add to cart  product_id = " + product_id);
 
-            let url = '/api/add_to_cart/'
+            let url = 'http:/localhost:8000/api/add_to_cart/'
             let data = {
                 'product_id' : '{{product.id}}', 
                 'quantity': 1,
                 'title': `{{ product.name}}`,
-                }
-
-            
-            fetch(url, {
+                };
+            let header = {
               method : 'POST', 
               headers :{
                 'Content-Type': "application/json",
@@ -155,7 +68,9 @@
               },
               credentials: 'same-origin',
               body : JSON.stringify(data),
-            })      
+            };
+
+            fetch(url, header)      
             .then(response => {
               result = response.json()
               return result
@@ -173,5 +88,6 @@
     }) 
 
 </script>
+{% endblock %}
 
-  {% endblock %}
+{% endblock %}

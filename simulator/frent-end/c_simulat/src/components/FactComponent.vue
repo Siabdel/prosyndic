@@ -1,7 +1,7 @@
 <template>
   <div class="container col-12 mt-4">
     <!-- Tableau pour les charges de fonctionnement -->
-    <table class="table table-responsive table-striped">
+    <table class="table table-responsive table-striped table-bordered">
       <caption class="text-bold text-xl"> Proposition de devis </caption>
             <thead>
               <tr> 
@@ -12,7 +12,7 @@
       <tbody>
         <tr v-for="(elem, index) in chargesFonctionnement" :key="index">
           <td colspan="3">{{ elem.title }}</td>
-          <table class="table table-striped ">
+          <table class="table table-striped table-bordered ">
              <thead v-if="index==0" class="thead-dark">
               <tr>
                 <th scope="col">Nom</th>

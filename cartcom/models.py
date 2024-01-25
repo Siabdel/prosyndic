@@ -4,12 +4,14 @@ from django.db import models
 from datetime import datetime
 from django_pandas.managers import DataFrameManager
 # class machine   conditionnement   gestform ""
-from django.utils.translation import gettext as _
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
 from django.contrib.auth.models import User
 # from ofschedule.models import DjangoMachine
+from django.contrib.contenttypes.models import ContentType
 from django.conf import settings
+from django.utils.translation import gettext_lazy as _
+
 
 
 class Dict2Obj(object):
@@ -77,16 +79,6 @@ class ItemManager(models.Manager):
             kwargs['object_id'] = kwargs['product'].pk
             del(kwargs['product'])
         return super(ItemManager, self).get(*args, **kwargs)
-
-class ItemRaw(models.Model):
-    raw_message = models.JSONField()
-
-
-from django.db import models
-from django.contrib.contenttypes.fields import GenericForeignKey
-from django.contrib.contenttypes.models import ContentType
-from django.conf import settings
-from django.utils.translation import gettext_lazy as _
 
 class ItemManager(models.Manager):
     def get(self, *args, **kwargs):

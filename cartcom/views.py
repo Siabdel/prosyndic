@@ -326,7 +326,11 @@ class ListItemCartView(ListView, e_cart.CartDevis):
         context = self.get_context_data(**kwargs)
         #-------------------------
         action = kwargs.get('action', 'listitem')
+        
         product_id = kwargs.get('product_id',)
+        messages.add_message(self.request, messages.INFO, '## in get = {} ##'.format(product_id))
+        product = get_object_or_404(cart_models.Product, pk=product_id)
+
         quantitee = kwargs.get('quantitee', 1)
         messages.add_message(self.request, messages.INFO, 
                              "get action={} product_id={} cartdb={}"
@@ -341,7 +345,7 @@ class ListItemCartView(ListView, e_cart.CartDevis):
 
         elif action == "additem" and product_id:
             # ajout of dans panier
-            data = self.add_item_of_incart(product_id, quantitee)
+            data = self.add_item_of_incart(product, quantitee)
             messages.add_message(self.request, messages.INFO, 'add item in cart= %s' % self.cartdb)
 
         elif action == "delitem":
@@ -425,22 +429,22 @@ class ListItemCartView(ListView, e_cart.CartDevis):
         return item_list
 
     # ajout de of dans le panier
-    def add_item_of_incart(self, product_id, quantitee=1):
+    def add_item_of_incart(self, product, quantitee=1):
         resp = {}
-        messages.add_message(self.request, messages.INFO, 'in add_item code produit =%s quantitee= %s' % (product_id, self.request.session ))
         try:
-            item_list = cart_models.Product.objects.all()
-            if not self.is_product_exist_incart(product_id):
+            if not self.is_product_exist_incart(product):
                 # on ajoute dans panier
-                self.add(product_id, 1, quantitee)
-                resp['status'] = "OK of ajouter dans panier = %s  " % (product_id)
-                messages.add_message(self.request, messages.INFO, 'type of self.cardOf %s ' %  type(self.cartdb))
+                self.add(product, quantitee)
+                resp['status'] = "OK of ajouter dans panier = %s  " % (product)
+                messages.add_message(self.request, messages.INFO, 'type of self.cardOf {}'
+                                     .format(type(self.cartdb)))
             else:
-                messages.add_message(self.request, messages.INFO, '%s  Article existe deja ! code of=' % product_id)
-                resp['status'] = '%s  Article existe deja ! code of=' % product_id
+                messages.add_message(self.request, messages.INFO, '{} Article existe deja#='
+                                     .format(product))
+                resp['status'] = '{}  Article existe deja ! code of='.foramt(product)
         except Exception as err:
-            messages.add_message(self.request, messages.INFO, 'Erreur add product err = %s ' %  err)
-            messages.add_message(self.request, messages.INFO, 'type of self.cardOf %s ' %  type(self.cartdb))
+            messages.add_message(self.request, messages.INFO, 'Erreur add product {} err={}'
+                                 .format(product, err))
             resp['status'] = "KO error=%s  " % (str(err))
 
         return resp

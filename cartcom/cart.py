@@ -61,20 +61,17 @@ class Cart(object):
         messages.add_message(self.request, messages.INFO, 'On crée un panier {}'.format(cart.id))
         return cart
 
-    def add(self, product, unit_price, quantity=1):
-        try:
-            item = ItemArticle.objects.get(cart=self.cartdb, product=product)
-        except ItemArticle.DoesNotExist:
-            item = ItemArticle()
-            item.cart = self.cartdb
-            item.product = product
-            item.unit_price = unit_price
-            item.quantity = quantity
-            item.save()
-        else:
-            item.unit_price = unit_price
-            item.quantity += int(quantity)
-            item.save()
+    def add(self, product, quantity=1):
+        item = ItemArticle(
+        content_object = product, 
+        object_id = product.pk,
+        cart = self.cartdb,
+        )
+        ## item.set_product(product)
+        messages.add_message(self.request, messages.INFO, '### try in add  {} ###'.format(product.id))
+        item.unit_price = product.unit_price
+        item.quantity = quantity
+        item.save()
 
     def remove(self, product):
         try:
@@ -157,9 +154,10 @@ class CartDevis(Cart):
 
     def is_product_exist_incart(self, product):
         # messages.add_message(self.request, messages.INFO, 'type of self.cartdb  = %s ' %  self.cartdb.item_set.all())
-        for item in self.cartdb.itemarticle_set.all():
-            if item.product.pk == product:
-                return True
+        if type(self.cartdb ) == models.CartOf:
+            for item in self.cartdb.cart_items.all():
+                if item.product.pk == product.id:
+                    return True
         return False
 def create_cart_in_database( creation_date=datetime.datetime.now(), checked_out=False):
     """

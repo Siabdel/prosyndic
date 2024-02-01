@@ -62,16 +62,24 @@ class Cart(object):
         return cart
 
     def add(self, product, quantity=1):
-        item = ItemArticle(
-        content_object = product, 
-        object_id = product.pk,
-        cart = self.cartdb,
-        )
-        ## item.set_product(product)
-        messages.add_message(self.request, messages.INFO, '### try in add  {} ###'.format(product.id))
-        item.unit_price = product.unit_price
-        item.quantity = quantity
-        item.save()
+        
+        try:
+            ## item = ItemArticle.objects.filter(cart=self.cartdb, product=product )
+            item = ItemArticle.objects.get_by_product(product)
+            
+        except ItemArticle.DoesNotExist:
+            item = ItemArticle()
+            item.cart = self.cartdb
+            item.unit_price = product.unit_price
+            item.quantity = quantity
+            item.content_object = product
+            item.object_id = product.pk
+            messages.add_message(self.request, messages.INFO, '### try in add  {} ###'.format(product.id))
+            item.save()
+        else:
+            item.unit_price = product.unit_price
+            item.quantity += int(quantity)
+            item.save()
 
     def remove(self, product):
         try:

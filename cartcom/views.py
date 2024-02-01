@@ -311,7 +311,7 @@ class ListItemCartView(ListView, e_cart.CartDevis):
         context = super(ListItemCartView, self).get_context_data(**kwargs)
         # init panier Cart
         e_cart.Cart.__init__(self, self.request)
-        messages.add_message(self.request, messages.INFO, 'in get_context_data cartdb= %s' % self.cartdb)
+        ## messages.add_message(self.request, messages.INFO, 'in get_context_data cartdb= %s' % self.cartdb)
         
         # context['object_list'] = self.get_items_cart()
         context['products'] = cart_models.Product.objects.all()
@@ -328,14 +328,9 @@ class ListItemCartView(ListView, e_cart.CartDevis):
         action = kwargs.get('action', 'listitem')
         
         product_id = kwargs.get('product_id',)
-        messages.add_message(self.request, messages.INFO, '## in get = {} ##'.format(product_id))
+        ## messages.add_message(self.request, messages.INFO, '## in get = {} ##'.format(product_id))
         product = get_object_or_404(cart_models.Product, pk=product_id)
-
         quantitee = kwargs.get('quantitee', 1)
-        messages.add_message(self.request, messages.INFO, 
-                             "get action={} product_id={} cartdb={}"
-                             .format(action, product_id, self.cartdb))
-
 
         if action == "listitem":
             context = self.get_context_data(**kwargs)
@@ -346,7 +341,7 @@ class ListItemCartView(ListView, e_cart.CartDevis):
         elif action == "additem" and product_id:
             # ajout of dans panier
             data = self.add_item_of_incart(product, quantitee)
-            messages.add_message(self.request, messages.INFO, 'add item in cart= %s' % self.cartdb)
+            ## messages.add_message(self.request, messages.INFO, 'add item in cart= %s' % self.cartdb)
 
         elif action == "delitem":
             item_id = kwargs.get('element_id')
@@ -432,16 +427,10 @@ class ListItemCartView(ListView, e_cart.CartDevis):
     def add_item_of_incart(self, product, quantitee=1):
         resp = {}
         try:
-            if not self.is_product_exist_incart(product):
-                # on ajoute dans panier
-                self.add(product, quantitee)
-                resp['status'] = "OK of ajouter dans panier = %s  " % (product)
-                messages.add_message(self.request, messages.INFO, 'type of self.cardOf {}'
-                                     .format(type(self.cartdb)))
-            else:
-                messages.add_message(self.request, messages.INFO, '{} Article existe deja#='
-                                     .format(product))
-                resp['status'] = '{}  Article existe deja ! code of='.foramt(product)
+            ## if not self.is_product_exist_incart(product):
+            # on ajoute dans panier
+            self.add(product, quantitee)
+            resp['status'] = "OK of ajouter dans panier = {}".format(product)
         except Exception as err:
             messages.add_message(self.request, messages.INFO, 'Erreur add product {} err={}'
                                  .format(product, err))

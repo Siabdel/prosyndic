@@ -119,12 +119,13 @@ class ItemArticle(models.Model):
     @product.setter
     def set_product(self, value):
         self.content_type = ContentType.objects.get_for_model(type(value))
+        self.content_object = value 
         self.object_id = value.product.pk 
     
     product = property(get_product, set_product) 
     
     def __str__(self):
-        return "itemArticle : {}".format(self.product.titre)
+        return "itemArticle : {}".format(self.product.name)
 
 # ------------------------------------
 # -- Abstarct Service & Produits
